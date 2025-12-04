@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.turbo/
+.cache/
+.vite/
+.nuxt/
+.svelte-kit/
+coverage/
+
+# Logs
+logs
+*.log
+*.log.*
+pnpm-debug.log*
+npm-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env*.example
+
+# TypeScript
+*.tsbuildinfo
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing and tooling
+cypress/screenshots/
+cypress/videos/
+.eslintcache
+
+# Go
+bin/
+*.exe
+*.test
+*.out
+tmp/
+
+# Package archives
+*.tgz

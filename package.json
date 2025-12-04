@@ -1,0 +1,22 @@
+{
+  "name": "mono-repo",
+  "version": "1.0.0",
+  "description": "Multi-Framework Monorepo with Next.js 16, Express, and Gin",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "web": "pnpm --filter @mono-repo/web dev",
+    "node": "pnpm --filter @mono-repo/backend-node dev",
+    "go": "cd apps/backend-go && go run main.go"
+  },
+  "keywords": ["monorepo", "nextjs", "express", "gin", "typescript", "golang"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.17.1",
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  }
+}
