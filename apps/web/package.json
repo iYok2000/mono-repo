@@ -9,16 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@mono-repo/shared-types": "workspace:*",
     "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "@mono-repo/shared-types": "workspace:*"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/xlsx": "^0.0.36",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "tailwindcss": "^4",
