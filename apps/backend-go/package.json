@@ -1,0 +1,11 @@
+{
+  "name": "@mono-repo/backend-go",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "go run cmd/server/main.go",
+    "build": "go build -o bin/server cmd/server/main.go",
+    "proto": "make proto",
+    "clean": "make clean"
+  }
+}

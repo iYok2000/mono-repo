@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package greeter;
+
+option go_package = "monorepo/backend-go/proto/greeter";
+
+service GreeterService {
+    rpc SayHello (HelloRequest) returns (HelloResponse) {}
+
+    rpc SayHelloStream (HelloRequest) returns (stream HelloResponse) {}
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloResponse {
+    string message = 1;
+    int64 timestamp = 2;
+}
+

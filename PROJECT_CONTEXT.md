@@ -75,6 +75,7 @@ project_context/
 
 - 📄 [Installation Guide](./project_context/installation-guide.md) - Complete setup guide for Next.js 16 + Express + Gin monorepo
 - 📄 [Next.js 16 Setup](./project_context/nextjs-setup.md) - Frontend configuration and implementation details
+- 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
 
 ---
 
