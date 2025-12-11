@@ -48,6 +48,27 @@ As an AI agent for this project, you MUST:
 - **Comments**: Brief, descriptive only where needed - not everything
 - **Code length**: Keep functions and files manageable
 
+### Module Structure & Imports
+
+- **NO circular dependencies**: NEVER create import cycles (A imports B, B imports A)
+- **Type definitions location**: Place shared types/interfaces in dedicated type modules
+- **Import direction**: Always import from type modules, never re-export from service modules back to types
+- **Example of WRONG approach**:
+  ```typescript
+  // ❌ BAD: Circular dependency
+  // exportService.ts exports VocExportData
+  // types/data.ts: export type { VocExportData } from '../../exportService'
+  // exportService.ts: import { ... } from './export/types'
+  // Result: exportService → types → exportService (LOOP!)
+  ```
+- **Example of CORRECT approach**:
+  ```typescript
+  // ✅ GOOD: One-way import
+  // types/data.ts: export interface VocExportData { ... }
+  // exportService.ts: import type { VocExportData } from './export/types'
+  // Result: exportService → types (NO LOOP)
+  ```
+
 ## 🚫 Strict Rules (NEVER Break These)
 
 1. **NO file deletion** unless explicitly instructed

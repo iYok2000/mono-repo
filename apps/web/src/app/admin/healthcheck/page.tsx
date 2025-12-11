@@ -1,0 +1,25 @@
+"use client";
+
+import { HealthDashboard } from "@/components/health/HealthDashboard";
+
+export default function HealthcheckPage() {
+  return (
+    <main className="min-h-screen bg-[var(--background)] px-6 py-12 font-sans text-[var(--foreground)]">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <header className="flex flex-col gap-2">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">
+            Admin / Observability
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
+            Service Health Dashboard
+          </h1>
+          <p className="text-sm text-[var(--color-muted)]">
+            ตรวจสอบสถานะ, latency และ endpoint ของบริการ Node และ Go พร้อมปุ่มรีเฟรชแบบเรียลไทม์
+          </p>
+        </header>
+
+        <HealthDashboard />
+      </div>
+    </main>
+  );
+}

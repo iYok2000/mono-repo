@@ -5,8 +5,8 @@
 ## 📖 Project Overview
 
 **Project Name**: Multi-Framework Monorepo
-**Type**: Monorepo (Next.js 16 + Node.js + Golang)
-**Purpose**: Full-stack application with Next.js frontend and dual backend services (Express + Gin)
+**Type**: Monorepo (Next.js 16 + Golang)
+**Purpose**: Full-stack application with Next.js frontend and Golang backend (Gin)
 
 ---
 
@@ -39,22 +39,12 @@ project_context/
 
 ```
 - apps/web (Next.js 16 + TypeScript)
-- apps/backend-node (Express + TypeScript)
 - apps/backend-go (Golang + Gin Framework)
-- packages/shared-types (TypeScript interfaces)
 ```
-
-### Shared Types Package
-
-**Why**: Ensure type safety between frontend and Node backend  
-**How**: TypeScript interfaces in `packages/shared-types`  
-**Usage**: Import via `@mono-repo/shared-types` using workspace protocol
-**Notes**: Only TypeScript apps (web, backend-node) can use this
 
 **Package Names**:
 - `@mono-repo/web` - Next.js 16 frontend
-- `@mono-repo/backend-node` - Express backend
-- `@mono-repo/shared-types` - Shared TypeScript types
+- `@mono-repo/backend-go` - Golang Gin backend (separate Go module)
 
 ---
 
@@ -73,9 +63,10 @@ project_context/
 
 **Current Features**:
 
-- 📄 [Installation Guide](./project_context/installation-guide.md) - Complete setup guide for Next.js 16 + Express + Gin monorepo
+- 📄 [Installation Guide](./project_context/installation-guide.md) - Complete setup guide for Next.js 16 + Gin monorepo
 - 📄 [Next.js 16 Setup](./project_context/nextjs-setup.md) - Frontend configuration and implementation details
 - 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
+- 📄 [Data Export Feature](./project_context/data-export.md) - CSV export functionality with RFC 4180 compliance, type safety, and accessibility support
 
 ---
 
@@ -94,14 +85,14 @@ For simple features that don't need full documentation:
 
 ### API Communication
 
-**Pattern**: RESTful API
+**Pattern**: RESTful API + gRPC
 **Ports**:
 
 - Next.js (Frontend): 3000
-- Backend Node (Express): 3001
-- Backend Go (Gin): 8080 (default) or 3002
+- Backend Go (Gin HTTP): 8080
+- Backend Go (gRPC): 50051
 
-**CORS**: Configured in both backend services to allow frontend origin
+**CORS**: Configured in Gin backend to allow frontend origin
 
 ### Error Handling
 
@@ -122,9 +113,9 @@ For simple features that don't need full documentation:
 | Package    | Purpose            | Chosen Because                           |
 | ---------- | ------------------ | ---------------------------------------- |
 | Next.js 16 | Frontend Framework | React framework with SSR, App Router     |
-| Express    | Node.js API        | Industry standard, flexible, middleware  |
 | Gin        | Go Web Framework   | High performance, minimal, easy to use   |
-| TypeScript | Type Safety        | Shared types between Next.js and Node.js |
+| gRPC       | Backend Protocol   | High-performance RPC framework           |
+| TypeScript | Type Safety        | Frontend type safety and tooling         |
 | pnpm       | Package Manager    | Fast, efficient, monorepo support        |
 | Turborepo  | Build System       | Fast builds, caching, parallel execution |
 
@@ -137,14 +128,13 @@ For simple features that don't need full documentation:
 - **Run all services**: `pnpm dev` (uses Turborepo)
 - **Run individually**:
   - Next.js: `pnpm web`
-  - Express: `pnpm node`
   - Gin: `pnpm go`
 - Hot reload enabled for all services
 
 **Ports**:
 - Next.js: http://localhost:3000
-- Express: http://localhost:3001
-- Gin: http://localhost:8080
+- Gin HTTP: http://localhost:8080
+- Gin gRPC: localhost:50051
 
 **Production**: [To be documented]
 
@@ -154,26 +144,27 @@ For simple features that don't need full documentation:
 
 ### Known Issues
 
-- Backend services (Express & Gin) are not yet implemented
-- Shared types package needs to be created
+- Template Gallery system is in progress (Phase 1 completed)
+- Database integration not yet implemented
 
 ### Future Improvements
 
-- Implement Express backend with basic REST API
-- Implement Gin backend with basic REST API
-- Create shared-types package with common interfaces
-- Setup Docker for containerization
-- Add database integration (PostgreSQL/MongoDB)
+- Complete Template Gallery (Phases 2-6)
+- Add PostgreSQL database integration
 - Implement authentication system
+- Setup Docker for containerization
+- Add more backend API endpoints
+- Integrate frontend with Gin/gRPC backend
 
 ### Important Reminders
 
-- **Next.js 16 is now installed** in `apps/web/`
-- Always use `@mono-repo/[package-name]` for imports
+- **Next.js 16** with App Router in `apps/web/`
+- **Golang Gin + gRPC** backend in `apps/backend-go/`
+- **Template Gallery** foundation complete (Phase 1: Types, UI, Services, Mock Data)
 - Run `pnpm install` at root after adding new dependencies
-- Backend services need to be created manually
+- Use TypeScript strict mode for type safety
 
 ---
 
-**Last Updated**: 2025-12-04
-**Updated By**: AI Agent (Claude) - Updated architecture to Next.js 16 + Express + Gin
+**Last Updated**: 2025-12-11
+**Updated By**: AI Agent (Claude) - Removed backend-node, Template Gallery Phase 1 completed

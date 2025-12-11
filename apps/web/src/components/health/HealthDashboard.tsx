@@ -8,23 +8,23 @@ export const HealthDashboard = () => {
   const { data, loading, error, refresh } = useHealthChecks();
 
   return (
-    <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <section className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm text-[var(--foreground)]">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">
             Service Health
           </p>
-          <h2 className="text-2xl font-bold tracking-tight text-zinc-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
             Status dashboard
           </h2>
-          <p className="text-sm text-zinc-600">
+          <p className="text-sm text-[var(--color-muted)]">
             Node / Go services with live status, latency, and endpoints.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => refresh()}
-            className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800"
+            className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--background)] transition hover:opacity-90"
           >
             Refresh
           </button>

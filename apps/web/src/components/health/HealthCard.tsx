@@ -8,12 +8,14 @@ type Props = {
 const statusStyle = (status: ServiceHealth["status"]) => {
   if (status === "healthy") {
     return {
-      chip: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      chip:
+        "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-100 dark:border-emerald-800",
       dot: "bg-emerald-500",
     };
   }
   return {
-    chip: "bg-red-100 text-red-700 border-red-200",
+    chip:
+      "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-100 dark:border-red-800",
     dot: "bg-red-500",
   };
 };
@@ -22,11 +24,13 @@ export function HealthCard({ health }: Props) {
   const styles = statusStyle(health.status);
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm text-[var(--foreground)]">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-zinc-500">Service</p>
-          <h2 className="text-lg font-semibold text-zinc-900">
+          <p className="text-sm font-medium text-[var(--color-muted)]">
+            Service
+          </p>
+          <h2 className="text-lg font-semibold text-[var(--foreground)]">
             {health.name}
           </h2>
         </div>
@@ -41,28 +45,34 @@ export function HealthCard({ health }: Props) {
         </span>
       </div>
 
-      <p className="mt-3 text-sm text-zinc-700">{health.description}</p>
+      <p className="mt-3 text-sm text-[var(--color-muted)]">
+        {health.description}
+      </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-zinc-600">
+      <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-[var(--color-muted)]">
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-wide text-zinc-500">Ping</p>
-          <p className="font-medium text-zinc-900">
+          <p className="text-xs uppercase tracking-wide text-[var(--color-muted)]">
+            Ping
+          </p>
+          <p className="font-medium text-[var(--foreground)]">
             {health.latencyMs ? `${health.latencyMs} ms` : "n/a"}
           </p>
         </div>
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-wide text-zinc-500">
+          <p className="text-xs uppercase tracking-wide text-[var(--color-muted)]">
             Checked at
           </p>
-          <p className="font-medium text-zinc-900">
+          <p className="font-medium text-[var(--foreground)]">
             {new Date(health.checkedAt).toLocaleTimeString()}
           </p>
         </div>
         <div className="col-span-2 space-y-1">
-          <p className="text-xs uppercase tracking-wide text-zinc-500">
+          <p className="text-xs uppercase tracking-wide text-[var(--color-muted)]">
             Endpoint
           </p>
-          <p className="font-mono text-xs text-zinc-700">{health.endpoint}</p>
+          <p className="font-mono text-xs text-[var(--color-muted)]">
+            {health.endpoint}
+          </p>
         </div>
       </div>
     </div>

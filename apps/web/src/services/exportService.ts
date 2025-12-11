@@ -1,75 +1,78 @@
-import { utils, write } from "xlsx";
+import type { VocExportData } from './export/types';
 
-export type ExportFormat = "csv" | "xlsx";
-export type VocRow = Record<string, unknown>;
-
-const deriveColumns = (rows: VocRow[]) => {
-  const seen: string[] = [];
+const deriveColumns = (rows: VocExportData[]): string[] => {
+  const columnSet = new Set<string>();
   rows.forEach((row) => {
-    Object.keys(row).forEach((k) => {
-      if (!seen.includes(k)) seen.push(k);
-    });
+    Object.keys(row).forEach((key) => columnSet.add(key));
   });
-  return seen;
+  return Array.from(columnSet);
 };
 
-const jsonToCsv = (rows: VocRow[], columns: string[]) => {
-  const esc = (v: unknown) => {
-    if (v === null || v === undefined) return "";
-    const s =
-      typeof v === "string"
-        ? v
-        : typeof v === "number" || typeof v === "boolean"
-        ? String(v)
-        : JSON.stringify(v);
-    const needsQuotes = /[",\n]/.test(s);
-    const escaped = s.replace(/"/g, '""');
-    return needsQuotes ? `"${escaped}"` : escaped;
-  };
+const escapeCsvValue = (value: unknown): string => {
+  if (value === null || value === undefined) return "";
+
+  const stringValue =
+    typeof value === "string"
+      ? value
+      : typeof value === "number" || typeof value === "boolean"
+      ? String(value)
+      : JSON.stringify(value);
+
+  const needsQuotes = /[",\n]/.test(stringValue);
+  const escaped = stringValue.replace(/"/g, '""');
+
+  return needsQuotes ? `"${escaped}"` : escaped;
+};
+
+const jsonToCsv = (rows: VocExportData[], columns: string[]): string => {
   const header = columns.join(",");
-  const lines = rows.map((r) => columns.map((c) => esc(r[c])).join(","));
+  const lines = rows.map((row) =>
+    columns.map((col) => escapeCsvValue(row[col as keyof VocExportData])).join(",")
+  );
   return [header, ...lines].join("\n");
 };
 
-const jsonToXlsx = (rows: VocRow[], columns: string[]) => {
-  const sheet = utils.json_to_sheet(rows, { header: columns });
-  const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, sheet, "Export");
-  const buffer = write(workbook, { bookType: "xlsx", type: "array" });
-  return new Blob([buffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
-};
-
-const downloadBlob = (blob: Blob, filename: string) => {
+const downloadBlob = (blob: Blob, filename: string): void => {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
   URL.revokeObjectURL(url);
 };
 
-const makeFilename = (fmt: ExportFormat) =>
-  `export-${new Date().toISOString().slice(0, 10)}.${fmt}`;
+const generateFilename = (customName?: string): string => {
+  const date = new Date().toISOString().slice(0, 10);
+  return customName || `export-${date}.csv`;
+};
 
-export const exportFromRows = (format: ExportFormat, rows: VocRow[]) => {
+export const exportToCsv = (
+  rows: VocExportData[],
+  filename?: string
+): void => {
   if (!Array.isArray(rows) || rows.length === 0) {
     throw new Error("No data to export");
   }
+
   const columns = deriveColumns(rows);
+  const csvContent = jsonToCsv(rows, columns);
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-  if (format === "csv") {
-    const csv = jsonToCsv(rows, columns);
-    downloadBlob(
-      new Blob([csv], { type: "text/csv;charset=utf-8;" }),
-      makeFilename("csv")
-    );
-    return;
-  }
-
-  downloadBlob(jsonToXlsx(rows, columns), makeFilename("xlsx"));
+  downloadBlob(blob, generateFilename(filename));
 };
+
+export { ExportType } from './export/types';
+
+export type {
+  VocExportData,
+  ExportConfig,
+  ExportOptions,
+  ColumnConfig,
+  ExportTypeDataMap,
+} from './export/types';
+
+export { exportWithType, exportConfigRegistry } from './export';
+export { vocDetailsConfig } from './export/configs';
