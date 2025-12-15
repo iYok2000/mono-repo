@@ -1,67 +1,25 @@
-/**
- * CopyButton Component
- *
- * Button for copying text to clipboard with visual feedback.
- * Uses modern Clipboard API with fallback.
- *
- * Security:
- * - Uses secure Clipboard API (requires HTTPS or localhost)
- * - Content is not modified before copying (no XSS vector)
- * - Validates clipboard permissions
- *
- * Accessibility: Clear visual and text feedback for screen readers.
- */
-
 "use client";
 
 import { useState, useCallback } from "react";
 import { cx } from "@/lib/cx";
 
 export interface CopyButtonProps {
-  /** Text to copy to clipboard */
   text: string;
-
-  /** Button label when idle */
   label?: string;
-
-  /** Button label when copied */
   copiedLabel?: string;
-
-  /** Duration to show "copied" state (ms) */
   copiedDuration?: number;
-
-  /** Button size */
   size?: "sm" | "md" | "lg";
-
-  /** Custom className */
   className?: string;
-
-  /** Callback when copy succeeds */
   onCopy?: () => void;
-
-  /** Callback when copy fails */
   onError?: (error: Error) => void;
 }
 
-/**
- * Copy text to clipboard using modern API with fallback
- *
- * Security: Uses navigator.clipboard.writeText which is secure.
- * Falls back to document.execCommand for older browsers.
- */
 const copyToClipboard = async (text: string): Promise<void> => {
-  // Modern Clipboard API (preferred)
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return;
-    } catch (err) {
-      // Fall through to fallback
-      console.warn("Clipboard API failed, using fallback:", err);
-    }
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
   }
 
-  // Fallback for older browsers
   const textArea = document.createElement("textarea");
   textArea.value = text;
   textArea.style.position = "fixed";
@@ -72,7 +30,7 @@ const copyToClipboard = async (text: string): Promise<void> => {
 
   try {
     textArea.select();
-    const successful = document.execCommand('copy');
+    const successful = document.execCommand("copy");
     if (!successful) {
       throw new Error("execCommand copy failed");
     }
@@ -81,19 +39,6 @@ const copyToClipboard = async (text: string): Promise<void> => {
   }
 };
 
-/**
- * CopyButton Component
- *
- * @example
- * <CopyButton text={codeString} label="Copy Code" />
- *
- * @example
- * <CopyButton
- *   text={configCode}
- *   size="sm"
- *   onCopy={() => console.log('Copied!')}
- * />
- */
 export const CopyButton = ({
   text,
   label = "Copy",
@@ -114,7 +59,6 @@ export const CopyButton = ({
       setCopied(true);
       onCopy?.();
 
-      // Reset copied state after duration
       setTimeout(() => {
         setCopied(false);
       }, copiedDuration);
@@ -123,7 +67,6 @@ export const CopyButton = ({
       setError(errorMessage);
       onError?.(err instanceof Error ? err : new Error(errorMessage));
 
-      // Clear error after duration
       setTimeout(() => {
         setError(null);
       }, copiedDuration);
@@ -143,29 +86,19 @@ export const CopyButton = ({
       aria-label={copied ? copiedLabel : label}
       aria-live="polite"
       className={cx(
-        // Base styles
         "inline-flex items-center gap-2 rounded-lg border font-semibold transition-all",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
-
-        // State styles
         copied
           ? "border-emerald-300 bg-emerald-50 text-emerald-800"
           : error
           ? "border-red-300 bg-red-50 text-red-800"
           : "border-[var(--color-border)] bg-[var(--color-button)] text-[var(--foreground)] hover:bg-[var(--color-surface)]",
-
-        // Disabled state
-        copied && 'cursor-default',
-
-        // Size
+        copied && "cursor-default",
         sizeClasses[size],
-
-        // Custom className
         className
       )}
       type="button"
     >
-      {/* Icon */}
       {copied ? (
         <svg
           className="h-4 w-4"
@@ -206,8 +139,6 @@ export const CopyButton = ({
           <path d="M4.5 6A1.5 1.5 0 003 7.5v9A1.5 1.5 0 004.5 18h7a1.5 1.5 0 001.5-1.5v-5.879a1.5 1.5 0 00-.44-1.06L9.44 6.439A1.5 1.5 0 008.378 6H4.5z" />
         </svg>
       )}
-
-      {/* Label */}
       <span>{copied ? copiedLabel : error ? "Error" : label}</span>
     </button>
   );

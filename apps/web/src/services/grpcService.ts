@@ -75,7 +75,6 @@ export const callSayHelloStream = async (
             const parsed = JSON.parse(data) as GRPCResponse;
             onMessage(parsed);
           } catch {
-            // Ignore malformed JSON
           }
         }
       }

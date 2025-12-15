@@ -1,67 +1,25 @@
-/**
- * Tabs Component
- *
- * Accessible tab navigation component.
- * Follows WAI-ARIA tabs pattern for keyboard navigation.
- *
- * Security: Type-safe tab definitions prevent XSS.
- * Accessibility: Full keyboard navigation (Arrow keys, Home, End).
- */
-
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { cx } from "@/lib/cx";
 
 export interface Tab {
-  /** Unique identifier */
   id: string;
-
-  /** Display label */
   label: string;
-
-  /** Tab content */
   content: React.ReactNode;
-
-  /** Is tab disabled? */
   disabled?: boolean;
-
-  /** Optional icon */
   icon?: React.ReactNode;
-
-  /** Optional badge (e.g., count) */
   badge?: React.ReactNode;
 }
 
 export interface TabsProps {
-  /** Array of tabs */
   tabs: Tab[];
-
-  /** Default active tab ID */
   defaultTab?: string;
-
-  /** Controlled active tab ID */
   activeTab?: string;
-
-  /** Callback when tab changes */
   onChange?: (tabId: string) => void;
-
-  /** Custom className for container */
   className?: string;
 }
 
-/**
- * Tabs Component with keyboard navigation
- *
- * @example
- * <Tabs
- *   tabs={[
- *     { id: 'demo', label: 'Demo', content: <DemoComponent /> },
- *     { id: 'code', label: 'Code', content: <CodeViewer /> },
- *   ]}
- *   defaultTab="demo"
- * />
- */
 export const Tabs = ({
   tabs,
   defaultTab,
@@ -69,7 +27,6 @@ export const Tabs = ({
   onChange,
   className,
 }: TabsProps) => {
-  // Determine if controlled or uncontrolled
   const isControlled = controlledActiveTab !== undefined;
   const [internalActiveTab, setInternalActiveTab] = useState(
     defaultTab || tabs[0]?.id || ""
@@ -78,16 +35,12 @@ export const Tabs = ({
   const activeTab = isControlled ? controlledActiveTab : internalActiveTab;
   const tabRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
-  // Update internal state if controlled value changes
   useEffect(() => {
     if (isControlled && controlledActiveTab) {
       setInternalActiveTab(controlledActiveTab);
     }
   }, [isControlled, controlledActiveTab]);
 
-  /**
-   * Handle tab change with validation
-   */
   const handleTabChange = useCallback(
     (tabId: string) => {
       const tab = tabs.find((t) => t.id === tabId);
@@ -101,9 +54,6 @@ export const Tabs = ({
     [tabs, isControlled, onChange]
   );
 
-  /**
-   * Keyboard navigation handler
-   */
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, currentTabId: string) => {
       const enabledTabs = tabs.filter((t) => !t.disabled);
@@ -112,21 +62,23 @@ export const Tabs = ({
       let targetTab: Tab | undefined;
 
       switch (event.key) {
-        case 'ArrowLeft':
-        case 'ArrowUp':
+        case "ArrowLeft":
+        case "ArrowUp":
           event.preventDefault();
-          targetTab = enabledTabs[currentIndex - 1] || enabledTabs[enabledTabs.length - 1];
+          targetTab =
+            enabledTabs[currentIndex - 1] ||
+            enabledTabs[enabledTabs.length - 1];
           break;
-        case 'ArrowRight':
-        case 'ArrowDown':
+        case "ArrowRight":
+        case "ArrowDown":
           event.preventDefault();
           targetTab = enabledTabs[currentIndex + 1] || enabledTabs[0];
           break;
-        case 'Home':
+        case "Home":
           event.preventDefault();
           targetTab = enabledTabs[0];
           break;
-        case 'End':
+        case "End":
           event.preventDefault();
           targetTab = enabledTabs[enabledTabs.length - 1];
           break;
@@ -146,11 +98,10 @@ export const Tabs = ({
 
   return (
     <div className={cx("w-full", className)}>
-      {/* Tab List */}
       <div
         role="tablist"
         aria-label="Content tabs"
-        className="flex gap-2 border-b border-[var(--color-border)]"
+        className="flex gap-2 border-b border-(--color-border)"
       >
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
@@ -171,16 +122,11 @@ export const Tabs = ({
               onClick={() => handleTabChange(tab.id)}
               onKeyDown={(e) => handleKeyDown(e, tab.id)}
               className={cx(
-                // Base styles
                 "inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
-
-                // Active state
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary) focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 isActive
-                  ? "border-[var(--color-primary)] text-[var(--foreground)]"
-                  : "border-transparent text-[var(--color-muted)] hover:text-[var(--foreground)]",
-
-                // Disabled state
+                  ? "border-(--color-primary) text-foreground"
+                  : "border-transparent text-(--color-muted) hover:text-foreground",
                 tab.disabled && "cursor-not-allowed opacity-50"
               )}
             >
@@ -192,7 +138,6 @@ export const Tabs = ({
         })}
       </div>
 
-      {/* Tab Panels */}
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
 

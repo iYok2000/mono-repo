@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { memo } from "react";
 import ThemeSwitchToggle from "../troggle/themeSwitchTroggle";
-import ActionButton from "./ActionButton";
+import { ActionButton } from "../ui/ActionButton";
 
 const navLinks = [
   { name: "Dev Toolkit", href: "/dev-toolkit" },

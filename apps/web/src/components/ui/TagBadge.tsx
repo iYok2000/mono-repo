@@ -10,9 +10,16 @@ export const TagBadge = ({ tag }: Props) => {
   const Icon = meta.icon;
 
   return (
-    <Badge variant="outline" size="sm" className="gap-1">
-      {Icon && <Icon className="h-3.5 w-3.5" />}
-      {meta.label}
+    <Badge
+      variant="outline"
+      size="sm"
+      className={Icon ? "px-2 py-1" : "gap-1"}
+    >
+      {Icon ? (
+        <Icon className="h-4 w-4" aria-label={meta.label} />
+      ) : (
+        meta.label
+      )}
     </Badge>
   );
 };

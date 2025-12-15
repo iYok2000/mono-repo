@@ -33,22 +33,17 @@ export abstract class BaseService<TProps extends ServiceProps = ServiceProps> {
   abstract readonly defaultProps: TProps;
   abstract readonly propsSchema: PropSchema[];
 
-  // 1. REQUIRED: Live Preview
   abstract renderPreview(props: TProps): ReactNode;
 
-  // 2. REQUIRED: Code Snippets (minimum 2 panels)
   abstract getCodePanels(): CodePanel[];
 
-  // 3. REQUIRED: Custom UI Controls (different per service)
   abstract renderControls(
     props: TProps,
     onChange: (newProps: TProps) => void
   ): ReactNode;
 
-  // 4. REQUIRED: How to Use
   abstract getHowToUse(): string;
 
-  // 5. REQUIRED: Dependencies + Metadata
   abstract readonly dependencies: Dependency[];
   abstract readonly lastUpdated: string;
 

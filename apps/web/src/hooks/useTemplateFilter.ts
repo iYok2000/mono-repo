@@ -1,72 +1,29 @@
-/**
- * useTemplateFilter Hook
- *
- * React hook for managing template filter state and logic.
- * Handles category, tags, and search filtering.
- *
- * Security: All filtering uses validated service layer methods.
- */
+"use client";
 
-'use client';
-
-import { useState, useMemo, useCallback } from 'react';
-import type { Template, TemplateCategory, TemplateTag } from '@/types/template';
-import { filterTemplates, getTemplateStats } from '@/services/templateService';
+import { useState, useMemo, useCallback } from "react";
+import type { Template, TemplateCategory, TemplateTag } from "@/types/template";
+import { filterTemplates } from "@/services/templateService";
 
 export interface UseTemplateFilterOptions {
-  /** Initial templates to filter */
   templates: Template[];
-
-  /** Initial category filter */
   initialCategory?: TemplateCategory;
-
-  /** Initial tags filter */
   initialTags?: TemplateTag[];
-
-  /** Initial search query */
   initialSearchQuery?: string;
 }
 
-/**
- * Hook for template filtering with state management
- *
- * @param options - Configuration options
- * @returns Filter state and control functions
- *
- * @example
- * const {
- *   filteredTemplates,
- *   selectedCategory,
- *   selectedTags,
- *   searchQuery,
- *   setCategory,
- *   toggleTag,
- *   setSearchQuery,
- *   clearFilters
- * } = useTemplateFilter({ templates });
- */
 export const useTemplateFilter = (options: UseTemplateFilterOptions) => {
-  const { templates, initialCategory, initialTags = [], initialSearchQuery = '' } = options;
+  const { templates, initialCategory, initialTags = [], initialSearchQuery = "" } = options;
 
-  // Filter state
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | undefined>(
     initialCategory
   );
   const [selectedTags, setSelectedTags] = useState<TemplateTag[]>(initialTags);
   const [searchQuery, setSearchQuery] = useState<string>(initialSearchQuery);
 
-  /**
-   * Set category filter
-   * Pass undefined to clear category filter
-   */
   const setCategory = useCallback((category: TemplateCategory | undefined) => {
     setSelectedCategory(category);
   }, []);
 
-  /**
-   * Toggle tag in filter
-   * Adds if not present, removes if present
-   */
   const toggleTag = useCallback((tag: TemplateTag) => {
     setSelectedTags((prev) => {
       if (prev.includes(tag)) {
@@ -76,9 +33,6 @@ export const useTemplateFilter = (options: UseTemplateFilterOptions) => {
     });
   }, []);
 
-  /**
-   * Add tag to filter
-   */
   const addTag = useCallback((tag: TemplateTag) => {
     setSelectedTags((prev) => {
       if (prev.includes(tag)) return prev;
@@ -86,55 +40,33 @@ export const useTemplateFilter = (options: UseTemplateFilterOptions) => {
     });
   }, []);
 
-  /**
-   * Remove tag from filter
-   */
   const removeTag = useCallback((tag: TemplateTag) => {
     setSelectedTags((prev) => prev.filter((t) => t !== tag));
   }, []);
 
-  /**
-   * Clear all tags
-   */
   const clearTags = useCallback(() => {
     setSelectedTags([]);
   }, []);
 
-  /**
-   * Set search query with sanitization
-   */
   const setSearch = useCallback((query: string) => {
-    // Trim and limit length
     const sanitized = query.trim().slice(0, 100);
     setSearchQuery(sanitized);
   }, []);
 
-  /**
-   * Clear search query
-   */
   const clearSearch = useCallback(() => {
-    setSearchQuery('');
+    setSearchQuery("");
   }, []);
 
-  /**
-   * Clear all filters
-   */
   const clearFilters = useCallback(() => {
     setSelectedCategory(undefined);
     setSelectedTags([]);
-    setSearchQuery('');
+    setSearchQuery("");
   }, []);
 
-  /**
-   * Check if any filters are active
-   */
   const hasActiveFilters = useMemo(() => {
     return Boolean(selectedCategory || selectedTags.length > 0 || searchQuery.trim().length > 0);
   }, [selectedCategory, selectedTags, searchQuery]);
 
-  /**
-   * Get filtered templates using service layer
-   */
   const filteredTemplates = useMemo(() => {
     return filterTemplates({
       category: selectedCategory,
@@ -143,9 +75,6 @@ export const useTemplateFilter = (options: UseTemplateFilterOptions) => {
     });
   }, [selectedCategory, selectedTags, searchQuery]);
 
-  /**
-   * Get statistics for current filter state
-   */
   const stats = useMemo(() => {
     return {
       total: templates.length,
@@ -154,9 +83,6 @@ export const useTemplateFilter = (options: UseTemplateFilterOptions) => {
     };
   }, [templates.length, filteredTemplates.length]);
 
-  /**
-   * Get all available tags from templates
-   */
   const availableTags = useMemo(() => {
     const tagSet = new Set<TemplateTag>();
     templates.forEach((template) => {
@@ -165,9 +91,6 @@ export const useTemplateFilter = (options: UseTemplateFilterOptions) => {
     return Array.from(tagSet).sort();
   }, [templates]);
 
-  /**
-   * Get available categories from templates
-   */
   const availableCategories = useMemo(() => {
     const categorySet = new Set<TemplateCategory>();
     templates.forEach((template) => {
@@ -177,21 +100,14 @@ export const useTemplateFilter = (options: UseTemplateFilterOptions) => {
   }, [templates]);
 
   return {
-    // Filtered data
     filteredTemplates,
     stats,
-
-    // Filter state
     selectedCategory,
     selectedTags,
     searchQuery,
     hasActiveFilters,
-
-    // Available options
     availableTags,
     availableCategories,
-
-    // Control functions
     setCategory,
     toggleTag,
     addTag,

@@ -71,7 +71,7 @@ export const Badge = ({
 
         isInteractive && "cursor-pointer transition-all hover:scale-105",
         isInteractive &&
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary) focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary) focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
 
         className
       )}
@@ -85,7 +85,7 @@ export const Badge = ({
             e.stopPropagation();
             onRemove();
           }}
-          className="ml-0.5 rounded-full hover:bg-(--color-surface-alt) focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--color-primary)"
+          className="ml-0.5 rounded-full hover:bg-(--color-surface-alt) focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-primary)]"
           aria-label="Remove"
           type="button"
         >

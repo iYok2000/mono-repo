@@ -1,44 +1,18 @@
-/**
- * Button Component
- *
- * Reusable button component with multiple variants and sizes.
- * Follows existing Tailwind patterns from the codebase.
- *
- * Security: React auto-escapes all content. Type-safe props prevent misuse.
- * Accessibility: Proper ARIA attributes, keyboard navigation support.
- */
-
 import { cx } from "@/lib/cx";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Visual style variant */
   variant?: ButtonVariant;
-
-  /** Button size */
   size?: ButtonSize;
-
-  /** Is the button in a loading state? */
   loading?: boolean;
-
-  /** Full width button */
   fullWidth?: boolean;
-
-  /** Icon to display before text */
   icon?: React.ReactNode;
-
-  /** Icon to display after text */
   iconAfter?: React.ReactNode;
-
-  /** Children content */
   children: React.ReactNode;
 }
 
-/**
- * Get variant-specific classes
- */
 const getVariantClasses = (variant: ButtonVariant): string => {
   const variants: Record<ButtonVariant, string> = {
     primary:
@@ -53,9 +27,6 @@ const getVariantClasses = (variant: ButtonVariant): string => {
   return variants[variant];
 };
 
-/**
- * Get size-specific classes
- */
 const getSizeClasses = (size: ButtonSize): string => {
   const sizes: Record<ButtonSize, string> = {
     sm: "px-3 py-1.5 text-sm",
@@ -65,19 +36,6 @@ const getSizeClasses = (size: ButtonSize): string => {
   return sizes[size];
 };
 
-/**
- * Reusable Button Component
- *
- * @example
- * <Button variant="primary" onClick={handleClick}>
- *   Click Me
- * </Button>
- *
- * @example
- * <Button variant="outline" loading disabled>
- *   Loading...
- * </Button>
- */
 export const Button = ({
   variant = "primary",
   size = "md",
@@ -98,24 +56,18 @@ export const Button = ({
       aria-busy={loading}
       aria-disabled={isDisabled}
       className={cx(
-        // Base styles
         "inline-flex items-center justify-center gap-2 rounded-2xl border font-semibold transition-all",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
 
-        // Variant styles
         getVariantClasses(variant),
 
-        // Size styles
         getSizeClasses(size),
 
-        // State styles
         isDisabled && "cursor-not-allowed opacity-60",
         !isDisabled && "hover:-translate-y-0.5 hover:shadow-md",
 
-        // Full width
         fullWidth && "w-full",
 
-        // Custom className
         className
       )}
       {...props}
