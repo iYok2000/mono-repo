@@ -4,6 +4,7 @@ import Link from "next/link";
 import { memo } from "react";
 import ThemeSwitchToggle from "../troggle/themeSwitchTroggle";
 import { ActionButton } from "../ui/ActionButton";
+import { DecorativeImage } from "../decorative";
 
 const navLinks = [
   { name: "Dev Toolkit", href: "/dev-toolkit" },
@@ -13,6 +14,7 @@ const navLinks = [
 
 const Header = () => (
   <nav className="sticky top-0 z-50 w-full border-b border-(--color-border) bg-background text-foreground">
+    <DecorativeImage variant="top-center" opacity={0.6} zIndex={0} />
     <div className="mx-auto flex max-w-8xl items-center justify-between px-6 py-4 sm:px-10">
       <div className="flex items-center gap-3 text-lg font-bold tracking-tight">
         <svg

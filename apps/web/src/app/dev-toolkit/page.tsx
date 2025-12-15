@@ -12,14 +12,13 @@ export default function DevToolkitPage() {
     <main className="relative min-h-screen bg-background px-6 py-10 text-foreground">
       <DecorativeImage variant="bottom-left" opacity={0.63} zIndex={0} />
       <DecorativeImage variant="top-right" opacity={0.6} zIndex={0} />
-      <DecorativeImage variant="top-center" opacity={0.6} zIndex={0} />
 
       <div className="relative z-10 mx-auto flex w-full max-w-8xl gap-8">
         <aside className="hidden w-56 shrink-0 md:block">
           <div className="sticky top-28 rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 shadow-sm">
             <DecorativeImage
               variant="decoration"
-              opacity={0.6}
+              opacity={0.72}
               zIndex={0}
               width={100}
               className="absolute -top-1 -right-5"
