@@ -4,18 +4,22 @@ package greeter;
 
 option go_package = "monorepo/backend-go/proto/greeter";
 
+// GreeterService exposes unary and server-streaming greetings over gRPC.
 service GreeterService {
+    // SayHello returns a single greeting for the provided name.
     rpc SayHello (HelloRequest) returns (HelloResponse) {}
 
+    // SayHelloStream streams greeting messages back to the client.
     rpc SayHelloStream (HelloRequest) returns (stream HelloResponse) {}
 }
 
+// HelloRequest carries the name to be greeted.
 message HelloRequest {
     string name = 1;
 }
 
+// HelloResponse contains the greeting message with its timestamp.
 message HelloResponse {
     string message = 1;
     int64 timestamp = 2;
 }
-

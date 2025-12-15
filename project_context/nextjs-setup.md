@@ -99,13 +99,13 @@ Server starts at: http://localhost:3000
 import { ApiResponse } from '@mono-repo/shared-types';
 
 export default async function Home() {
-  // Call Express API
-  const res = await fetch('http://localhost:3001/api/data');
+  // Call Go API (Gin)
+  const res = await fetch('http://localhost:8080/health');
   const data: ApiResponse = await res.json();
 
   return (
     <div>
-      <h1>Data from API: {data.message}</h1>
+      <h1>Backend health: {data.status}</h1>
     </div>
   );
 }
@@ -140,26 +140,21 @@ export function Dashboard({ user, products }: Props) {
 ### Server Component (Default)
 
 ```typescript
-// apps/web/src/app/products/page.tsx
-import { Product } from '@mono-repo/shared-types';
+// apps/web/src/app/health/page.tsx
+import { HealthCheck } from '@mono-repo/shared-types';
 
-async function getProducts(): Promise<Product[]> {
-  const res = await fetch('http://localhost:3001/api/products');
+async function getHealth(): Promise<HealthCheck> {
+  const res = await fetch('http://localhost:8080/health', { next: { revalidate: 0 } });
   return res.json();
 }
 
-export default async function ProductsPage() {
-  const products = await getProducts();
+export default async function HealthPage() {
+  const health = await getHealth();
 
   return (
     <div>
-      <h1>Products</h1>
-      {products.map(product => (
-        <div key={product.id}>
-          <h2>{product.name}</h2>
-          <p>${product.price}</p>
-        </div>
-      ))}
+      <h1>Backend status: {health.status}</h1>
+      <p>Service: {health.service}</p>
     </div>
   );
 }
@@ -249,25 +244,17 @@ export async function GET() {
 
 ### next.config.ts
 
+Current config is minimal. Add rewrites if you want to proxy to Gin (Go) locally:
+
 ```typescript
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable experimental features if needed
-  experimental: {
-    // serverActions: true,
-  },
-
-  // API rewrites for backend proxy (optional)
   async rewrites() {
     return [
       {
-        source: '/api/node/:path*',
-        destination: 'http://localhost:3001/:path*',
-      },
-      {
-        source: '/api/go/:path*',
-        destination: 'http://localhost:8080/:path*',
+        source: "/api/go/:path*",
+        destination: "http://localhost:8080/:path*",
       },
     ];
   },
@@ -352,11 +339,10 @@ export default nextConfig;
 ## Next Steps
 
 1. ✅ Next.js 16 installed and configured
-2. ⏳ Create Express backend (`apps/backend-node`)
-3. ⏳ Create Gin backend (`apps/backend-go`)
-4. ⏳ Create shared-types package (`packages/shared-types`)
-5. ⏳ Build example API integration
-6. ⏳ Setup authentication flow
+2. ✅ Gin backend (`apps/backend-go`)
+3. ⏳ Create shared-types package (`packages/shared-types`)
+4. ⏳ Build example API integration
+5. ⏳ Setup authentication flow
 
 ---
 

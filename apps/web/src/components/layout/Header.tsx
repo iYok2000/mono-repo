@@ -7,14 +7,13 @@ import { ActionButton } from "../ui/ActionButton";
 
 const navLinks = [
   { name: "Dev Toolkit", href: "/dev-toolkit" },
-
   { name: "Projects", href: "/" },
   { name: "Contact", href: "/" },
 ];
 
 const Header = () => (
   <nav className="sticky top-0 z-50 w-full border-b border-(--color-border) bg-background text-foreground">
-    <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-10">
+    <div className="mx-auto flex max-w-8xl items-center justify-between px-6 py-4 sm:px-10">
       <div className="flex items-center gap-3 text-lg font-bold tracking-tight">
         <svg
           className="h-5 w-5 text-(--color-primary)"

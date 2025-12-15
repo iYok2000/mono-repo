@@ -1,6 +1,6 @@
 # Installation Guide
 
-> Step-by-step guide to setup the monorepo with Next.js 16, Express, and Gin
+> Step-by-step guide to setup the monorepo with Next.js 16 and Gin (Express backend was removed)
 
 ---
 
@@ -9,7 +9,7 @@
 Before starting, ensure you have the following installed:
 
 ### Required:
-- **Node.js** 18+ (for Next.js 16 and Express)
+- **Node.js** 18+ (for Next.js 16 frontend)
 - **Go** 1.23+ (for Gin framework)
 - **pnpm** 8+ (package manager)
 
@@ -99,104 +99,6 @@ apps/web/
     "lint": "next lint"
   }
 }
-```
-
----
-
-## 🟢 Backend Node: Express + TypeScript Setup
-
-### Navigate to apps folder:
-```bash
-cd apps
-mkdir backend-node
-cd backend-node
-```
-
-### Initialize package.json:
-```bash
-pnpm init
-```
-
-### Install Express and dependencies:
-```bash
-pnpm add express cors dotenv
-pnpm add -D typescript @types/node @types/express @types/cors tsx nodemon
-```
-
-### Initialize TypeScript:
-```bash
-npx tsc --init
-```
-
-### Update `tsconfig.json`:
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["ES2020"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
-}
-```
-
-### Create basic Express server:
-
-**File: `src/index.ts`**
-```typescript
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 3001;
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Routes
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Express API is running!' });
-});
-
-app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'healthy', service: 'backend-node' });
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Express server running on http://localhost:${PORT}`);
-});
-```
-
-### Update `package.json` scripts:
-```json
-{
-  "name": "@mono-repo/backend-node",
-  "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "lint": "tsc --noEmit"
-  }
-}
-```
-
-### Create `.env` file:
-```env
-PORT=3001
-NODE_ENV=development
 ```
 
 ---
@@ -358,14 +260,7 @@ pnpm dev
 # Runs on http://localhost:3000
 ```
 
-**Terminal 2 - Express:**
-```bash
-cd apps/backend-node
-pnpm dev
-# Runs on http://localhost:3001
-```
-
-**Terminal 3 - Gin:**
+**Terminal 2 - Gin:**
 ```bash
 cd apps/backend-go
 go run main.go
@@ -427,12 +322,6 @@ curl http://localhost:3000
 # Should show Next.js page
 ```
 
-**Express (Node Backend):**
-```bash
-curl http://localhost:3001/health
-# Response: {"status":"healthy","service":"backend-node"}
-```
-
 **Gin (Go Backend):**
 ```bash
 curl http://localhost:8080/health
@@ -446,7 +335,6 @@ curl http://localhost:8080/ping
 
 ## 📚 References
 
-- [Express.js Installation Guide](https://expressjs.com/en/starter/installing.html)
 - [Gin Framework Quickstart](https://gin-gonic.com/en/docs/quickstart/)
 - [Next.js 16 Documentation](https://nextjs.org/docs)
 - [pnpm Workspaces](https://pnpm.io/workspaces)
@@ -460,9 +348,6 @@ curl http://localhost:8080/ping
 ```bash
 # Kill process on port 3000 (Next.js)
 lsof -ti:3000 | xargs kill -9
-
-# Kill process on port 3001 (Express)
-lsof -ti:3001 | xargs kill -9
 
 # Kill process on port 8080 (Gin)
 lsof -ti:8080 | xargs kill -9

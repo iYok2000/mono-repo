@@ -1,50 +1,54 @@
+import { DecorativeImage } from "@/components/decorative";
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[var(--background)] px-6 py-12 font-sans text-[var(--foreground)]">
+    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
+      <DecorativeImage variant="theme-main" opacity={0.05} zIndex={0} />
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <section className="overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] px-8 py-12 shadow-sm sm:px-10">
+        <section className="overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) px-8 py-12 shadow-sm sm:px-10">
           <div className="space-y-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--color-muted)">
               PEA DevOps Playground
             </p>
-            <h1 className="text-4xl font-bold tracking-tight text-[var(--foreground)] sm:text-5xl">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
               Welcome to the platform
             </h1>
-            <p className="max-w-2xl text-lg text-[var(--color-muted)]">
-              ศูนย์กลางทดสอบและพัฒนาเว็บแอปของทีม DevOps เริ่มต้นได้ทันทีจากหน้าแรกนี้
-              และสำรวจฟีเจอร์อื่นๆ ได้จากเมนูด้านบน
+            <p className="max-w-2xl text-lg text-(--color-muted)">
+              ศูนย์กลางทดสอบและพัฒนาเว็บแอปของทีม DevOps
+              เริ่มต้นได้ทันทีจากหน้าแรกนี้ และสำรวจฟีเจอร์อื่นๆ
+              ได้จากเมนูด้านบน
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">
+              <div className="rounded-2xl border border-(--color-border) bg-(--color-surface-alt) px-4 py-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--color-primary)">
                   เริ่มต้น
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-[var(--foreground)]">
+                <h3 className="mt-2 text-lg font-semibold text-foreground">
                   สำรวจหน้าเว็บ
                 </h3>
-                <p className="mt-1 text-sm text-[var(--color-muted)]">
+                <p className="mt-1 text-sm text-(--color-muted)">
                   หน้าแรกถูกทำให้สะอาดเพื่อโฟกัสการต้อนรับและข้อมูลเบื้องต้น
                 </p>
               </div>
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-secondary)]">
+              <div className="rounded-2xl border border-(--color-border) bg-(--color-surface-alt) px-4 py-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--color-secondary)">
                   การนำทาง
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-[var(--foreground)]">
+                <h3 className="mt-2 text-lg font-semibold text-foreground">
                   เมนูส่วนหัว
                 </h3>
-                <p className="mt-1 text-sm text-[var(--color-muted)]">
+                <p className="mt-1 text-sm text-(--color-muted)">
                   ใช้แถบเมนูด้านบนเพื่อไปยังเครื่องมือหรือหน้าต่างๆ ในระบบ
                 </p>
               </div>
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">
+              <div className="rounded-2xl border border-(--color-border) bg-(--color-surface-alt) px-4 py-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--color-primary)">
                   คำแนะนำ
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-[var(--foreground)]">
+                <h3 className="mt-2 text-lg font-semibold text-foreground">
                   ปรับแต่งตามทีม
                 </h3>
-                <p className="mt-1 text-sm text-[var(--color-muted)]">
+                <p className="mt-1 text-sm text-(--color-muted)">
                   เพิ่มลิงก์หรือข้อมูลของทีมได้ใน Header และหน้าแรกตามต้องการ
                 </p>
               </div>

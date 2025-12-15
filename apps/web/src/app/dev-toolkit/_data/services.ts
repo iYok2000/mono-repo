@@ -1,6 +1,6 @@
 import type { TagKey } from "@/config/tagMeta";
 
-export type ServiceStatus = "recommended" | "new" | "coming-soon";
+export type ServiceStatus = "recommended" | "new" | "coming-soon" | "default";
 
 export type ServiceItem = {
   id: string;
@@ -38,6 +38,7 @@ export const services: ServiceItem[] = [
     category: "Export & Import",
     description: "อัปโหลดไฟล์ XLSX และพรีวิวข้อมูลก่อนบันทึก",
     tags: ["import", "ts"],
+    status: "default",
     image: "https://placehold.co/600x300?text=Import+XLSX",
   },
   {
@@ -55,6 +56,7 @@ export const services: ServiceItem[] = [
     category: "Theme & UI",
     description: "ตัวอย่างตารางพร้อมปุ่ม Export ฝังใน UI จริง",
     tags: ["ui", "react", "next", "ts"],
+    status: "default",
     image: "https://placehold.co/600x300?text=Table+Export",
   },
   {
@@ -69,4 +71,6 @@ export const services: ServiceItem[] = [
   },
 ];
 
-export const recommended = services.filter((item) => item.status === "recommended");
+export const recommended = services.filter(
+  (item) => item.status === "recommended"
+);

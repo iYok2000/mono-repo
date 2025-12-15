@@ -51,7 +51,7 @@ const result = exampleFunction({ id: '1', name: 'Example' });
 
 ### Internal Dependencies
 - `@my-app/shared-types` - For type definitions
-- `apps/backend-node` - API endpoints
+- `apps/backend-go` - API endpoints
 
 ### External Dependencies
 - `library-name@version` - Purpose and why chosen

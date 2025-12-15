@@ -26,8 +26,12 @@ const (
 // GreeterServiceClient is the client API for GreeterService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// GreeterService exposes unary and server-streaming greetings over gRPC.
 type GreeterServiceClient interface {
+	// SayHello returns a single greeting for the provided name.
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+	// SayHelloStream streams greeting messages back to the client.
 	SayHelloStream(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HelloResponse], error)
 }
 
@@ -71,8 +75,12 @@ type GreeterService_SayHelloStreamClient = grpc.ServerStreamingClient[HelloRespo
 // GreeterServiceServer is the server API for GreeterService service.
 // All implementations must embed UnimplementedGreeterServiceServer
 // for forward compatibility.
+//
+// GreeterService exposes unary and server-streaming greetings over gRPC.
 type GreeterServiceServer interface {
+	// SayHello returns a single greeting for the provided name.
 	SayHello(context.Context, *HelloRequest) (*HelloResponse, error)
+	// SayHelloStream streams greeting messages back to the client.
 	SayHelloStream(*HelloRequest, grpc.ServerStreamingServer[HelloResponse]) error
 	mustEmbedUnimplementedGreeterServiceServer()
 }

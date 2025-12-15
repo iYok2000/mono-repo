@@ -17,12 +17,13 @@ export interface CardProps {
 const getVariantClasses = (variant: CardVariant): string => {
   const variants: Record<CardVariant, string> = {
     default:
-      "rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm text-[var(--color-foreground)]",
+      "rounded-2xl border border-(--color-border) bg-(--color-surface) text-[var(--color-foreground)] shadow-sm",
     bordered:
-      "rounded-2xl border-2 border-[var(--color-primary)] bg-[var(--color-surface)] text-[var(--color-foreground)]",
+      "rounded-2xl border border-(--color-primary) bg-(--color-surface) text-[var(--color-foreground)] shadow-sm",
     elevated:
-      "rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg text-[var(--color-foreground)]",
-    flat: "rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-foreground)]",
+      "rounded-2xl border border-(--color-border) bg-(--color-surface) text-[var(--color-foreground)] shadow-md",
+    flat:
+      "rounded-2xl border border-transparent bg-(--color-surface-alt) text-[var(--color-foreground)]",
   };
   return variants[variant];
 };
@@ -50,6 +51,13 @@ export const Card = ({
   const isInteractive = Boolean(onClick);
   const hasHeader = header !== undefined && header !== null;
   const hasFooter = footer !== undefined && footer !== null;
+  const paddingClass = getPaddingClasses(padding);
+  const variantClass = getVariantClasses(variant);
+  const baseInteractive = isInteractive
+    ? "cursor-pointer text-left transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-background)"
+    : "";
+  const hoverClass =
+    isInteractive || hover ? "hover:shadow-lg hover:border-(--color-border)" : "";
 
   const Component = isInteractive ? "button" : "div";
 
@@ -57,44 +65,32 @@ export const Card = ({
     <Component
       onClick={onClick}
       className={cx(
-        "w-full",
-
-        getVariantClasses(variant),
-
-        !hasHeader && !hasFooter && getPaddingClasses(padding),
-
-        isInteractive && "cursor-pointer text-left transition-all",
-        (isInteractive || hover) && "hover:-translate-y-1 hover:shadow-xl",
-        isInteractive &&
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-background)",
-
+        "w-full flex flex-col overflow-hidden transition-colors",
+        variantClass,
+        !hasHeader && !hasFooter && paddingClass,
+        baseInteractive,
+        hoverClass,
         className
       )}
       {...(isInteractive && { type: "button" })}
     >
       {hasHeader && (
         <div
-          className={cx(
-            "border-b border-(--color-border)",
-            getPaddingClasses(padding)
-          )}
+          className={cx("border-b border-(--color-border)", paddingClass)}
         >
           {header}
         </div>
       )}
 
       <div
-        className={cx((hasHeader || hasFooter) && getPaddingClasses(padding))}
+        className={cx("flex-1", (hasHeader || hasFooter) && paddingClass)}
       >
         {children}
       </div>
 
       {hasFooter && (
         <div
-          className={cx(
-            "border-t border-(--color-border)",
-            getPaddingClasses(padding)
-          )}
+          className={cx("mt-auto border-t border-(--color-border)", paddingClass)}
         >
           {footer}
         </div>
