@@ -13,17 +13,19 @@ type Config struct {
 	ServiceName string
 	Environment string
 	FrontendURL string
+	DatabaseURL string
 }
 
 func Load() *Config {
 	return &Config{
 		EnableHTTP:  getEnvBool("ENABLE_HTTP", true),
-		EnableGRPC:  getEnvBool("ENABLE_GRPC", true),
+		EnableGRPC:  getEnvBool("ENABLE_GRPC", false),
 		HTTPPort:    getEnv("HTTP_PORT", "8080"),
 		GRPCPort:    getEnv("GRPC_PORT", "50051"),
 		ServiceName: getEnv("SERVICE_NAME", "backend-go"),
 		Environment: getEnv("ENVIRONMENT", "development"),
 		FrontendURL: getEnv("FRONTEND_URL", "http://localhost:3000"),
+		DatabaseURL: getEnv("DATABASE_URL", ""),
 	}
 }
 

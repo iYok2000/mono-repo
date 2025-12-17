@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/Card";
 import { TagBadge } from "@/components/ui/TagBadge";
 import { cx } from "@/lib/cx";
 import type { ServiceItem } from "../_data/services";
+import { memo } from "react";
 
 const STATUS_RIBBON = {
   recommended: {
@@ -21,14 +22,19 @@ const STATUS_RIBBON = {
   },
 } as const;
 
+type RibbonStatus = keyof typeof STATUS_RIBBON;
+
 type Props = {
   item: ServiceItem;
 };
 
-export const ServiceCard = ({ item }: Props) => {
+const ServiceCardComponent = ({ item }: Props) => {
   const isComingSoon = item.status === "coming-soon";
   const detailHref = isComingSoon ? "#" : `/dev-toolkit/${item.id}`;
-  const ribbon = item.status ? STATUS_RIBBON[item.status] : null;
+  const ribbon =
+    item.status && item.status !== "default"
+      ? STATUS_RIBBON[item.status as RibbonStatus]
+      : null;
 
   return (
     <Card
@@ -79,3 +85,5 @@ export const ServiceCard = ({ item }: Props) => {
     </Card>
   );
 };
+
+export const ServiceCard = memo(ServiceCardComponent);

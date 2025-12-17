@@ -49,3 +49,4 @@ help:
 	@echo "  make fmt            - Format code"
 	@echo "  make lint           - Run linter (requires golangci-lint)"
 	@echo "  make help           - Show this help message"
+	@echo "  make migrate        - Run DB migrations (AutoMigrate via GORM)"
