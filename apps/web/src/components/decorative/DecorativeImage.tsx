@@ -28,9 +28,9 @@ const VARIANT_CONFIG: Record<
   },
   "top-center": {
     filename: "top-center",
-    defaultClass: "absolute top-[-10] left-1/2 -translate-x-1/2",
-    defaultWidth: 100,
-    defaultHeight: 100,
+    defaultClass: "absolute top-[8px] left-1/2 -translate-x-1/2",
+    defaultWidth: 150,
+    defaultHeight: 150,
   },
   "theme-main": {
     filename: "theme-main",
