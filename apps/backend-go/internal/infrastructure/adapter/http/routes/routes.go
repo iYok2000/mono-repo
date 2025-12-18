@@ -42,10 +42,22 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 			categories.DELETE("/:id", categoryHandler.DeleteCategory)
 		}
 
-		// TODO: Add service endpoints when needed
-		// services := api.Group("/services")
-		// {
-		// 	services.GET("", serviceHandler.ListServices)
-		// }
+		// Toolkit endpoints
+		toolkitHandler := handler.NewToolkitHandler(
+			cnt.CreateToolkitHandler,
+			cnt.UpdateToolkitHandler,
+			cnt.DeleteToolkitHandler,
+			cnt.ListToolkitsHandler,
+			cnt.GetToolkitHandler,
+		)
+
+		toolkits := api.Group("/toolkits")
+		{
+			toolkits.GET("", toolkitHandler.ListToolkits)
+			toolkits.GET("/:id", toolkitHandler.GetToolkit)
+			toolkits.POST("", toolkitHandler.CreateToolkit)
+			toolkits.PUT("/:id", toolkitHandler.UpdateToolkit)
+			toolkits.DELETE("/:id", toolkitHandler.DeleteToolkit)
+		}
 	}
 }

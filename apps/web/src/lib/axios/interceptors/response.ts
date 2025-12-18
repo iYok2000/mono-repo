@@ -13,35 +13,42 @@ export const responseInterceptor = (response: AxiosResponse) => {
 };
 
 export const responseErrorInterceptor = (error: any) => {
-  if (error.response) {
-    const { status, data } = error.response;
-
+  // Network error or no response
+  if (!error.response) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('❌ Response Error:', {
-        status,
+      console.error('❌ Network Error:', {
+        message: error.message,
         url: error.config?.url,
-        data,
+        code: error.code,
       });
     }
+    return Promise.reject(error);
+  }
 
-    if (status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
-    }
+  // HTTP error with response
+  const { status, data } = error.response;
 
-    if (status === 403) {
-      console.error('Access denied');
-    }
+  if (process.env.NODE_ENV === 'development') {
+    console.error('❌ Response Error:', {
+      status,
+      url: error.config?.url,
+      data,
+    });
+  }
 
-    if (status >= 500) {
-      console.error('Server error:', data);
+  if (status === 401) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
-  } else if (error.request) {
-    console.error('❌ Network Error: No response received', error.request);
-  } else {
-    console.error('❌ Error:', error.message);
+  }
+
+  if (status === 403) {
+    console.error('Access denied');
+  }
+
+  if (status >= 500) {
+    console.error('Server error:', data);
   }
 
   return Promise.reject(error);

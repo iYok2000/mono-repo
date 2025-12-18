@@ -2,13 +2,13 @@ import { DecorativeImage } from "@/components/decorative";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
+    <main className="relative min-h-screen bg-background px-4 py-8 sm:px-6 sm:py-12 font-sans text-foreground">
       <DecorativeImage variant="theme-main" opacity={0.05} zIndex={0} />
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <section className="overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) px-8 py-12 shadow-sm sm:px-10">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 sm:gap-8">
+        <section className="overflow-hidden rounded-2xl sm:rounded-3xl border border-(--color-border) bg-(--color-surface) px-6 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12 shadow-sm">
           <div className="space-y-5">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--color-muted)">
-              PEA DevOps Playground
+              Playground
             </p>
             <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
               Welcome to the platform
@@ -18,8 +18,8 @@ export default function Home() {
               เริ่มต้นได้ทันทีจากหน้าแรกนี้ และสำรวจฟีเจอร์อื่นๆ
               ได้จากเมนูด้านบน
             </p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-2xl border border-(--color-border) bg-(--color-surface-alt) px-4 py-5">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
+              <div className="rounded-xl sm:rounded-2xl border border-(--color-border) bg-(--color-surface-alt) px-4 py-4 sm:py-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-(--color-primary)">
                   เริ่มต้น
                 </p>

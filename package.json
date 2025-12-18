@@ -10,7 +10,7 @@
     "clean": "turbo run clean",
     "web": "pnpm --filter @mono-repo/web dev",
     "node": "pnpm --filter @mono-repo/backend-node dev",
-    "go": "cd apps/backend-go && go run main.go"
+    "go": "cd apps/backend-go && go run cmd/server/main.go"
   },
   "keywords": ["monorepo", "nextjs", "express", "gin", "typescript", "golang"],
   "author": "",

@@ -67,6 +67,7 @@ project_context/
 - 📄 [Next.js 16 Setup](./project_context/nextjs-setup.md) - Frontend configuration and implementation details
 - 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
 - 📄 [Data Export Feature](./project_context/data-export.md) - CSV export functionality with RFC 4180 compliance, type safety, and accessibility support
+- 📄 [DevToolkit Management](./project_context/devtoolkit-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
 
 ---
 
@@ -145,26 +146,34 @@ For simple features that don't need full documentation:
 ### Known Issues
 
 - Template Gallery system is in progress (Phase 1 completed)
-- Database integration not yet implemented
+
+### Recent Additions
+
+- ✅ **DevToolkit Management** - Complete CRUD system with Admin Dashboard
+- ✅ **Category Management** - Category CRUD with API integration
+- ✅ **Admin Layout** - Sidebar navigation for admin pages
+- ✅ **PostgreSQL Integration** - Database connected with GORM
 
 ### Future Improvements
 
 - Complete Template Gallery (Phases 2-6)
-- Add PostgreSQL database integration
 - Implement authentication system
 - Setup Docker for containerization
-- Add more backend API endpoints
-- Integrate frontend with Gin/gRPC backend
+- Add search and pagination to DevToolkit list
+- Image upload functionality
+- Permission management
 
 ### Important Reminders
 
 - **Next.js 16** with App Router in `apps/web/`
 - **Golang Gin + gRPC** backend in `apps/backend-go/`
-- **Template Gallery** foundation complete (Phase 1: Types, UI, Services, Mock Data)
+- **PostgreSQL** database with GORM ORM
+- **Admin Pages** available at `/admin/category` and `/admin/devtoolkit`
 - Run `pnpm install` at root after adding new dependencies
 - Use TypeScript strict mode for type safety
+- Backend API at `http://localhost:8080/api`
 
 ---
 
-**Last Updated**: 2025-12-11
-**Updated By**: AI Agent (Claude) - Removed backend-node, Template Gallery Phase 1 completed
+**Last Updated**: 2025-12-18
+**Updated By**: AI Agent (Claude) - Added DevToolkit Management system with full CRUD, Admin Dashboard, and Sidebar navigation

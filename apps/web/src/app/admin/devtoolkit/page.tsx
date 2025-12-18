@@ -1,0 +1,288 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/Button";
+import { Modal, ModalType } from "@/components/ui/Modal";
+import { ToolkitForm } from "./_components/ToolkitForm";
+import { ToolkitList } from "./_components/ToolkitList";
+import * as toolkitService from "@/services/toolkitService";
+import * as categoryService from "@/services/categoryService";
+import type { DevToolkit } from "@/types/devtoolkit";
+import type { Category } from "@/services/category/types";
+import { TOOLKIT_STATUSES, PREDEFINED_TAGS } from "@/types/devtoolkit";
+
+export default function DevToolkitPage() {
+  const [toolkits, setToolkits] = useState<DevToolkit[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<{
+    id: string;
+    category_id: string;
+    title: string;
+    status: DevToolkit["status"];
+    tags: string[];
+    image: string;
+    description: string;
+  }>({
+    id: "",
+    category_id: "",
+    title: "",
+    status: "default",
+    tags: [],
+    image: "",
+    description: "",
+  });
+  const [formErrors, setFormErrors] = useState({
+    id: "",
+    category_id: "",
+    title: "",
+    description: "",
+  });
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    type: ModalType;
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: "info",
+    title: "",
+    message: "",
+  });
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    show: boolean;
+    id: string | null;
+  }>({
+    show: false,
+    id: null,
+  });
+
+  useEffect(() => {
+    fetchToolkits();
+    fetchCategories();
+  }, []);
+
+  const fetchToolkits = async () => {
+    try {
+      const data = await toolkitService.getToolkits();
+      setToolkits(data);
+    } catch (error) {
+      showModal("error", "เกิดข้อผิดพลาด", "ไม่สามารถโหลดข้อมูลได้");
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await categoryService.getCategories();
+      setCategories(data);
+    } catch (error) {
+      showModal("error", "เกิดข้อผิดพลาด", "ไม่สามารถโหลดหมวดหมู่ได้");
+    }
+  };
+
+  const showModal = (type: ModalType, title: string, message: string) => {
+    setModal({ isOpen: true, type, title, message });
+  };
+
+  const closeModal = () => {
+    setModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const validateForm = (): boolean => {
+    const errors = {
+      id: "",
+      category_id: "",
+      title: "",
+      description: "",
+    };
+    let isValid = true;
+
+    if (!editingId && !formData.id.trim()) {
+      errors.id = "กรุณากรอกรหัส";
+      isValid = false;
+    }
+
+    if (!formData.category_id.trim()) {
+      errors.category_id = "กรุณาเลือกหมวดหมู่";
+      isValid = false;
+    }
+
+    if (!formData.title.trim()) {
+      errors.title = "กรุณากรอกชื่อ";
+      isValid = false;
+    }
+
+    if (!formData.description.trim()) {
+      errors.description = "กรุณากรอกคำอธิบาย";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      if (editingId) {
+        await toolkitService.updateToolkit(editingId, {
+          category_id: formData.category_id,
+          title: formData.title,
+          status: formData.status,
+          tags: formData.tags,
+          image: formData.image,
+          description: formData.description,
+        });
+        showModal("success", "สำเร็จ", "แก้ไข Toolkit สำเร็จแล้ว");
+      } else {
+        await toolkitService.createToolkit({
+          id: formData.id,
+          category_id: formData.category_id,
+          title: formData.title,
+          status: formData.status,
+          tags: formData.tags,
+          image: formData.image,
+          description: formData.description,
+        });
+        showModal("success", "สำเร็จ", "เพิ่ม Toolkit สำเร็จแล้ว");
+      }
+
+      resetForm();
+      fetchToolkits();
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
+      showModal("error", "เกิดข้อผิดพลาด", message);
+    }
+  };
+
+  const handleEdit = (toolkit: DevToolkit) => {
+    setEditingId(toolkit.id);
+    setFormData({
+      id: toolkit.id,
+      category_id: toolkit.category_id,
+      title: toolkit.title,
+      status: toolkit.status,
+      tags: toolkit.tags || [],
+      image: toolkit.image || "",
+      description: toolkit.description || "",
+    });
+    setShowForm(true);
+    setFormErrors({ id: "", category_id: "", title: "", description: "" });
+  };
+
+  const handleDelete = (id: string) => {
+    setDeleteConfirm({ show: true, id });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.id) return;
+
+    try {
+      await toolkitService.deleteToolkit(deleteConfirm.id);
+      setDeleteConfirm({ show: false, id: null });
+      showModal("success", "สำเร็จ", "ลบ Toolkit สำเร็จแล้ว");
+      fetchToolkits();
+    } catch (error: any) {
+      setDeleteConfirm({ show: false, id: null });
+      const message =
+        error.response?.data?.message || "เกิดข้อผิดพลาดในการลบข้อมูล";
+      showModal("error", "เกิดข้อผิดพลาด", message);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      id: "",
+      category_id: "",
+      title: "",
+      status: "default",
+      tags: [],
+      image: "",
+      description: "",
+    });
+    setFormErrors({ id: "", category_id: "", title: "", description: "" });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const handleTagToggle = (tag: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.includes(tag)
+        ? prev.tags.filter((t) => t !== tag)
+        : [...prev.tags, tag],
+    }));
+  };
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">
+            จัดการ DevToolkit
+          </h1>
+          <p className="mt-2 text-sm text-(--color-muted)">
+            จัดการเครื่องมือสำหรับนักพัฒนา
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            resetForm();
+            setShowForm(!showForm);
+          }}
+          className="bg-(--color-primary) text-white"
+        >
+          {showForm ? "ยกเลิก" : "+ เพิ่ม Toolkit"}
+        </Button>
+      </div>
+
+      {showForm && (
+        <ToolkitForm
+          formData={formData}
+          formErrors={formErrors}
+          categories={categories}
+          statuses={TOOLKIT_STATUSES}
+          availableTags={PREDEFINED_TAGS}
+          isEditing={!!editingId}
+          onSubmit={handleSubmit}
+          onChange={setFormData}
+          onTagToggle={handleTagToggle}
+        />
+      )}
+
+      <ToolkitList
+        toolkits={toolkits}
+        categories={categories}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={closeModal}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+      />
+
+      <Modal
+        isOpen={deleteConfirm.show}
+        onClose={() => setDeleteConfirm({ show: false, id: null })}
+        title="ยืนยันการลบ"
+        message="คุณต้องการลบ Toolkit นี้ใช่หรือไม่?"
+        type="warning"
+        confirmText="ลบ"
+        cancelText="ยกเลิก"
+        onConfirm={confirmDelete}
+        showCancel={true}
+      />
+    </div>
+  );
+}

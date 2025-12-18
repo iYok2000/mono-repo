@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { TagBadge } from "@/components/ui/TagBadge";
 import { cx } from "@/lib/cx";
-import type { ServiceItem } from "../_data/services";
 import { memo } from "react";
+import type { ToolkitStatus } from "@/types/devtoolkit";
 
 const STATUS_RIBBON = {
   recommended: {
@@ -15,7 +15,7 @@ const STATUS_RIBBON = {
     className:
       "bg-sky-600 text-white shadow-md dark:bg-sky-500 dark:text-[var(--background)]",
   },
-  "coming-soon": {
+  coming_soon: {
     label: "Coming soon",
     className:
       "bg-[var(--color-button)] text-[var(--color-muted)] border border-[var(--color-border)] shadow-md",
@@ -24,12 +24,22 @@ const STATUS_RIBBON = {
 
 type RibbonStatus = keyof typeof STATUS_RIBBON;
 
+export type ServiceItem = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  status?: ToolkitStatus;
+  tags?: string[];
+  image?: string;
+};
+
 type Props = {
   item: ServiceItem;
 };
 
 const ServiceCardComponent = ({ item }: Props) => {
-  const isComingSoon = item.status === "coming-soon";
+  const isComingSoon = item.status === "coming_soon";
   const detailHref = isComingSoon ? "#" : `/dev-toolkit/${item.id}`;
   const ribbon =
     item.status && item.status !== "default"

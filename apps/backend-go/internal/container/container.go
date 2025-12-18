@@ -24,11 +24,16 @@ type Container struct {
 	CreateCategoryHandler *command.CreateCategoryHandler
 	UpdateCategoryHandler *command.UpdateCategoryHandler
 	DeleteCategoryHandler *command.DeleteCategoryHandler
+	CreateToolkitHandler  *command.CreateToolkitHandler
+	UpdateToolkitHandler  *command.UpdateToolkitHandler
+	DeleteToolkitHandler  *command.DeleteToolkitHandler
 
 	// Query Handlers (Read Operations)
 	ListCategoriesHandler *query.ListCategoriesHandler
 	GetCategoryHandler    *query.GetCategoryHandler
 	ListServicesHandler   *query.ListServicesHandler
+	ListToolkitsHandler   *query.ListToolkitsHandler
+	GetToolkitHandler     *query.GetToolkitHandler
 }
 
 // New creates and initializes a new Container with all dependencies
@@ -52,11 +57,16 @@ func New(cfg *config.Config) (*Container, error) {
 	createCategoryHandler := command.NewCreateCategoryHandler(categoryRepo)
 	updateCategoryHandler := command.NewUpdateCategoryHandler(categoryRepo)
 	deleteCategoryHandler := command.NewDeleteCategoryHandler(categoryRepo)
+	createToolkitHandler := command.NewCreateToolkitHandler(categoryRepo, serviceRepo)
+	updateToolkitHandler := command.NewUpdateToolkitHandler(categoryRepo, serviceRepo)
+	deleteToolkitHandler := command.NewDeleteToolkitHandler(serviceRepo)
 
 	// Initialize query handlers
 	listCategoriesHandler := query.NewListCategoriesHandler(categoryRepo)
 	getCategoryHandler := query.NewGetCategoryHandler(categoryRepo)
 	listServicesHandler := query.NewListServicesHandler(serviceRepo)
+	listToolkitsHandler := query.NewListToolkitsHandler(serviceRepo)
+	getToolkitHandler := query.NewGetToolkitHandler(serviceRepo)
 
 	return &Container{
 		DB:                    db,
@@ -65,9 +75,14 @@ func New(cfg *config.Config) (*Container, error) {
 		CreateCategoryHandler: createCategoryHandler,
 		UpdateCategoryHandler: updateCategoryHandler,
 		DeleteCategoryHandler: deleteCategoryHandler,
+		CreateToolkitHandler:  createToolkitHandler,
+		UpdateToolkitHandler:  updateToolkitHandler,
+		DeleteToolkitHandler:  deleteToolkitHandler,
 		ListCategoriesHandler: listCategoriesHandler,
 		GetCategoryHandler:    getCategoryHandler,
 		ListServicesHandler:   listServicesHandler,
+		ListToolkitsHandler:   listToolkitsHandler,
+		GetToolkitHandler:     getToolkitHandler,
 	}, nil
 }
 

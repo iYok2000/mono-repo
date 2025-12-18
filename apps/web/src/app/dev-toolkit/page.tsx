@@ -1,19 +1,97 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { ServiceCard } from "./_components/ServiceCard";
-import { recommended, services } from "./_data/services";
+import type { ServiceItem } from "./_components/ServiceCard";
 import { DecorativeImage } from "@/components/decorative";
+import * as toolkitService from "@/services/toolkitService";
+import * as categoryService from "@/services/categoryService";
+import type { DevToolkit } from "@/types/devtoolkit";
+
+type ToolkitWithCategory = DevToolkit & {
+  category_name?: string;
+};
 
 export default function DevToolkitPage() {
+  const [toolkits, setToolkits] = useState<ToolkitWithCategory[]>([]);
+  const [categories, setCategories] = useState<categoryService.Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [toolkitsData, categoriesData] = await Promise.all([
+          toolkitService.getToolkits(),
+          categoryService.getCategories(),
+        ]);
+
+        // Map category names to toolkits
+        const toolkitsWithCategory = toolkitsData.map((toolkit) => ({
+          ...toolkit,
+          category_name:
+            categoriesData.find((cat) => cat.id === toolkit.category_id)
+              ?.name_th || "อื่นๆ",
+        }));
+
+        setToolkits(toolkitsWithCategory);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Error loading toolkits:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Group toolkits by category
+  const toolkitsByCategory = toolkits.reduce(
+    (acc, toolkit) => {
+      const categoryName = toolkit.category_name || "อื่นๆ";
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(toolkit);
+      return acc;
+    },
+    {} as Record<string, ToolkitWithCategory[]>
+  );
+
+  // Get recommended toolkits
+  const recommendedToolkits = toolkits.filter(
+    (t) => t.status === "recommended"
+  );
+
+  // Create sections from categories
   const sections = [
-    { id: "recommended", label: "Recommended" },
-    { id: "all-services", label: "All Services" },
+    ...(recommendedToolkits.length > 0
+      ? [{ id: "recommended", label: "แนะนำ" }]
+      : []),
+    ...Object.keys(toolkitsByCategory)
+      .sort()
+      .map((categoryName) => ({
+        id: categoryName.toLowerCase().replace(/\s+/g, "-"),
+        label: categoryName,
+      })),
   ];
 
+  if (loading) {
+    return (
+      <main className="relative min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-10 text-foreground">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <p className="text-(--color-muted)">กำลังโหลด...</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="relative min-h-screen bg-background px-6 py-10 text-foreground">
+    <main className="relative min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-10 text-foreground">
       <DecorativeImage variant="bottom-left" opacity={0.63} zIndex={0} />
       <DecorativeImage variant="top-right" opacity={0.6} zIndex={0} />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-8xl gap-8">
+      <div className="relative z-10 mx-auto flex w-full max-w-8xl gap-6 sm:gap-8">
         <aside className="hidden w-56 shrink-0 md:block">
           <div className="sticky top-28 rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 shadow-sm">
             <DecorativeImage
@@ -40,42 +118,80 @@ export default function DevToolkitPage() {
           </div>
         </aside>
 
-        <div className="flex w-full flex-col gap-10">
-          <header className="space-y-3">
+        <div className="flex w-full flex-col gap-6 sm:gap-10">
+          <header className="space-y-2 sm:space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-(--color-muted)">
               Dev Tools
             </p>
             <div className="space-y-2">
-              <h1 className="text-4xl font-bold tracking-tight">Dev Toolkit</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+                Dev Toolkit
+              </h1>
               <p className="max-w-3xl text-base text-(--color-muted)">
-                รวม service และ demo ที่ทีมใช้ลองฟีเจอร์ เช่น
-                export/import/theme พร้อมลิงก์ไปหน้าทดสอบย่อย
+                รวมเครื่องมือและ demo ที่ทีมใช้ทดสอบฟีเจอร์ต่างๆ
+                จัดกลุ่มตามหมวดหมู่
               </p>
             </div>
           </header>
 
-          <section id="recommended" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Recommended</h2>
-              <p className="text-sm text-(--color-muted)">
-                ลองอันนี้ก่อนเพื่อเห็น flow หลัก
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {recommended.map((item) => (
-                <ServiceCard key={item.id} item={item} />
-              ))}
-            </div>
-          </section>
+          {recommendedToolkits.length > 0 && (
+            <section id="recommended" className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <h2 className="text-lg sm:text-xl font-semibold">แนะนำ</h2>
+                <p className="text-xs sm:text-sm text-(--color-muted)">
+                  เครื่องมือที่แนะนำให้ลองใช้
+                </p>
+              </div>
+              <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+                {recommendedToolkits.map((toolkit) => {
+                  const item: ServiceItem = {
+                    id: toolkit.id,
+                    title: toolkit.title,
+                    category: toolkit.category_name || "อื่นๆ",
+                    description: toolkit.description || "",
+                    status: toolkit.status,
+                    tags: toolkit.tags,
+                    image: toolkit.image,
+                  };
+                  return <ServiceCard key={toolkit.id} item={item} />;
+                })}
+              </div>
+            </section>
+          )}
 
-          <section id="all-services" className="space-y-4">
-            <h2 className="text-xl font-semibold">All Services</h2>
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {services.map((item) => (
-                <ServiceCard key={item.id} item={item} />
-              ))}
+          {Object.entries(toolkitsByCategory)
+            .sort(([a], [b]) => a.localeCompare(b, "th"))
+            .map(([categoryName, categoryToolkits]) => (
+              <section
+                key={categoryName}
+                id={categoryName.toLowerCase().replace(/\s+/g, "-")}
+                className="space-y-3 sm:space-y-4"
+              >
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  {categoryName}
+                </h2>
+                <div className="grid gap-3 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {categoryToolkits.map((toolkit) => {
+                    const item: ServiceItem = {
+                      id: toolkit.id,
+                      title: toolkit.title,
+                      category: categoryName,
+                      description: toolkit.description || "",
+                      status: toolkit.status,
+                      tags: toolkit.tags,
+                      image: toolkit.image,
+                    };
+                    return <ServiceCard key={toolkit.id} item={item} />;
+                  })}
+                </div>
+              </section>
+            ))}
+
+          {toolkits.length === 0 && !loading && (
+            <div className="text-center py-12">
+              <p className="text-(--color-muted)">ยังไม่มีข้อมูล DevToolkit</p>
             </div>
-          </section>
+          )}
         </div>
       </div>
     </main>

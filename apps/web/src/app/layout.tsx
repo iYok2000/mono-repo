@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Header from "@/components/layout/Header";
+import { MobileNotSupported } from "@/components/layout/MobileNotSupported";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,15 +27,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          {children}
+          <MobileNotSupported />
+
+          <div className="hidden md:flex min-h-screen flex-col">
+            <Header />
+            <div className="flex-1">
+              {children}
+            </div>
+          </div>
         </ThemeProvider>
       </body>
     </html>
