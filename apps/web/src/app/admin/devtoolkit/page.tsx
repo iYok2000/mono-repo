@@ -1,44 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Modal, ModalType } from "@/components/ui/Modal";
+import { LoadingFallback, PageSuspense } from "@/components/ui/LoadingFallback";
 import { ToolkitForm } from "./_components/ToolkitForm";
 import { ToolkitList } from "./_components/ToolkitList";
 import * as toolkitService from "@/services/toolkitService";
-import * as categoryService from "@/services/categoryService";
-import type { DevToolkit } from "@/types/devtoolkit";
-import type { Category } from "@/services/category/types";
 import { TOOLKIT_STATUSES, PREDEFINED_TAGS } from "@/types/devtoolkit";
+import { mapToolkitError } from "./_utils/errorMapper";
+import { useDevToolkit } from "./_hooks/useDevToolkit";
+import { useToolkitForm } from "./_hooks/useToolkitForm";
 
-export default function DevToolkitPage() {
-  const [toolkits, setToolkits] = useState<DevToolkit[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<{
-    id: string;
-    category_id: string;
-    title: string;
-    status: DevToolkit["status"];
-    tags: string[];
-    image: string;
-    description: string;
-  }>({
-    id: "",
-    category_id: "",
-    title: "",
-    status: "default",
-    tags: [],
-    image: "",
-    description: "",
-  });
-  const [formErrors, setFormErrors] = useState({
-    id: "",
-    category_id: "",
-    title: "",
-    description: "",
-  });
+function DevToolkitContent() {
+  // Data fetching with custom hook
+  const { toolkits, categories, loading, error, refreshToolkits } =
+    useDevToolkit();
+
+  // Form management with custom hook
+  const {
+    formData,
+    setFormData,
+    formErrors,
+    editingId,
+    showForm,
+    setShowForm,
+    validateForm,
+    setEditMode,
+    resetForm,
+    handleTagToggle,
+  } = useToolkitForm(categories);
+
+  // Modal states
   const [modal, setModal] = useState<{
     isOpen: boolean;
     type: ModalType;
@@ -50,6 +43,7 @@ export default function DevToolkitPage() {
     title: "",
     message: "",
   });
+
   const [deleteConfirm, setDeleteConfirm] = useState<{
     show: boolean;
     id: string | null;
@@ -58,29 +52,7 @@ export default function DevToolkitPage() {
     id: null,
   });
 
-  useEffect(() => {
-    fetchToolkits();
-    fetchCategories();
-  }, []);
-
-  const fetchToolkits = async () => {
-    try {
-      const data = await toolkitService.getToolkits();
-      setToolkits(data);
-    } catch (error) {
-      showModal("error", "เกิดข้อผิดพลาด", "ไม่สามารถโหลดข้อมูลได้");
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const data = await categoryService.getCategories();
-      setCategories(data);
-    } catch (error) {
-      showModal("error", "เกิดข้อผิดพลาด", "ไม่สามารถโหลดหมวดหมู่ได้");
-    }
-  };
-
+  // Modal handlers
   const showModal = (type: ModalType, title: string, message: string) => {
     setModal({ isOpen: true, type, title, message });
   };
@@ -89,39 +61,7 @@ export default function DevToolkitPage() {
     setModal((prev) => ({ ...prev, isOpen: false }));
   };
 
-  const validateForm = (): boolean => {
-    const errors = {
-      id: "",
-      category_id: "",
-      title: "",
-      description: "",
-    };
-    let isValid = true;
-
-    if (!editingId && !formData.id.trim()) {
-      errors.id = "กรุณากรอกรหัส";
-      isValid = false;
-    }
-
-    if (!formData.category_id.trim()) {
-      errors.category_id = "กรุณาเลือกหมวดหมู่";
-      isValid = false;
-    }
-
-    if (!formData.title.trim()) {
-      errors.title = "กรุณากรอกชื่อ";
-      isValid = false;
-    }
-
-    if (!formData.description.trim()) {
-      errors.description = "กรุณากรอกคำอธิบาย";
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
+  // CRUD handlers
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -154,27 +94,15 @@ export default function DevToolkitPage() {
       }
 
       resetForm();
-      fetchToolkits();
+      refreshToolkits();
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
+      const message = mapToolkitError(error);
       showModal("error", "เกิดข้อผิดพลาด", message);
     }
   };
 
-  const handleEdit = (toolkit: DevToolkit) => {
-    setEditingId(toolkit.id);
-    setFormData({
-      id: toolkit.id,
-      category_id: toolkit.category_id,
-      title: toolkit.title,
-      status: toolkit.status,
-      tags: toolkit.tags || [],
-      image: toolkit.image || "",
-      description: toolkit.description || "",
-    });
-    setShowForm(true);
-    setFormErrors({ id: "", category_id: "", title: "", description: "" });
+  const handleEdit = (toolkit: any) => {
+    setEditMode(toolkit);
   };
 
   const handleDelete = (id: string) => {
@@ -188,38 +116,28 @@ export default function DevToolkitPage() {
       await toolkitService.deleteToolkit(deleteConfirm.id);
       setDeleteConfirm({ show: false, id: null });
       showModal("success", "สำเร็จ", "ลบ Toolkit สำเร็จแล้ว");
-      fetchToolkits();
+      refreshToolkits();
     } catch (error: any) {
       setDeleteConfirm({ show: false, id: null });
-      const message =
-        error.response?.data?.message || "เกิดข้อผิดพลาดในการลบข้อมูล";
+      const message = mapToolkitError(error);
       showModal("error", "เกิดข้อผิดพลาด", message);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      id: "",
-      category_id: "",
-      title: "",
-      status: "default",
-      tags: [],
-      image: "",
-      description: "",
-    });
-    setFormErrors({ id: "", category_id: "", title: "", description: "" });
-    setEditingId(null);
-    setShowForm(false);
-  };
+  // Loading and error states
+  if (loading) {
+    return <LoadingFallback message="กำลังโหลดข้อมูล DevToolkit..." />;
+  }
 
-  const handleTagToggle = (tag: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: prev.tags.includes(tag)
-        ? prev.tags.filter((t) => t !== tag)
-        : [...prev.tags, tag],
-    }));
-  };
+  if (error) {
+    return (
+      <div className="mx-auto max-w-7xl">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-red-800">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
@@ -284,5 +202,15 @@ export default function DevToolkitPage() {
         showCancel={true}
       />
     </div>
+  );
+}
+
+export default function DevToolkitPage() {
+  return (
+    <PageSuspense
+      fallback={<LoadingFallback message="กำลังโหลดข้อมูล DevToolkit..." />}
+    >
+      <DevToolkitContent />
+    </PageSuspense>
   );
 }

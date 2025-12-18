@@ -48,6 +48,23 @@ As an AI agent for this project, you MUST:
 - **Comments**: Brief, descriptive only where needed - not everything
 - **Code length**: Keep functions and files manageable
 
+### React Best Practices
+
+- **Controlled Components**: Use `value` prop on `<select>`, `<input>`, `<textarea>` - NEVER use `selected` on `<option>` or `checked` on `<input type="checkbox">` directly
+  ```tsx
+  // ❌ BAD: Uncontrolled pattern (HTML way)
+  <select>
+    <option value="1" selected>Option 1</option>
+  </select>
+  
+  // ✅ GOOD: Controlled component (React way)
+  <select value={value} onChange={handleChange}>
+    <option value="1">Option 1</option>
+  </select>
+  ```
+- **State as Single Source of Truth**: React manages selection through state, not DOM attributes
+- **Why**: Ensures consistency, prevents conflicts between React state and DOM state, avoids warnings
+
 ### Module Structure & Imports
 
 - **NO circular dependencies**: NEVER create import cycles (A imports B, B imports A)

@@ -1,20 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ServiceCard } from "./_components/ServiceCard";
 import type { ServiceItem } from "./_components/ServiceCard";
 import { DecorativeImage } from "@/components/decorative";
+import { LoadingFallback, PageSuspense } from "@/components/ui/LoadingFallback";
 import * as toolkitService from "@/services/toolkitService";
 import * as categoryService from "@/services/categoryService";
-import type { DevToolkit } from "@/types/devtoolkit";
+import {
+  mapToolkitsWithCategories,
+  groupToolkitsByCategory,
+  getUniqueCategorySections,
+} from "./_utils/toolkitHelpers";
+import type { ToolkitWithCategory } from "./_utils/toolkitHelpers";
 
-type ToolkitWithCategory = DevToolkit & {
-  category_name?: string;
-};
-
-export default function DevToolkitPage() {
+function DevToolkitContent() {
   const [toolkits, setToolkits] = useState<ToolkitWithCategory[]>([]);
-  const [categories, setCategories] = useState<categoryService.Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,16 +26,13 @@ export default function DevToolkitPage() {
           categoryService.getCategories(),
         ]);
 
-        // Map category names to toolkits
-        const toolkitsWithCategory = toolkitsData.map((toolkit) => ({
-          ...toolkit,
-          category_name:
-            categoriesData.find((cat) => cat.id === toolkit.category_id)
-              ?.name_th || "อื่นๆ",
-        }));
+        // Map category names and IDs to toolkits
+        const mappedToolkits = mapToolkitsWithCategories(
+          toolkitsData,
+          categoriesData
+        );
 
-        setToolkits(toolkitsWithCategory);
-        setCategories(categoriesData);
+        setToolkits(mappedToolkits);
       } catch (error) {
         console.error("Error loading toolkits:", error);
       } finally {
@@ -45,45 +43,24 @@ export default function DevToolkitPage() {
     loadData();
   }, []);
 
-  // Group toolkits by category
-  const toolkitsByCategory = toolkits.reduce(
-    (acc, toolkit) => {
-      const categoryName = toolkit.category_name || "อื่นๆ";
-      if (!acc[categoryName]) {
-        acc[categoryName] = [];
-      }
-      acc[categoryName].push(toolkit);
-      return acc;
-    },
-    {} as Record<string, ToolkitWithCategory[]>
-  );
+  // Memoize grouped data
+  const { toolkitsByCategory, recommendedToolkits, sections } = useMemo(() => {
+    const grouped = groupToolkitsByCategory(toolkits);
+    const recommended = toolkits.filter((t) => t.status === "recommended");
+    const uniqueSections = getUniqueCategorySections(
+      grouped,
+      recommended.length > 0
+    );
 
-  // Get recommended toolkits
-  const recommendedToolkits = toolkits.filter(
-    (t) => t.status === "recommended"
-  );
-
-  // Create sections from categories
-  const sections = [
-    ...(recommendedToolkits.length > 0
-      ? [{ id: "recommended", label: "แนะนำ" }]
-      : []),
-    ...Object.keys(toolkitsByCategory)
-      .sort()
-      .map((categoryName) => ({
-        id: categoryName.toLowerCase().replace(/\s+/g, "-"),
-        label: categoryName,
-      })),
-  ];
+    return {
+      toolkitsByCategory: grouped,
+      recommendedToolkits: recommended,
+      sections: uniqueSections,
+    };
+  }, [toolkits]);
 
   if (loading) {
-    return (
-      <main className="relative min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-10 text-foreground">
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-(--color-muted)">กำลังโหลด...</p>
-        </div>
-      </main>
-    );
+    return <LoadingFallback message="กำลังโหลดข้อมูล Dev Toolkit..." />;
   }
 
   return (
@@ -92,6 +69,7 @@ export default function DevToolkitPage() {
       <DecorativeImage variant="top-right" opacity={0.6} zIndex={0} />
 
       <div className="relative z-10 mx-auto flex w-full max-w-8xl gap-6 sm:gap-8">
+        {/* Sidebar Navigation */}
         <aside className="hidden w-56 shrink-0 md:block">
           <div className="sticky top-28 rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 shadow-sm">
             <DecorativeImage
@@ -118,6 +96,7 @@ export default function DevToolkitPage() {
           </div>
         </aside>
 
+        {/* Main Content */}
         <div className="flex w-full flex-col gap-6 sm:gap-10">
           <header className="space-y-2 sm:space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-(--color-muted)">
@@ -134,6 +113,7 @@ export default function DevToolkitPage() {
             </div>
           </header>
 
+          {/* Recommended Section */}
           {recommendedToolkits.length > 0 && (
             <section id="recommended" className="space-y-3 sm:space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -159,35 +139,40 @@ export default function DevToolkitPage() {
             </section>
           )}
 
+          {/* Category Sections - Fixed duplicate rendering */}
           {Object.entries(toolkitsByCategory)
             .sort(([a], [b]) => a.localeCompare(b, "th"))
-            .map(([categoryName, categoryToolkits]) => (
-              <section
-                key={categoryName}
-                id={categoryName.toLowerCase().replace(/\s+/g, "-")}
-                className="space-y-3 sm:space-y-4"
-              >
-                <h2 className="text-lg sm:text-xl font-semibold">
-                  {categoryName}
-                </h2>
-                <div className="grid gap-3 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
-                  {categoryToolkits.map((toolkit) => {
-                    const item: ServiceItem = {
-                      id: toolkit.id,
-                      title: toolkit.title,
-                      category: categoryName,
-                      description: toolkit.description || "",
-                      status: toolkit.status,
-                      tags: toolkit.tags,
-                      image: toolkit.image,
-                    };
-                    return <ServiceCard key={toolkit.id} item={item} />;
-                  })}
-                </div>
-              </section>
-            ))}
+            .map(([categoryName, categoryToolkits]) => {
+              const sectionId = categoryName.toLowerCase().replace(/\s+/g, "-");
+              return (
+                <section
+                  key={sectionId}
+                  id={sectionId}
+                  className="space-y-3 sm:space-y-4"
+                >
+                  <h2 className="text-lg sm:text-xl font-semibold">
+                    {categoryName}
+                  </h2>
+                  <div className="grid gap-3 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    {categoryToolkits.map((toolkit) => {
+                      const item: ServiceItem = {
+                        id: toolkit.id,
+                        title: toolkit.title,
+                        category: categoryName,
+                        description: toolkit.description || "",
+                        status: toolkit.status,
+                        tags: toolkit.tags,
+                        image: toolkit.image,
+                      };
+                      return <ServiceCard key={toolkit.id} item={item} />;
+                    })}
+                  </div>
+                </section>
+              );
+            })}
 
-          {toolkits.length === 0 && !loading && (
+          {/* Empty State */}
+          {toolkits.length === 0 && (
             <div className="text-center py-12">
               <p className="text-(--color-muted)">ยังไม่มีข้อมูล DevToolkit</p>
             </div>
@@ -195,5 +180,13 @@ export default function DevToolkitPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function DevToolkitPage() {
+  return (
+    <PageSuspense fallback={<LoadingFallback message="กำลังโหลดข้อมูล Dev Toolkit..." />}>
+      <DevToolkitContent />
+    </PageSuspense>
   );
 }

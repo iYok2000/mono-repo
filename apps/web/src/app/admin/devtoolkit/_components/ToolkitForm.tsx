@@ -77,7 +77,7 @@ export const ToolkitForm = ({
               หมวดหมู่ <span className="text-red-500">*</span>
             </label>
             <select
-              value={formData.category_id}
+              value={formData.category_id || ""}
               onChange={(e) => handleChange("category_id", e.target.value)}
               className="w-full rounded-lg border border-(--color-border) bg-(--color-button) px-4 py-2 text-foreground focus:border-(--color-primary) focus:outline-none"
             >
