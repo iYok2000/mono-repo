@@ -51,9 +51,11 @@ jobs:
             fi
             export PNPM_HOME="$HOME/.local/share/pnpm"
             export PATH="$PNPM_HOME:$PATH"
+            sudo chown -R "$USER":"$USER" /home/ubuntu/mono-repo
             sudo rm -rf node_modules apps/*/node_modules packages/*/node_modules packages/*/dist .pnpm-store
             sudo chown -R "$USER":"$USER" /home/ubuntu/mono-repo
             pnpm store prune
+            mkdir -p apps/web/node_modules apps/backend-go/node_modules packages/shared-types/node_modules
             rm -rf .env
             cat > .env << 'EOF'
             ${{ vars.YOK_SERVER_DEV_ENV }}
