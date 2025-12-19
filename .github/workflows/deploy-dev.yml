@@ -93,13 +93,13 @@ jobs:
             mkdir -p mono-repo/apps/web mono-repo/apps/backend-go mono-repo/logs
             
             # Move built files
-            rm -rf mono-repo/apps/web/.next mono-repo/apps/web/public
-            mv deploy/web-next mono-repo/apps/web/.next
-            mv deploy/web-public mono-repo/apps/web/public
-            cp deploy/web-package.json mono-repo/apps/web/package.json
+            sudo rm -rf mono-repo/apps/web/.next mono-repo/apps/web/public
+            sudo mv deploy/web-next mono-repo/apps/web/.next
+            sudo mv deploy/web-public mono-repo/apps/web/public
+            sudo cp deploy/web-package.json mono-repo/apps/web/package.json
             
-            rm -rf mono-repo/apps/backend-go/bin
-            mv deploy/backend-bin mono-repo/apps/backend-go/bin
+            sudo rm -rf mono-repo/apps/backend-go/bin
+            sudo mv deploy/backend-bin mono-repo/apps/backend-go/bin
             
             # Install Next.js production dependencies only
             cd mono-repo/apps/web
