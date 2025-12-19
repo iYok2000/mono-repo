@@ -72,7 +72,7 @@ export const ToolkitList = ({
                 <td className="px-6 py-4 text-sm text-foreground">
                   {getCategoryName(toolkit.category_id)}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-2 py-4 text-sm">
                   <Badge variant="primary">
                     {TOOLKIT_STATUS_LABELS[toolkit.status]}
                   </Badge>

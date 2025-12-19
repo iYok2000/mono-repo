@@ -74,9 +74,9 @@ function DevToolkitContent() {
           <div className="sticky top-28 rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 shadow-sm">
             <DecorativeImage
               variant="decoration"
-              opacity={0.72}
+              opacity={0.8}
               zIndex={0}
-              width={100}
+              width={70}
               className="absolute -top-1 -right-5"
             />
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-(--color-muted)">

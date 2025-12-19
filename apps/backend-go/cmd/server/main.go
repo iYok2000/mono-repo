@@ -19,7 +19,13 @@ import (
 )
 
 func main() {
+	// Try to load .env from multiple locations
+	// 1. Root .env (for pnpm dev from root)
+	// 2. Local .env (for go run from apps/backend-go/)
+	// 3. Environment variables (for Docker)
+	_ = godotenv.Load("../../.env")
 	_ = godotenv.Load(".env")
+
 	cfg := config.Load()
 
 	logger.Init()
