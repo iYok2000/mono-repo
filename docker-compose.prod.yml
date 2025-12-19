@@ -34,16 +34,15 @@ services:
     container_name: mono-repo-backend-go-prod
     restart: always
     ports:
-      - "8080:8080"   # HTTP API
-      - "50051:50051" # gRPC
+      - "${HTTP_PORT:-8080}:8080"   # HTTP API
+      - "${GRPC_PORT:-50051}:50051" # gRPC
     env_file:
-      - ./apps/backend-go/.env  # อ่านจาก .env ของ backend
+      - .env  # อ่านจาก .env ที่ root (layer นอกสุด)
     environment:
       # Override ค่าที่ต้องการสำหรับ Docker Production
       - GIN_MODE=release
       - GO_ENV=production
       - DB_HOST=postgres  # ใช้ชื่อ service แทน localhost
-      - DB_PORT=5432
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,12 +63,10 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ./apps/web/.env.local  # อ่านจาก .env.local ของ web
+      - .env  # อ่านจาก .env ที่ root (layer นอกสุด)
     environment:
       # Override ค่าที่ต้องการสำหรับ Docker Production
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
-      - NEXT_PUBLIC_GRPC_URL=http://localhost:50051
     depends_on:
       - backend-go
     networks:
