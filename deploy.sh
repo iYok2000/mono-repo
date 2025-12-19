@@ -19,9 +19,9 @@ echo -e "${BLUE}📂 Project root: ${PROJECT_ROOT}${NC}"
 # Create logs directory
 mkdir -p "${PROJECT_ROOT}/logs"
 
-# Install dependencies
+# Install dependencies with shamefully-hoist to avoid symlink issues
 echo -e "${BLUE}📦 Installing dependencies...${NC}"
-pnpm install
+pnpm install --shamefully-hoist --no-frozen-lockfile
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Failed to install dependencies${NC}"
     exit 1
