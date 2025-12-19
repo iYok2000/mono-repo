@@ -5,9 +5,9 @@ on:
     branches:
       - develop
     paths:
-      - "apps/backend-go/**"
-      - "apps/web/**"
-      - "**"
+      - "apps/**"
+      - "packages/**"
+      - "deploy.sh"
       - ".github/workflows/deploy-dev.yml"
 
 jobs:
@@ -18,16 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Upload deploy script
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST_YOK_SERVER_DEV }}
-          username: ${{ secrets.USERNAME_YOK_SERVER_DEV }}
-          key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
-          source: "deploy.sh"
-          target: "/home/ubuntu/mono-repo/"
-
-      - name: Deploy Website Yok Server Dev
+      - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_YOK_SERVER_DEV }}
@@ -35,30 +26,33 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
           script: |
             set -e
-            cd /home/ubuntu/mono-repo
+            
+            # Go to project
+            cd /home/ubuntu/mono-repo || { echo "Project not found"; exit 1; }
+            
+            # Pull latest
             git fetch origin
             git reset --hard origin/develop
             git clean -fd
-            if ! command -v node >/dev/null 2>&1; then
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-            fi
+            
+            # Setup Node
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" || {
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+              [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            }
             nvm install 20
             nvm use 20
-            if ! command -v pnpm >/dev/null 2>&1; then
-              curl -fsSL https://get.pnpm.io/install.sh | sh -
-            fi
-            export PNPM_HOME="$HOME/.local/share/pnpm"
-            export PATH="$PNPM_HOME:$PATH"
-            sudo chown -R "$USER":"$USER" /home/ubuntu/mono-repo
-            sudo rm -rf node_modules apps/*/node_modules packages/*/node_modules packages/*/dist .pnpm-store
-            sudo chown -R "$USER":"$USER" /home/ubuntu/mono-repo
-            pnpm store prune
-            mkdir -p apps/web/node_modules apps/backend-go/node_modules packages/shared-types/node_modules
-            rm -rf .env
+            
+            # Clean completely
+            rm -rf node_modules apps/*/node_modules packages/*/node_modules packages/*/dist
+            rm -rf package-lock.json apps/*/package-lock.json packages/*/package-lock.json
+            
+            # Create env
             cat > .env << 'EOF'
             ${{ vars.YOK_SERVER_DEV_ENV }}
             EOF
+            
+            # Deploy
             chmod +x deploy.sh
             ./deploy.sh

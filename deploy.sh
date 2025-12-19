@@ -1,114 +1,62 @@
 #!/bin/bash
 
-# Don't exit on error - we want to see all errors
-set +e
+set -e
 
-echo "🚀 Starting deployment..."
+echo "🚀 Deployment started"
 
-# Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 RED='\033[0;31m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Get absolute path of project root
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo -e "${BLUE}📂 Project root: ${PROJECT_ROOT}${NC}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo -e "${BLUE}📂 ${ROOT}${NC}"
 
-# Create logs directory
-mkdir -p "${PROJECT_ROOT}/logs"
+mkdir -p "${ROOT}/logs"
 
-# Install dependencies with shamefully-hoist to avoid symlink issues
-echo -e "${BLUE}📦 Installing dependencies...${NC}"
-pnpm install --shamefully-hoist --no-frozen-lockfile
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to install dependencies${NC}"
-    exit 1
-fi
+# Install with npm (no symlink issues)
+echo -e "${BLUE}📦 npm install${NC}"
+npm install
 
-# Build shared packages first (required for Next.js types)
-echo -e "${BLUE}🔧 Building shared packages...${NC}"
-pnpm --filter @mono-repo/shared-types build
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to build shared-types${NC}"
-    exit 1
-fi
+# Build shared-types
+echo -e "${BLUE}🔧 Build shared-types${NC}"
+cd "${ROOT}/packages/shared-types"
+npm run build
 
-# Build Next.js app
-echo -e "${BLUE}🏗️  Building Next.js app...${NC}"
-cd "${PROJECT_ROOT}/apps/web"
-pnpm build
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to build Next.js app${NC}"
-    exit 1
-fi
-cd "${PROJECT_ROOT}"
+# Build Next.js
+echo -e "${BLUE}🏗️ Build Next.js${NC}"
+cd "${ROOT}/apps/web"
+npm run build
 
-# Build Go backend
-echo -e "${BLUE}🏗️  Building Go backend...${NC}"
-cd "${PROJECT_ROOT}/apps/backend-go"
+# Build Go
+echo -e "${BLUE}🏗️ Build Go${NC}"
+cd "${ROOT}/apps/backend-go"
 mkdir -p bin
 go build -o bin/server cmd/server/main.go
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to build Go backend${NC}"
-    exit 1
-fi
-cd "${PROJECT_ROOT}"
 
-# Verify binary exists
-if [ ! -f "${PROJECT_ROOT}/apps/backend-go/bin/server" ]; then
-    echo -e "${RED}❌ Backend binary not found!${NC}"
-    exit 1
-fi
+cd "${ROOT}"
 
-# Restart services using PM2
-echo -e "${BLUE}🔄 Restarting services...${NC}"
+# Restart services
+echo -e "${BLUE}🔄 Restart services${NC}"
 
-# Stop existing processes (ignore errors if not running)
 pm2 delete backend-go 2>/dev/null || true
 pm2 delete web 2>/dev/null || true
 
-# Start backend from project root (so it can load .env)
-echo -e "${BLUE}🚀 Starting Go backend...${NC}"
-cd "${PROJECT_ROOT}"
 pm2 start apps/backend-go/bin/server \
     --name backend-go \
-    --cwd "${PROJECT_ROOT}" \
-    --log "${PROJECT_ROOT}/logs/backend-go.log" \
-    --error "${PROJECT_ROOT}/logs/backend-go-error.log"
+    --cwd "${ROOT}" \
+    --log "${ROOT}/logs/backend-go.log" \
+    --error "${ROOT}/logs/backend-go-error.log"
 
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to start Go backend${NC}"
-    echo -e "${YELLOW}📋 Checking PM2 logs...${NC}"
-    pm2 logs backend-go --lines 50 --nostream
-    exit 1
-fi
-
-# Start Next.js
-echo -e "${BLUE}🚀 Starting Next.js app...${NC}"
-cd "${PROJECT_ROOT}/apps/web"
+cd "${ROOT}/apps/web"
 pm2 start npm \
     --name web \
-    --cwd "${PROJECT_ROOT}/apps/web" \
-    --log "${PROJECT_ROOT}/logs/web.log" \
-    --error "${PROJECT_ROOT}/logs/web-error.log" \
+    --cwd "${ROOT}/apps/web" \
+    --log "${ROOT}/logs/web.log" \
+    --error "${ROOT}/logs/web-error.log" \
     -- start
 
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to start Next.js app${NC}"
-    echo -e "${YELLOW}📋 Checking PM2 logs...${NC}"
-    pm2 logs web --lines 50 --nostream
-    exit 1
-fi
-
-cd "${PROJECT_ROOT}"
-
-# Save PM2 configuration
 pm2 save
-
-# Show status
-echo -e "${BLUE}📊 PM2 Status:${NC}"
 pm2 list
 
-echo -e "${GREEN}✅ Deployment completed successfully!${NC}"
+echo -e "${GREEN}✅ Deployed${NC}"
