@@ -1,0 +1,33 @@
+name: deploy-prod
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/backend-go/**"
+      - "apps/web/**"
+      - "**"
+      - ".github/workflows/deploy-prod.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy Website Yok Server Prod
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_YOK_SERVER_PROD }}
+          username: ${{ secrets.USERNAME_YOK_SERVER_PROD }}
+          key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_PROD }}
+          script: |
+            cd /home/ubuntu/mono-repo && git checkout develop && git pull
+            rm -rf .env
+            cat > .env << EOF
+            ${{ vars.YOK_SERVER_PROD_ENV }}
+            EOF
+            ./deploy.sh

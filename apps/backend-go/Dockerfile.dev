@@ -5,16 +5,13 @@ FROM golang:1.24-alpine
 
 # Install development tools
 RUN apk add --no-cache git make protobuf protobuf-dev curl
-
-# Install Air for hot reload
-RUN go install github.com/air-verse/air@latest
-
+# # Install Air for hot reload
+# RUN go install github.com/air-verse/air@latest
 # Install protoc plugins
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-WORKDIR /app
-
+    WORKDIR /app
 # Copy go mod files
 COPY go.mod go.sum ./
 RUN go mod download
@@ -32,5 +29,8 @@ EXPOSE 8080 50051
 ENV GIN_MODE=debug
 ENV GO_ENV=development
 
-# Use Air for hot reload
-CMD ["air"]
+#Run go
+CMD ["go", "run", "./cmd/server/main.go"]
+
+# # Use Air for hot reload
+# CMD ["air"]

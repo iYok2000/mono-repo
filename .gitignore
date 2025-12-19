@@ -52,3 +52,5 @@ tmp/
 
 # Package archives
 *.tgz
+#data
+postgres_data

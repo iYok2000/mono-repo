@@ -6,18 +6,23 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
+    # image: postgres:16-alpine
+    image: postgres:18.1
     container_name: mono-repo-postgres
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-devdb}
-      POSTGRES_USER: ${POSTGRES_USER:-devuser}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
-      PGDATA: /var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
+    # environment:
+    #   POSTGRES_DB: ${POSTGRES_DB:-devdb}
+    #   POSTGRES_USER: ${POSTGRES_USER:-devuser}
+    #   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
+    #   PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql
+    # volumes:
+    #   - ./postgres_data:/var/lib/postgresql/data
     networks:
       - mono-repo-network
     healthcheck:
@@ -34,8 +39,9 @@ services:
     container_name: mono-repo-backend-go
     restart: unless-stopped
     ports:
-      - "${HTTP_PORT:-8080}:8080"   # HTTP API
-      - "${GRPC_PORT:-50051}:50051" # gRPC
+      - "8080:8080"
+      # - "${HTTP_PORT:-8080}:8080"   # HTTP API
+      # - "${GRPC_PORT:-50051}:50051" # gRPC
     volumes:
       # Mount source code for hot reload
       - ./apps/backend-go:/app
@@ -44,8 +50,11 @@ services:
     env_file:
       - .env  # อ่านจาก .env ที่ root (layer นอกสุด)
     environment:
-      # Override ค่าที่ต้องการสำหรับ Docker (มี priority สูงกว่า env_file)
-      - DB_HOST=postgres  # ใช้ชื่อ service แทน localhost
+      DATABASE_URL: "${DATABASE_URL}"
+    # environment:
+    #   # Override ค่าที่ต้องการสำหรับ Docker (มี priority สูงกว่า env_file)
+    #   - DB_HOST=postgres  # ใช้ชื่อ service แทน localhost
+    command: ["go", "run", "./cmd/server/main.go"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -83,7 +92,7 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
-    driver: local
+  # postgres_data:
+  #   driver: local
   go_modules:
     driver: local

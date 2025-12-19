@@ -1,0 +1,33 @@
+name: deploy-dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "apps/backend-go/**"
+      - "apps/web/**"
+      - "**"
+      - ".github/workflows/deploy-dev.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy Website Yok Server Dev
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_YOK_SERVER_DEV }}
+          username: ${{ secrets.USERNAME_YOK_SERVER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
+          script: |
+            cd /home/ubuntu/mono-repo && git checkout develop && git pull
+            rm -rf .env
+            cat > .env << EOF
+            ${{ vars.YOK_SERVER_DEV_ENV }}
+            EOF
+            ./deploy.sh
