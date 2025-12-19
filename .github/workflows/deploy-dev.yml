@@ -27,7 +27,7 @@ jobs:
           source: "deploy.sh"
           target: "/home/ubuntu/mono-repo/"
 
-            - name: Deploy Website Yok Server Dev
+      - name: Deploy Website Yok Server Dev
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_YOK_SERVER_DEV }}
@@ -39,8 +39,6 @@ jobs:
             git fetch origin
             git reset --hard origin/develop
             git clean -fd
-
-            # Node (ใช้ nvm; ถ้ามี node แล้วจะข้าม)
             if ! command -v node >/dev/null 2>&1; then
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
             fi
@@ -48,18 +46,13 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             nvm install 20
             nvm use 20
-
-            # pnpm
             if ! command -v pnpm >/dev/null 2>&1; then
               curl -fsSL https://get.pnpm.io/install.sh | sh -
             fi
             export PNPM_HOME="$HOME/.local/share/pnpm"
             export PATH="$PNPM_HOME:$PATH"
-
-            # เคลียร์สิทธิ์/โฟลเดอร์ที่เคยถูกสร้างด้วย root (ถ้ามี)
             sudo chown -R "$USER":"$USER" /home/ubuntu/mono-repo
             rm -rf node_modules apps/web/node_modules apps/backend-go/node_modules
-
             rm -rf .env
             cat > .env << 'EOF'
             ${{ vars.YOK_SERVER_DEV_ENV }}
