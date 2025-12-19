@@ -124,7 +124,6 @@ function DevToolkitContent() {
     }
   };
 
-  // Loading and error states
   if (loading) {
     return <LoadingFallback message="กำลังโหลดข้อมูล DevToolkit..." />;
   }

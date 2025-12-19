@@ -52,7 +52,7 @@ func (h *CategoryHandler) ListCategories(c *gin.Context) {
 
 	// Convert DTOs to HTTP response
 	result := response.CategoriesToResponse(dtos)
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, response.NewSuccessResponse(result))
 }
 
 // GetCategory handles GET /categories/:id
@@ -70,7 +70,7 @@ func (h *CategoryHandler) GetCategory(c *gin.Context) {
 
 	// Convert DTO to HTTP response
 	result := response.CategoryFromDTO(*dto)
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, response.NewSuccessResponse(result))
 }
 
 // CreateCategory handles POST /categories
@@ -97,7 +97,7 @@ func (h *CategoryHandler) CreateCategory(c *gin.Context) {
 
 	// Convert DTO to HTTP response
 	result := response.CategoryFromDTO(*dto)
-	c.JSON(http.StatusCreated, result)
+	c.JSON(http.StatusCreated, response.NewSuccessResponse(result))
 }
 
 // UpdateCategory handles PUT /categories/:id
@@ -126,7 +126,7 @@ func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 
 	// Convert DTO to HTTP response
 	result := response.CategoryFromDTO(*dto)
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, response.NewSuccessResponse(result))
 }
 
 // DeleteCategory handles DELETE /categories/:id
