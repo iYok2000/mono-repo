@@ -40,12 +40,12 @@ jobs:
             git reset --hard origin/develop
             git clean -fd
 
-            # install pnpm (standalone) if not exists
+            # install pnpm (standalone) if missing
             if ! command -v pnpm >/dev/null 2>&1; then
               curl -fsSL https://get.pnpm.io/install.sh | sh -
-              export PNPM_HOME="$HOME/.local/share/pnpm"
-              export PATH="$PNPM_HOME:$PATH"
             fi
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
 
             rm -rf .env
             cat > .env << 'EOF'
