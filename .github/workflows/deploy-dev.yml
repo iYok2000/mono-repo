@@ -51,10 +51,10 @@ jobs:
             export PNPM_HOME="$HOME/.local/share/pnpm"
             export PATH="$PNPM_HOME:$PATH"
             
-            # Clean old node_modules completely
-            sudo rm -rf node_modules apps/*/node_modules packages/*/node_modules
+            # Clean everything including pnpm cache
+            sudo rm -rf node_modules apps/*/node_modules packages/*/node_modules .pnpm-store
             
-            # Fix permissions after clean
+            # Fix permissions
             sudo chown -R $USER:$USER /home/ubuntu/mono-repo
             
             # Create env

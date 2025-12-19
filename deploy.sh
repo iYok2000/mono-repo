@@ -14,14 +14,12 @@ echo -e "${BLUE}📂 Project: ${ROOT}${NC}"
 
 mkdir -p "${ROOT}/logs"
 
-# Ensure .npmrc exists for shamefully-hoist
-if [ ! -f "${ROOT}/.npmrc" ]; then
-    cat > "${ROOT}/.npmrc" << 'EOL'
-shamefully-hoist=true
+# Force .npmrc with node-linker=hoisted (no symlinks)
+cat > "${ROOT}/.npmrc" << 'EOL'
+node-linker=hoisted
 auto-install-peers=true
 strict-peer-dependencies=false
 EOL
-fi
 
 # Install dependencies
 echo -e "${BLUE}📦 Installing dependencies...${NC}"
