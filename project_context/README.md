@@ -5,7 +5,7 @@ This folder contains detailed documentation for each feature and module in the p
 ## Structure
 
 ```
-project_context/
+project_context
 ├── README.md           # This file
 ├── TEMPLATE.md         # Template for new feature docs
 └── [feature-name].md   # Individual feature documentation
