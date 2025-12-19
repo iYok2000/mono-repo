@@ -1,0 +1,89 @@
+# Docker Compose for Production Testing
+# Usage: docker-compose -f docker-compose.prod.yml up
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: mono-repo-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-proddb}
+      POSTGRES_USER: ${POSTGRES_USER:-produser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - mono-repo-network-prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-produser} -d ${POSTGRES_DB:-proddb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Go Backend (Gin + gRPC) - Production
+  backend-go:
+    build:
+      context: ./apps/backend-go
+      dockerfile: Dockerfile
+    container_name: mono-repo-backend-go-prod
+    restart: always
+    ports:
+      - "8080:8080"   # HTTP API
+      - "50051:50051" # gRPC
+    env_file:
+      - ./apps/backend-go/.env  # อ่านจาก .env ของ backend
+    environment:
+      # Override ค่าที่ต้องการสำหรับ Docker Production
+      - GIN_MODE=release
+      - GO_ENV=production
+      - DB_HOST=postgres  # ใช้ชื่อ service แทน localhost
+      - DB_PORT=5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - mono-repo-network-prod
+    # Security: read-only root filesystem (uncomment if needed)
+    # read_only: true
+    # tmpfs:
+    #   - /tmp
+
+  # Next.js Web App - Production
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    container_name: mono-repo-web-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/web/.env.local  # อ่านจาก .env.local ของ web
+    environment:
+      # Override ค่าที่ต้องการสำหรับ Docker Production
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_GRPC_URL=http://localhost:50051
+    depends_on:
+      - backend-go
+    networks:
+      - mono-repo-network-prod
+    # Security: read-only root filesystem (uncomment if needed)
+    # read_only: true
+    # tmpfs:
+    #   - /tmp
+    #   - /app/.next/cache
+
+networks:
+  mono-repo-network-prod:
+    driver: bridge
+
+volumes:
+  postgres_data_prod:
+    driver: local

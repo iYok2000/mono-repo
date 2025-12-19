@@ -1,0 +1,58 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Test coverage
+*.out
+coverage.out
+
+# Go workspace file
+go.work
+
+# Dependencies
+vendor/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+*.md
+
+# Logs
+*.log
+
+# Environment files (will be mounted separately)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build cache
+.turbo
+tmp/
+
+# Air (hot reload tool)
+.air.toml
+tmp/
+
+# Makefile (not needed in production)
+Makefile

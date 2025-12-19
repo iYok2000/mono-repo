@@ -1,0 +1,92 @@
+# Docker Compose for Local Development
+# Usage: docker-compose up
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: mono-repo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-devdb}
+      POSTGRES_USER: ${POSTGRES_USER:-devuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mono-repo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devuser} -d ${POSTGRES_DB:-devdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Go Backend (Gin + gRPC)
+  backend-go:
+    build:
+      context: ./apps/backend-go
+      dockerfile: Dockerfile.dev
+    container_name: mono-repo-backend-go
+    restart: unless-stopped
+    ports:
+      - "8080:8080"   # HTTP API
+      - "50051:50051" # gRPC
+    volumes:
+      # Mount source code for hot reload
+      - ./apps/backend-go:/app
+      # Cache Go modules
+      - go_modules:/go/pkg/mod
+    env_file:
+      - ./apps/backend-go/.env  # อ่านจาก .env ของ backend
+    environment:
+      # Override ค่าที่ต้องการสำหรับ Docker (มี priority สูงกว่า env_file)
+      - DB_HOST=postgres  # ใช้ชื่อ service แทน localhost
+      - DB_PORT=5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - mono-repo-network
+
+  # Next.js Web App
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile.dev
+    container_name: mono-repo-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot reload
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      # Prevent overwriting node_modules
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    env_file:
+      - ./apps/web/.env.local  # อ่านจาก .env.local ของ web
+    environment:
+      # Override ค่าที่ต้องการสำหรับ Docker
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_GRPC_URL=http://localhost:50051
+    depends_on:
+      - backend-go
+    networks:
+      - mono-repo-network
+
+networks:
+  mono-repo-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  go_modules:
+    driver: local
