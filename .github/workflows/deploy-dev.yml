@@ -5,67 +5,20 @@ on:
     branches:
       - develop
     paths:
-      - "apps/**"
-      - "packages/**"
+      - "apps/backend-go/**"
+      - "apps/web/**"
+      - "**"
       - ".github/workflows/deploy-dev.yml"
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build shared-types
-        run: pnpm --filter @mono-repo/shared-types build
-
-      - name: Build Next.js
-        run: |
-          cd apps/web
-          pnpm build
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.23"
-
-      - name: Build Go backend
-        run: |
-          cd apps/backend-go
-          mkdir -p bin
-          go build -o bin/server cmd/server/main.go
-
-      - name: Create deployment archive
-        run: |
-          mkdir -p deploy
-          cp -r apps/web/.next deploy/web-next
-          cp -r apps/web/public deploy/web-public
-          cp apps/web/package.json deploy/web-package.json
-          cp -r apps/backend-go/bin deploy/backend-bin
-          tar -czf deploy.tar.gz deploy/
-
-      - name: Upload deployment archive
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST_YOK_SERVER_DEV }}
-          username: ${{ secrets.USERNAME_YOK_SERVER_DEV }}
-          key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
-          source: "deploy.tar.gz"
-          target: "/home/ubuntu/"
-
-      - name: Deploy on server
+      - name: Deploy Website Yok Server Dev
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_YOK_SERVER_DEV }}
