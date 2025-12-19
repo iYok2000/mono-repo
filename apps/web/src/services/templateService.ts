@@ -1,5 +1,5 @@
-import type { Template, TemplateTag } from "@/types/template";
-import { TemplateCategory } from "@/types/template";
+import type { Template } from "@/types/template";
+import { TemplateCategory, TemplateTag } from "@/types/template";
 
 let templateRegistry: Map<string, Template> = new Map();
 
