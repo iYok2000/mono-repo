@@ -16,7 +16,7 @@ mkdir -p "${ROOT}/logs"
 
 # Install dependencies
 echo -e "${BLUE}📦 Installing dependencies...${NC}"
-pnpm install
+pnpm install --shamefully-hoist
 
 # Build shared-types
 echo -e "${BLUE}🔧 Building shared-types...${NC}"
