@@ -27,6 +27,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Build shared packages first (required for Next.js types)
+echo -e "${BLUE}🔧 Building shared packages...${NC}"
+pnpm --filter @mono-repo/shared-types build
+if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Failed to build shared-types${NC}"
+    exit 1
+fi
+
 # Build Next.js app
 echo -e "${BLUE}🏗️  Building Next.js app...${NC}"
 cd "${PROJECT_ROOT}/apps/web"
