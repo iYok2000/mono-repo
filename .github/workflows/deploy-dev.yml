@@ -7,18 +7,67 @@ on:
     paths:
       - "apps/**"
       - "packages/**"
-      - "deploy.sh"
       - ".github/workflows/deploy-dev.yml"
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to server
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared-types
+        run: pnpm --filter @mono-repo/shared-types build
+
+      - name: Build Next.js
+        run: |
+          cd apps/web
+          pnpm build
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Build Go backend
+        run: |
+          cd apps/backend-go
+          mkdir -p bin
+          go build -o bin/server cmd/server/main.go
+
+      - name: Create deployment archive
+        run: |
+          mkdir -p deploy
+          cp -r apps/web/.next deploy/web-next
+          cp -r apps/web/public deploy/web-public
+          cp apps/web/package.json deploy/web-package.json
+          cp -r apps/backend-go/bin deploy/backend-bin
+          tar -czf deploy.tar.gz deploy/
+
+      - name: Upload deployment archive
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST_YOK_SERVER_DEV }}
+          username: ${{ secrets.USERNAME_YOK_SERVER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
+          source: "deploy.tar.gz"
+          target: "/home/ubuntu/"
+
+      - name: Deploy on server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_YOK_SERVER_DEV }}
@@ -26,14 +75,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
           script: |
             set -e
-            
-            # Go to project
-            cd /home/ubuntu/mono-repo || { echo "Project not found"; exit 1; }
-            
-            # Pull latest
-            git fetch origin
-            git reset --hard origin/develop
-            git clean -fd
             
             # Setup Node
             export NVM_DIR="$HOME/.nvm"
@@ -44,24 +85,55 @@ jobs:
             nvm install 20
             nvm use 20
             
-            # Setup pnpm
-            if ! command -v pnpm >/dev/null 2>&1; then
-              curl -fsSL https://get.pnpm.io/install.sh | sh -
-            fi
-            export PNPM_HOME="$HOME/.local/share/pnpm"
-            export PATH="$PNPM_HOME:$PATH"
+            # Extract deployment
+            cd /home/ubuntu
+            tar -xzf deploy.tar.gz
             
-            # Clean everything including pnpm cache
-            sudo rm -rf node_modules apps/*/node_modules packages/*/node_modules .pnpm-store
+            # Setup project structure
+            mkdir -p mono-repo/apps/web mono-repo/apps/backend-go mono-repo/logs
             
-            # Fix permissions
-            sudo chown -R $USER:$USER /home/ubuntu/mono-repo
+            # Move built files
+            rm -rf mono-repo/apps/web/.next mono-repo/apps/web/public
+            mv deploy/web-next mono-repo/apps/web/.next
+            mv deploy/web-public mono-repo/apps/web/public
+            cp deploy/web-package.json mono-repo/apps/web/package.json
             
-            # Create env
+            rm -rf mono-repo/apps/backend-go/bin
+            mv deploy/backend-bin mono-repo/apps/backend-go/bin
+            
+            # Install Next.js production dependencies only
+            cd mono-repo/apps/web
+            npm install --omit=dev
+            
+            # Create .env
+            cd /home/ubuntu/mono-repo
             cat > .env << 'EOF'
             ${{ vars.YOK_SERVER_DEV_ENV }}
             EOF
             
-            # Deploy
-            chmod +x deploy.sh
-            ./deploy.sh
+            # Restart services
+            pm2 delete backend-go 2>/dev/null || true
+            pm2 delete web 2>/dev/null || true
+            
+            pm2 start apps/backend-go/bin/server \
+              --name backend-go \
+              --cwd /home/ubuntu/mono-repo \
+              --log logs/backend-go.log \
+              --error logs/backend-go-error.log
+            
+            cd apps/web
+            pm2 start npm \
+              --name web \
+              --cwd /home/ubuntu/mono-repo/apps/web \
+              --log /home/ubuntu/mono-repo/logs/web.log \
+              --error /home/ubuntu/mono-repo/logs/web-error.log \
+              -- start
+            
+            pm2 save
+            pm2 list
+            
+            # Cleanup
+            cd /home/ubuntu
+            rm -rf deploy deploy.tar.gz
+            
+            echo "✅ Deployment completed successfully!"
