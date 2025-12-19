@@ -84,6 +84,8 @@ jobs:
             nvm use 20
             
             # Extract deployment
+            cd /home/ubuntu/mono-repo
+            sudo chmod -R 775 ./apps/*
             cd /home/ubuntu
             tar -xzf deploy.tar.gz
             
