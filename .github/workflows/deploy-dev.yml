@@ -39,7 +39,6 @@ jobs:
             git fetch origin
             git reset --hard origin/develop
             git clean -fd
-            sudo chown -R "$USER":"$USER" /home/ubuntu/mono-repo
             if ! command -v node >/dev/null 2>&1; then
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
             fi
@@ -52,7 +51,9 @@ jobs:
             fi
             export PNPM_HOME="$HOME/.local/share/pnpm"
             export PATH="$PNPM_HOME:$PATH"
-            rm -rf node_modules apps/web/node_modules apps/backend-go/node_modules packages/*/node_modules packages/*/dist
+            sudo rm -rf node_modules apps/*/node_modules packages/*/node_modules packages/*/dist .pnpm-store
+            sudo chown -R "$USER":"$USER" /home/ubuntu/mono-repo
+            pnpm store prune
             rm -rf .env
             cat > .env << 'EOF'
             ${{ vars.YOK_SERVER_DEV_ENV }}
