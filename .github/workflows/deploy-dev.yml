@@ -16,7 +16,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Upload deploy script
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST_YOK_SERVER_DEV }}
+          username: ${{ secrets.USERNAME_YOK_SERVER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
+          source: "deploy.sh"
+          target: "/home/ubuntu/mono-repo/"
 
       - name: Deploy Website Yok Server Dev
         uses: appleboy/ssh-action@master
