@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -24,12 +25,20 @@ func main() {
 	// 2. Local .env (for go run from apps/backend-go/)
 	// 3. Environment variables (for Docker)
 	_ = godotenv.Load("../../.env")
-	_ = godotenv.Load(".env")
 
 	cfg := config.Load()
 
 	logger.Init()
 	defer logger.Log.Sync()
+
+	// Log loaded configuration for debugging
+	logger.Log.Info("🚀 Backend starting with configuration:")
+	logger.Log.Info("  SERVICE_NAME: " + cfg.ServiceName)
+	logger.Log.Info("  ENVIRONMENT: " + cfg.Environment)
+	logger.Log.Info("  HTTP_PORT: " + cfg.HTTPPort)
+	logger.Log.Info("  FRONTEND_URL: " + cfg.FrontendURL)
+
+	logger.Log.Info("  CORS_ALLOWED_ORIGINS: " + strings.Join(cfg.CorsAllowedOrigins, ", "))
 
 	cnt, err := container.New(cfg)
 	if err != nil {
