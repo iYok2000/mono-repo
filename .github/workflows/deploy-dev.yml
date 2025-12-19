@@ -44,9 +44,12 @@ jobs:
             nvm install 20
             nvm use 20
             
-            # Clean completely
-            rm -rf node_modules apps/*/node_modules packages/*/node_modules packages/*/dist
-            rm -rf package-lock.json apps/*/package-lock.json packages/*/package-lock.json
+            # Setup pnpm
+            if ! command -v pnpm >/dev/null 2>&1; then
+              curl -fsSL https://get.pnpm.io/install.sh | sh -
+            fi
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
             
             # Create env
             cat > .env << 'EOF'

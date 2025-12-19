@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🚀 Deployment started"
+echo "🚀 Starting deployment..."
 
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -10,34 +10,33 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo -e "${BLUE}📂 ${ROOT}${NC}"
+echo -e "${BLUE}📂 Project: ${ROOT}${NC}"
 
 mkdir -p "${ROOT}/logs"
 
-# Install with npm (no symlink issues)
-echo -e "${BLUE}📦 npm install${NC}"
-npm install
+# Install dependencies
+echo -e "${BLUE}📦 Installing dependencies...${NC}"
+pnpm install
 
 # Build shared-types
-echo -e "${BLUE}🔧 Build shared-types${NC}"
-cd "${ROOT}/packages/shared-types"
-npm run build
+echo -e "${BLUE}🔧 Building shared-types...${NC}"
+pnpm --filter @mono-repo/shared-types build
 
 # Build Next.js
-echo -e "${BLUE}🏗️ Build Next.js${NC}"
+echo -e "${BLUE}🏗️ Building Next.js...${NC}"
 cd "${ROOT}/apps/web"
-npm run build
+pnpm build
+cd "${ROOT}"
 
 # Build Go
-echo -e "${BLUE}🏗️ Build Go${NC}"
+echo -e "${BLUE}🏗️ Building Go backend...${NC}"
 cd "${ROOT}/apps/backend-go"
 mkdir -p bin
 go build -o bin/server cmd/server/main.go
-
 cd "${ROOT}"
 
 # Restart services
-echo -e "${BLUE}🔄 Restart services${NC}"
+echo -e "${BLUE}🔄 Restarting services...${NC}"
 
 pm2 delete backend-go 2>/dev/null || true
 pm2 delete web 2>/dev/null || true
@@ -56,7 +55,9 @@ pm2 start npm \
     --error "${ROOT}/logs/web-error.log" \
     -- start
 
+cd "${ROOT}"
+
 pm2 save
 pm2 list
 
-echo -e "${GREEN}✅ Deployed${NC}"
+echo -e "${GREEN}✅ Deployment completed!${NC}"
