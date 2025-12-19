@@ -34,9 +34,14 @@ jobs:
           username: ${{ secrets.USERNAME_YOK_SERVER_DEV }}
           key: ${{ secrets.SSH_PRIVATE_YOK_SERVER_DEV }}
           script: |
-            cd /home/ubuntu/mono-repo && git checkout develop && git pull
+            cd /home/ubuntu/mono-repo
+            git fetch origin
+            git reset --hard origin/develop
+            git clean -fd
+            command -v pnpm >/dev/null 2>&1 || npm install -g pnpm
             rm -rf .env
-            cat > .env << EOF
+            cat > .env << 'EOF'
             ${{ vars.YOK_SERVER_DEV_ENV }}
             EOF
+            chmod +x deploy.sh
             ./deploy.sh
