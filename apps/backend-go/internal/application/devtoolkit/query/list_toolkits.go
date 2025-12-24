@@ -80,10 +80,18 @@ func (h *GetToolkitHandler) Handle(ctx context.Context, id string) (*dto.DevTool
 		}
 	}
 
-	// Get description from detail
+	// Get content fields from detail
 	description := ""
+	mainContent := ""
+	howToUse := ""
+	reference := ""
+	example := ""
 	if toolkit.Detail != nil {
 		description = toolkit.Detail.Description
+		mainContent = toolkit.Detail.MainContent
+		howToUse = toolkit.Detail.HowToUse
+		reference = toolkit.Detail.Reference
+		example = toolkit.Detail.Example
 	}
 
 	return &dto.DevToolkitDetailDTO{
@@ -94,6 +102,10 @@ func (h *GetToolkitHandler) Handle(ctx context.Context, id string) (*dto.DevTool
 		Tags:        tags,
 		Image:       toolkit.Image,
 		Description: description,
+		MainContent: mainContent,
+		HowToUse:    howToUse,
+		Reference:   reference,
+		Example:     example,
 	}, nil
 }
 

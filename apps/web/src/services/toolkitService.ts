@@ -9,6 +9,12 @@ export interface CreateToolkitDTO {
   tags: string[];
   image: string;
   description: string;
+
+  // New content fields
+  main_content?: string;
+  how_to_use?: string;
+  reference?: string;
+  example?: string;
 }
 
 export interface UpdateToolkitDTO {
@@ -18,6 +24,12 @@ export interface UpdateToolkitDTO {
   tags: string[];
   image: string;
   description: string;
+
+  // New content fields
+  main_content?: string;
+  how_to_use?: string;
+  reference?: string;
+  example?: string;
 }
 
 export const getToolkits = async (): Promise<DevToolkit[]> => {

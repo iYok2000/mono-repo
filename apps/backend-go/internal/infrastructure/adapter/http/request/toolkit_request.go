@@ -9,6 +9,12 @@ type CreateToolkitRequest struct {
 	Tags        []string `json:"tags" binding:"required"`
 	Image       string   `json:"image"`
 	Description string   `json:"description" binding:"required"`
+
+	// New content fields - optional for backward compatibility
+	MainContent string `json:"main_content"`
+	HowToUse    string `json:"how_to_use"`
+	Reference   string `json:"reference"`
+	Example     string `json:"example"`
 }
 
 // UpdateToolkitRequest represents the HTTP request for updating a toolkit
@@ -19,4 +25,10 @@ type UpdateToolkitRequest struct {
 	Tags        []string `json:"tags" binding:"required"`
 	Image       string   `json:"image"`
 	Description string   `json:"description" binding:"required"`
+
+	// New content fields - optional for backward compatibility
+	MainContent string `json:"main_content"`
+	HowToUse    string `json:"how_to_use"`
+	Reference   string `json:"reference"`
+	Example     string `json:"example"`
 }

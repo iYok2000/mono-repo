@@ -84,6 +84,10 @@ func (h *ToolkitHandler) CreateToolkit(c *gin.Context) {
 		Tags:        req.Tags,
 		Image:       req.Image,
 		Description: req.Description,
+		MainContent: req.MainContent,
+		HowToUse:    req.HowToUse,
+		Reference:   req.Reference,
+		Example:     req.Example,
 	}
 
 	dto, err := h.createToolkitHandler.Handle(ctx, cmd)
@@ -115,6 +119,10 @@ func (h *ToolkitHandler) UpdateToolkit(c *gin.Context) {
 		Tags:        req.Tags,
 		Image:       req.Image,
 		Description: req.Description,
+		MainContent: req.MainContent,
+		HowToUse:    req.HowToUse,
+		Reference:   req.Reference,
+		Example:     req.Example,
 	}
 
 	dto, err := h.updateToolkitHandler.Handle(ctx, cmd)

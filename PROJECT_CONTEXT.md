@@ -68,6 +68,7 @@ project_context/
 - 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
 - 📄 [Data Export Feature](./project_context/data-export.md) - CSV export functionality with RFC 4180 compliance, type safety, and accessibility support
 - 📄 [DevToolkit Management](./project_context/devtoolkit-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
+- 📄 [Utils Documentation](./project_context/utils-documentation.md) - Comprehensive guide to all utility functions, custom hooks, error mappers, and helpers with performance optimization patterns
 
 ---
 
@@ -104,6 +105,69 @@ For simple features that don't need full documentation:
 
 **Frontend**: React Server Components (Next.js 16 default) + Client State (TBD)
 **Why**: Leverage Next.js 16 App Router for server-side rendering and data fetching
+
+### Security Guidelines
+
+**CRITICAL: Input Validation & Sanitization**
+
+All string fields from users, APIs, or external sources MUST be validated and sanitized to prevent XSS attacks and SQL injection.
+
+**Backend (Go) - ContentValidator Pattern**:
+```go
+// File: internal/application/[domain]/validation/content_validator.go
+
+// ✅ MANDATORY: Always use ContentValidator for string inputs
+type ContentValidator struct{}
+
+// Example validators:
+func (v *ContentValidator) ValidateAndSanitizeTitle(title string) (string, error)
+func (v *ContentValidator) ValidateAndSanitizeDescription(desc string) (string, error)
+func (v *ContentValidator) SanitizeMainContent(content string) (string, error)
+func (v *ContentValidator) ValidateImageURL(url string) (string, error)
+func (v *ContentValidator) ValidateTags(tags []string) ([]string, error)
+```
+
+**Required Security Measures**:
+1. **XSS Protection**: HTML escaping for plain text, dangerous tag removal for markdown
+2. **SQL Injection Prevention**: GORM parameterized queries (never raw SQL)
+3. **Length Validation**: Enforce maximum length limits on all fields
+4. **Format Validation**: Validate URLs, IDs, emails, etc.
+
+**Example Implementation**:
+```go
+// ✅ GOOD: Command handler with validation
+type CreateHandler struct {
+    validator *validation.ContentValidator
+}
+
+func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
+    // Validate and sanitize ALL string inputs
+    sanitizedTitle, err := h.validator.ValidateAndSanitizeTitle(cmd.Title)
+    if err != nil {
+        return err
+    }
+
+    sanitizedContent, err := h.validator.SanitizeMainContent(cmd.Content)
+    if err != nil {
+        return err
+    }
+
+    // Use sanitized data for persistence
+    model := &Model{
+        Title: sanitizedTitle,
+        Content: sanitizedContent,
+    }
+
+    return h.repository.Create(ctx, model)
+}
+```
+
+**Reference Implementation**: See [DevToolkit Management](./project_context/devtoolkit-management.md) for complete security implementation example with ContentValidator.
+
+**Frontend (React/Next.js) - Client-Side Validation**:
+- Client-side validation is for UX only (not security)
+- Backend validation is the primary security defense
+- Always validate on backend even if frontend validates
 
 ---
 
@@ -149,6 +213,8 @@ For simple features that don't need full documentation:
 
 ### Recent Additions
 
+- ✅ **DevToolkit Content Management** - Complete CMS with separate create/edit pages, markdown editor, code examples with copy button, and 4 new content fields (main_content, how_to_use, reference, example)
+- ✅ **Security Implementation** - ContentValidator pattern with XSS protection, SQL injection prevention, input sanitization for all string fields
 - ✅ **DevToolkit Management** - Complete CRUD system with Admin Dashboard
 - ✅ **Category Management** - Category CRUD with API integration
 - ✅ **Admin Layout** - Sidebar navigation for admin pages
@@ -165,15 +231,18 @@ For simple features that don't need full documentation:
 
 ### Important Reminders
 
+- **Security First**: ALL string inputs MUST use ContentValidator (XSS + SQL injection protection)
 - **Next.js 16** with App Router in `apps/web/`
 - **Golang Gin + gRPC** backend in `apps/backend-go/`
-- **PostgreSQL** database with GORM ORM
+- **PostgreSQL** database with GORM ORM (use parameterized queries, never raw SQL)
 - **Admin Pages** available at `/admin/category` and `/admin/devtoolkit`
+- **Content Management**: Create/edit pages at `/admin/devtoolkit/create` and `/admin/devtoolkit/edit/[id]`
 - Run `pnpm install` at root after adding new dependencies
 - Use TypeScript strict mode for type safety
 - Backend API at `http://localhost:8080/api`
+- Never use raw user input directly - always validate and sanitize first
 
 ---
 
-**Last Updated**: 2025-12-18
-**Updated By**: AI Agent (Claude) - Added DevToolkit Management system with full CRUD, Admin Dashboard, and Sidebar navigation
+**Last Updated**: 2025-12-22
+**Updated By**: AI Agent (Claude) - Added Security Guidelines with ContentValidator pattern, DevToolkit Content Management system with markdown editor and code examples
