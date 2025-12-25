@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal, ModalType } from "@/components/ui/Modal";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { CodeExample } from "@/components/admin/CodeExample";
+import { FormActionButtons } from "@/components/admin/FormActionButtons";
 import * as toolkitService from "@/services/toolkitService";
 import { useDevToolkit } from "../_hooks/useDevToolkit";
 import { TOOLKIT_STATUSES, TOOLKIT_STATUS_LABELS, PREDEFINED_TAGS } from "@/types/devtoolkit";
@@ -146,21 +147,22 @@ export default function CreateDevToolkitPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 pb-12">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">เพิ่ม DevToolkit</h1>
-          <p className="mt-2 text-sm text-(--color-muted)">
-            สร้างเครื่องมือใหม่สำหรับนักพัฒนา
-          </p>
-        </div>
-        <Link href="/admin/devtoolkit">
-          <Button className="bg-gray-500 hover:bg-gray-600 text-white">
-            ← กลับ
-          </Button>
-        </Link>
-      </div>
+    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
+      <div className="mx-auto w-full max-w-6xl space-y-8">
+        {/* Header */}
+        <header className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold">เพิ่ม DevToolkit</h1>
+            <p className="mt-2 text-(--color-muted)">
+              สร้างเครื่องมือใหม่สำหรับนักพัฒนา
+            </p>
+          </div>
+          <Link href="/admin/devtoolkit">
+            <Button className="bg-gray-500 hover:bg-gray-600">
+              ← กลับ
+            </Button>
+          </Link>
+        </header>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -378,23 +380,12 @@ export default function CreateDevToolkitPage() {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4">
-          <Button
-            type="submit"
-            disabled={submitting}
-            className="flex-1 bg-(--color-primary) hover:bg-green-600 text-white disabled:opacity-50"
-          >
-            {submitting ? "กำลังบันทึก..." : "บันทึก"}
-          </Button>
-          <Link href="/admin/devtoolkit" className="flex-1">
-            <Button
-              type="button"
-              className="w-full bg-gray-500 hover:bg-gray-600 text-white"
-            >
-              ยกเลิก
-            </Button>
-          </Link>
-        </div>
+        <FormActionButtons
+          mode="create"
+          isSubmitting={submitting}
+          onCancel={() => router.push("/admin/devtoolkit")}
+          entityName="DevToolkit"
+        />
       </form>
 
       {/* Modal */}
@@ -405,6 +396,7 @@ export default function CreateDevToolkitPage() {
         message={modal.message}
         type={modal.type}
       />
-    </div>
+      </div>
+    </main>
   );
 }

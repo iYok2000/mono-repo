@@ -24,6 +24,19 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 	// API routes
 	api := router.Group("/api")
 	{
+		// Authentication endpoints
+		authHandler := handler.NewAuthGinHandler(cnt.AuthService)
+		authMiddleware := middleware.NewAuthGinMiddleware(cnt.AuthService)
+
+		auth := api.Group("/auth")
+		{
+			auth.POST("/login", authHandler.Login)
+			auth.POST("/refresh", authHandler.RefreshToken)
+			auth.POST("/logout", authHandler.Logout)
+			auth.GET("/me", authMiddleware.RequireAuth(), authHandler.Me)
+			auth.POST("/change-password", authMiddleware.RequireAuth(), authHandler.ChangePassword)
+		}
+
 		// Category endpoints
 		categoryHandler := handler.NewCategoryHandler(
 			cnt.CreateCategoryHandler,
@@ -58,6 +71,26 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 			toolkits.POST("", toolkitHandler.CreateToolkit)
 			toolkits.PUT("/:id", toolkitHandler.UpdateToolkit)
 			toolkits.DELETE("/:id", toolkitHandler.DeleteToolkit)
+		}
+
+		// Banner endpoints
+		bannerHandler := handler.NewBannerHandler(
+			cnt.CreateBannerHandler,
+			cnt.UpdateBannerHandler,
+			cnt.DeleteBannerHandler,
+			cnt.ReorderBannersHandler,
+			cnt.ListBannersHandler,
+			cnt.GetBannerHandler,
+		)
+
+		banners := api.Group("/banners")
+		{
+			banners.GET("", bannerHandler.ListBanners)
+			banners.GET("/:id", bannerHandler.GetBanner)
+			banners.POST("", bannerHandler.CreateBanner)
+			banners.PUT("/:id", bannerHandler.UpdateBanner)
+			banners.DELETE("/:id", bannerHandler.DeleteBanner)
+			banners.POST("/reorder", bannerHandler.ReorderBanners)
 		}
 	}
 }

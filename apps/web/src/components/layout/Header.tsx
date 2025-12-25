@@ -9,7 +9,7 @@ import { DecorativeImage } from "../decorative";
 
 const navLinks = [
   { name: "Dev Toolkit", href: "/dev-toolkit" },
-  { name: "Projects", href: "/" },
+  { name: "Projects", href: "/project" },
   { name: "Contact", href: "/" },
 ];
 

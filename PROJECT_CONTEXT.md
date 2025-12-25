@@ -68,6 +68,8 @@ project_context/
 - 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
 - 📄 [Data Export Feature](./project_context/data-export.md) - CSV export functionality with RFC 4180 compliance, type safety, and accessibility support
 - 📄 [DevToolkit Management](./project_context/devtoolkit-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
+- 📄 [Banner Management System](./project_context/BANNER_MANAGEMENT.md) - CRUD + Drag & Drop reordering with CQRS pattern, mobile preview, multi-language support (TH/EN), and segment tier filtering
+- 📄 [Admin Authentication](./project_context/ADMIN_AUTH_README.md) - JWT-based authentication system for Admin panel
 - 📄 [Utils Documentation](./project_context/utils-documentation.md) - Comprehensive guide to all utility functions, custom hooks, error mappers, and helpers with performance optimization patterns
 
 ---
@@ -213,6 +215,7 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
 
 ### Recent Additions
 
+- ✅ **Banner Management System** - Complete CRUD with Drag & Drop reordering, mobile preview carousel, CQRS pattern, segment tier filtering, and bulk priority updates
 - ✅ **DevToolkit Content Management** - Complete CMS with separate create/edit pages, markdown editor, code examples with copy button, and 4 new content fields (main_content, how_to_use, reference, example)
 - ✅ **Security Implementation** - ContentValidator pattern with XSS protection, SQL injection prevention, input sanitization for all string fields
 - ✅ **DevToolkit Management** - Complete CRUD system with Admin Dashboard
@@ -244,5 +247,5 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
 
 ---
 
-**Last Updated**: 2025-12-22
-**Updated By**: AI Agent (Claude) - Added Security Guidelines with ContentValidator pattern, DevToolkit Content Management system with markdown editor and code examples
+**Last Updated**: 2025-12-25
+**Updated By**: AI Agent (Claude) - Added Banner Management System with Drag & Drop reordering, CQRS pattern, mobile preview, and bulk priority updates

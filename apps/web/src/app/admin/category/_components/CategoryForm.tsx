@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { FormActionButtons } from "@/components/admin/FormActionButtons";
 
 interface FormData {
   id: string;
@@ -111,18 +111,11 @@ export const CategoryForm = ({
           )}
         </div>
 
-        <div className="flex gap-3">
-          <Button type="submit">
-            {editingId ? "บันทึกการแก้ไข" : "สร้างหมวดหมู่"}
-          </Button>
-          <Button
-            type="button"
-            onClick={onCancel}
-            className="bg-gray-500 hover:bg-gray-600"
-          >
-            ยกเลิก
-          </Button>
-        </div>
+        <FormActionButtons
+          mode={editingId ? "edit" : "create"}
+          onCancel={onCancel}
+          entityName="หมวดหมู่"
+        />
       </form>
     </Card>
   );

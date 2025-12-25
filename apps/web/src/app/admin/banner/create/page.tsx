@@ -1,0 +1,79 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { BannerForm } from "../_components/BannerForm";
+import { createBanner } from "@/services/bannerService";
+import { CreateBannerDTO, UpdateBannerDTO } from "@/types/banner";
+import { Modal } from "@/components/ui/Modal";
+
+export default function CreateBannerPage() {
+  const router = useRouter();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (data: CreateBannerDTO | UpdateBannerDTO) => {
+    try {
+      await createBanner(data as CreateBannerDTO);
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        router.push("/admin/banner");
+      }, 1500);
+    } catch (error: any) {
+      console.error("Failed to create banner:", error);
+      setErrorMessage(
+        error.response?.data?.message || "Failed to create banner"
+      );
+      setShowErrorModal(true);
+    }
+  };
+
+  const handleCancel = () => {
+    router.push("/admin/banner");
+  };
+
+  return (
+    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
+      <div className="mx-auto w-full max-w-6xl space-y-8">
+        <header className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold">เพิ่ม Banner</h1>
+            <p className="mt-2 text-(--color-muted)">
+              สร้าง Banner ใหม่สำหรับระบบ
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+          >
+            ← กลับ
+          </button>
+        </header>
+
+        <div className="bg-(--color-surface) rounded-lg border border-(--color-border) p-6">
+          <BannerForm mode="create" onSubmit={handleSubmit} onCancel={handleCancel} />
+        </div>
+
+        <Modal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          type="success"
+          title="สำเร็จ"
+          message="สร้าง Banner สำเร็จแล้ว"
+          confirmText="ตกลง"
+        />
+
+        <Modal
+          isOpen={showErrorModal}
+          onClose={() => setShowErrorModal(false)}
+          type="error"
+          title="เกิดข้อผิดพลาด"
+          message={errorMessage}
+          confirmText="ตกลง"
+        />
+      </div>
+    </main>
+  );
+}

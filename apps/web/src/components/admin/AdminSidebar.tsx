@@ -7,7 +7,6 @@ import { cx } from "@/lib/cx";
 
 interface MenuItem {
   title: string;
-  //   icon: React.ReactNode;
   href: string;
 }
 
@@ -19,6 +18,10 @@ const MENU_ITEMS: MenuItem[] = [
   {
     title: "จัดการ DevToolkit",
     href: "/admin/devtoolkit",
+  },
+  {
+    title: "จัดการ Banner",
+    href: "/admin/banner",
   },
 ];
 
@@ -69,7 +72,7 @@ export const AdminSidebar = () => {
       {/* Sidebar */}
       <aside
         className={cx(
-          "fixed md:sticky top-0 left-0 z-40 w-64 bg-(--color-surface) border-r border-(--color-border) min-h-screen transition-transform duration-300 md:translate-x-0",
+          "fixed md:sticky top-0 left-0 z-40 w-60 bg-(--color-surface) border-r border-(--color-border) min-h-screen transition-transform duration-300 md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

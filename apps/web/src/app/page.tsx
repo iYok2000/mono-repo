@@ -1,10 +1,12 @@
+"use client";
+
 import { DecorativeImage } from "@/components/decorative";
 
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-background px-4 py-8 sm:px-6 sm:py-12 font-sans text-foreground">
       <DecorativeImage variant="theme-main" opacity={0.05} zIndex={0} />
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 sm:gap-8">
+      <div className="mx-auto flex w-full max-w-5xl flex-col">
         <section className="overflow-hidden rounded-2xl sm:rounded-3xl border border-(--color-border) bg-(--color-surface) px-6 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12 shadow-sm">
           <div className="space-y-5">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-(--color-muted)">

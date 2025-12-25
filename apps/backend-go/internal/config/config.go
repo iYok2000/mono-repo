@@ -16,6 +16,7 @@ type Config struct {
 	FrontendURL        string
 	DatabaseURL        string
 	CorsAllowedOrigins []string
+	JWTSecret          string // Added for JWT authentication
 }
 
 func Load() *Config {
@@ -29,6 +30,7 @@ func Load() *Config {
 		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
 		DatabaseURL:        getEnv("DATABASE_URL", ""),
 		CorsAllowedOrigins: getEnvArray("CORS_ALLOWED_ORIGINS", "http://localhost:3000"),
+		JWTSecret:          getEnv("JWT_SECRET", ""), // Must be set in production!
 	}
 }
 

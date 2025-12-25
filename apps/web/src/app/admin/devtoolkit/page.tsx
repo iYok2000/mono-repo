@@ -86,22 +86,21 @@ function DevToolkitContent() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            จัดการ DevToolkit
-          </h1>
-          <p className="mt-2 text-sm text-(--color-muted)">
-            จัดการเครื่องมือสำหรับนักพัฒนา
-          </p>
-        </div>
-        <Link href="/admin/devtoolkit/create">
-          <Button className="bg-(--color-primary) hover:bg-green-600 text-white">
+    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
+      <div className="mx-auto w-full max-w-6xl space-y-8">
+        <header className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold">จัดการ DevToolkit</h1>
+            <p className="mt-2 text-(--color-muted)">
+              สร้าง แก้ไข และจัดการเครื่องมือสำหรับนักพัฒนา
+            </p>
+          </div>
+          <Link href="/admin/devtoolkit/create">
+            <Button>
             + เพิ่ม Toolkit
           </Button>
         </Link>
-      </div>
+      </header>
 
       <ToolkitList
         toolkits={toolkits}
@@ -129,7 +128,8 @@ function DevToolkitContent() {
         onConfirm={confirmDelete}
         showCancel={true}
       />
-    </div>
+      </div>
+    </main>
   );
 }
 
