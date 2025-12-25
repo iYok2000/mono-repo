@@ -122,7 +122,7 @@ function DevToolkitContent() {
                   เครื่องมือที่แนะนำให้ลองใช้
                 </p>
               </div>
-              <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {recommendedToolkits.map((toolkit) => {
                   const item: ServiceItem = {
                     id: toolkit.id,
@@ -153,7 +153,7 @@ function DevToolkitContent() {
                   <h2 className="text-lg sm:text-xl font-semibold">
                     {categoryName}
                   </h2>
-                  <div className="grid gap-3 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {categoryToolkits.map((toolkit) => {
                       const item: ServiceItem = {
                         id: toolkit.id,

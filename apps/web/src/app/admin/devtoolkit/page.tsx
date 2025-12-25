@@ -1,35 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Modal, ModalType } from "@/components/ui/Modal";
 import { LoadingFallback, PageSuspense } from "@/components/ui/LoadingFallback";
-import { ToolkitForm } from "./_components/ToolkitForm";
 import { ToolkitList } from "./_components/ToolkitList";
 import * as toolkitService from "@/services/toolkitService";
-import { TOOLKIT_STATUSES, PREDEFINED_TAGS } from "@/types/devtoolkit";
 import { mapToolkitError } from "./_utils/errorMapper";
 import { useDevToolkit } from "./_hooks/useDevToolkit";
-import { useToolkitForm } from "./_hooks/useToolkitForm";
 
 function DevToolkitContent() {
+  const router = useRouter();
   // Data fetching with custom hook
   const { toolkits, categories, loading, error, refreshToolkits } =
     useDevToolkit();
-
-  // Form management with custom hook
-  const {
-    formData,
-    setFormData,
-    formErrors,
-    editingId,
-    showForm,
-    setShowForm,
-    validateForm,
-    setEditMode,
-    resetForm,
-    handleTagToggle,
-  } = useToolkitForm(categories);
 
   // Modal states
   const [modal, setModal] = useState<{
@@ -62,47 +48,8 @@ function DevToolkitContent() {
   };
 
   // CRUD handlers
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      if (editingId) {
-        await toolkitService.updateToolkit(editingId, {
-          category_id: formData.category_id,
-          title: formData.title,
-          status: formData.status,
-          tags: formData.tags,
-          image: formData.image,
-          description: formData.description,
-        });
-        showModal("success", "สำเร็จ", "แก้ไข Toolkit สำเร็จแล้ว");
-      } else {
-        await toolkitService.createToolkit({
-          id: formData.id,
-          category_id: formData.category_id,
-          title: formData.title,
-          status: formData.status,
-          tags: formData.tags,
-          image: formData.image,
-          description: formData.description,
-        });
-        showModal("success", "สำเร็จ", "เพิ่ม Toolkit สำเร็จแล้ว");
-      }
-
-      resetForm();
-      refreshToolkits();
-    } catch (error: any) {
-      const message = mapToolkitError(error);
-      showModal("error", "เกิดข้อผิดพลาด", message);
-    }
-  };
-
   const handleEdit = (toolkit: any) => {
-    setEditMode(toolkit);
+    router.push(`/admin/devtoolkit/edit/${toolkit.id}`);
   };
 
   const handleDelete = (id: string) => {
@@ -149,30 +96,12 @@ function DevToolkitContent() {
             จัดการเครื่องมือสำหรับนักพัฒนา
           </p>
         </div>
-        <Button
-          onClick={() => {
-            resetForm();
-            setShowForm(!showForm);
-          }}
-          className="bg-(--color-primary) text-white"
-        >
-          {showForm ? "ยกเลิก" : "+ เพิ่ม Toolkit"}
-        </Button>
+        <Link href="/admin/devtoolkit/create">
+          <Button className="bg-(--color-primary) hover:bg-green-600 text-white">
+            + เพิ่ม Toolkit
+          </Button>
+        </Link>
       </div>
-
-      {showForm && (
-        <ToolkitForm
-          formData={formData}
-          formErrors={formErrors}
-          categories={categories}
-          statuses={TOOLKIT_STATUSES}
-          availableTags={PREDEFINED_TAGS}
-          isEditing={!!editingId}
-          onSubmit={handleSubmit}
-          onChange={setFormData}
-          onTagToggle={handleTagToggle}
-        />
-      )}
 
       <ToolkitList
         toolkits={toolkits}

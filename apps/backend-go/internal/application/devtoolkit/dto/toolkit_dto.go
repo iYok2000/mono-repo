@@ -20,4 +20,10 @@ type DevToolkitDetailDTO struct {
 	Tags        []string `json:"tags"`
 	Image       string   `json:"image"`
 	Description string   `json:"description"`
+
+	// New content fields - support markdown and rich content
+	MainContent string `json:"main_content,omitempty"`
+	HowToUse    string `json:"how_to_use,omitempty"`
+	Reference   string `json:"reference,omitempty"`
+	Example     string `json:"example,omitempty"`
 }

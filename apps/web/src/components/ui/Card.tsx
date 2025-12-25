@@ -1,7 +1,7 @@
 import { cx } from "@/lib/cx";
 
 export type CardVariant = "default" | "bordered" | "elevated" | "flat";
-export type CardPadding = "none" | "sm" | "md" | "lg";
+export type CardPadding = "none" | "xs" | "sm" | "md" | "lg";
 
 export interface CardProps {
   variant?: CardVariant;
@@ -31,6 +31,7 @@ const getVariantClasses = (variant: CardVariant): string => {
 const getPaddingClasses = (padding: CardPadding): string => {
   const paddings: Record<CardPadding, string> = {
     none: "",
+    xs: "p-3",
     sm: "p-4",
     md: "p-6",
     lg: "p-8",

@@ -7,7 +7,7 @@ export type BadgeVariant =
   | "warning"
   | "error"
   | "outline";
-export type BadgeSize = "sm" | "md" | "lg";
+export type BadgeSize = "xs" | "sm" | "md" | "lg";
 
 export interface BadgeProps {
   variant?: BadgeVariant;
@@ -39,6 +39,7 @@ const getVariantClasses = (variant: BadgeVariant): string => {
 
 const getSizeClasses = (size: BadgeSize): string => {
   const sizes: Record<BadgeSize, string> = {
+    xs: "px-1.5 py-0.5 text-[10px]",
     sm: "px-2 py-0.5 text-xs",
     md: "px-3 py-1 text-sm",
     lg: "px-4 py-1.5 text-base",

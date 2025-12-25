@@ -18,6 +18,12 @@ export interface DevToolkitDetail {
   tags: string[];
   image: string;
   description: string;
+
+  // New content fields - support markdown and rich content
+  main_content?: string;
+  how_to_use?: string;
+  reference?: string;
+  example?: string;
 }
 
 export type ToolkitStatus = "recommended" | "new" | "coming_soon" | "default";

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"monorepo/backend-go/internal/application/devtoolkit/dto"
+	"monorepo/backend-go/internal/application/devtoolkit/validation"
 	"monorepo/backend-go/internal/core/domain/devtoolkit/repository"
 	"monorepo/backend-go/internal/core/domain/devtoolkit/valueobject"
 	"monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/devtoolkit/model"
@@ -22,12 +23,19 @@ type CreateToolkitCommand struct {
 	Tags        []string
 	Image       string
 	Description string
+
+	// New content fields
+	MainContent string
+	HowToUse    string
+	Reference   string
+	Example     string
 }
 
 // CreateToolkitHandler handles the create toolkit command
 type CreateToolkitHandler struct {
 	categoryRepo repository.CategoryRepository
 	serviceRepo  repository.ServiceRepository
+	validator    *validation.ContentValidator
 }
 
 // NewCreateToolkitHandler creates a new CreateToolkitHandler
@@ -38,11 +46,59 @@ func NewCreateToolkitHandler(
 	return &CreateToolkitHandler{
 		categoryRepo: categoryRepo,
 		serviceRepo:  serviceRepo,
+		validator:    validation.NewContentValidator(),
 	}
 }
 
 // Handle executes the create toolkit command
 func (h *CreateToolkitHandler) Handle(ctx context.Context, cmd CreateToolkitCommand) (*dto.DevToolkitDTO, error) {
+	// Security: Validate and sanitize all inputs
+	sanitizedID, err := h.validator.ValidateAndSanitizeID(cmd.ID)
+	if err != nil {
+		return nil, apperrors.NewValidationError("id", err.Error())
+	}
+
+	sanitizedTitle, err := h.validator.ValidateAndSanitizeTitle(cmd.Title)
+	if err != nil {
+		return nil, apperrors.NewValidationError("title", err.Error())
+	}
+
+	sanitizedDesc, err := h.validator.ValidateAndSanitizeDescription(cmd.Description)
+	if err != nil {
+		return nil, apperrors.NewValidationError("description", err.Error())
+	}
+
+	sanitizedImage, err := h.validator.ValidateImageURL(cmd.Image)
+	if err != nil {
+		return nil, apperrors.NewValidationError("image", err.Error())
+	}
+
+	sanitizedTags, err := h.validator.ValidateTags(cmd.Tags)
+	if err != nil {
+		return nil, apperrors.NewValidationError("tags", err.Error())
+	}
+
+	// Sanitize new content fields (XSS protection)
+	sanitizedMainContent, err := h.validator.SanitizeMainContent(cmd.MainContent)
+	if err != nil {
+		return nil, apperrors.NewValidationError("main_content", err.Error())
+	}
+
+	sanitizedHowToUse, err := h.validator.SanitizeHowToUse(cmd.HowToUse)
+	if err != nil {
+		return nil, apperrors.NewValidationError("how_to_use", err.Error())
+	}
+
+	sanitizedReference, err := h.validator.SanitizeReference(cmd.Reference)
+	if err != nil {
+		return nil, apperrors.NewValidationError("reference", err.Error())
+	}
+
+	sanitizedExample, err := h.validator.SanitizeExample(cmd.Example)
+	if err != nil {
+		return nil, apperrors.NewValidationError("example", err.Error())
+	}
+
 	// Validate CategoryID exists (mandatory)
 	category, err := h.categoryRepo.GetByID(ctx, cmd.CategoryID)
 	if err != nil {
@@ -53,39 +109,46 @@ func (h *CreateToolkitHandler) Handle(ctx context.Context, cmd CreateToolkitComm
 	}
 
 	// Validate Status
+	if err := h.validator.ValidateStatus(cmd.Status); err != nil {
+		return nil, apperrors.NewValidationError("status", err.Error())
+	}
 	status := valueobject.ServiceStatus(cmd.Status)
 	if !status.IsValid() {
 		return nil, apperrors.NewValidationError("status", "invalid status value")
 	}
 
-	// Validate Tags
-	if !valueobject.ValidateTags(cmd.Tags) {
+	// Validate Tags against predefined list
+	if !valueobject.ValidateTags(sanitizedTags) {
 		return nil, apperrors.NewValidationError("tags", "invalid tag value")
 	}
 
-	// Marshal tags to JSON
-	tagsJSON, err := json.Marshal(cmd.Tags)
+	// Marshal tags to JSON (SQL injection protection via parameterized queries)
+	tagsJSON, err := json.Marshal(sanitizedTags)
 	if err != nil {
 		return nil, apperrors.NewInternalError("failed to marshal tags", err)
 	}
 
-	// Create toolkit model
+	// Create toolkit model with sanitized data
 	toolkit := &model.DevToolkitModel{
-		ID:         cmd.ID,
+		ID:         sanitizedID,
 		CategoryID: cmd.CategoryID,
-		Title:      cmd.Title,
+		Title:      sanitizedTitle,
 		Status:     cmd.Status,
 		Tags:       datatypes.JSON(tagsJSON),
-		Image:      cmd.Image,
+		Image:      sanitizedImage,
 	}
 
-	// Create detail model
+	// Create detail model with sanitized content
 	detail := &model.DevToolkitDetailModel{
-		ToolkitID:   cmd.ID,
-		Description: cmd.Description,
+		ToolkitID:   sanitizedID,
+		Description: sanitizedDesc,
+		MainContent: sanitizedMainContent,
+		HowToUse:    sanitizedHowToUse,
+		Reference:   sanitizedReference,
+		Example:     sanitizedExample,
 	}
 
-	// Persist toolkit and detail
+	// Persist toolkit and detail (using GORM transactions - prevents SQL injection)
 	if err := h.serviceRepo.CreateWithDetail(ctx, toolkit, detail); err != nil {
 		return nil, apperrors.NewInternalError("failed to create toolkit", err)
 	}
@@ -96,7 +159,7 @@ func (h *CreateToolkitHandler) Handle(ctx context.Context, cmd CreateToolkitComm
 		CategoryID:  toolkit.CategoryID,
 		Title:       toolkit.Title,
 		Status:      toolkit.Status,
-		Tags:        cmd.Tags,
+		Tags:        sanitizedTags,
 		Image:       toolkit.Image,
 		Description: detail.Description,
 	}, nil

@@ -48,6 +48,163 @@ As an AI agent for this project, you MUST:
 - **Comments**: Brief, descriptive only where needed - not everything
 - **Code length**: Keep functions and files manageable
 
+### Security Best Practices (MANDATORY)
+
+**CRITICAL RULE: ALL string fields MUST be validated and sanitized**
+
+#### Backend (Go) - Input Validation & Sanitization
+
+- **ALWAYS use ContentValidator** for any string input from users, APIs, or external sources
+- **NEVER directly use raw user input** in database operations, responses, or business logic
+- **MANDATORY protections** for every string field:
+  1. ✅ **XSS Protection**: HTML escaping, dangerous tag removal
+  2. ✅ **SQL Injection Prevention**: Use GORM parameterized queries (never raw SQL)
+  3. ✅ **Length Validation**: Enforce maximum length limits
+  4. ✅ **Format Validation**: Validate data format (URL, email, ID format, etc.)
+
+**Example - REQUIRED pattern for all command handlers:**
+```go
+// ❌ BAD: Using raw input directly
+func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
+    model := &Model{
+        Title: cmd.Title,  // DANGEROUS! No validation/sanitization
+        Content: cmd.Content,
+    }
+    return h.repo.Create(ctx, model)
+}
+
+// ✅ GOOD: Always validate and sanitize
+func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
+    // MANDATORY: Use ContentValidator
+    validator := validation.NewContentValidator()
+
+    // Validate and sanitize EVERY string field
+    sanitizedTitle, err := validator.ValidateAndSanitizeTitle(cmd.Title)
+    if err != nil {
+        return apperrors.NewValidationError("title", err.Error())
+    }
+
+    sanitizedContent, err := validator.SanitizeMainContent(cmd.Content)
+    if err != nil {
+        return apperrors.NewValidationError("content", err.Error())
+    }
+
+    // Now safe to use
+    model := &Model{
+        Title: sanitizedTitle,
+        Content: sanitizedContent,
+    }
+    return h.repo.Create(ctx, model)
+}
+```
+
+#### Frontend (React/Next.js) - Client-Side Validation
+
+- **Client validation is for UX only**, NOT security
+- **Backend validation is the primary defense**
+- Still provide client-side validation for:
+  - Better user experience
+  - Immediate feedback
+  - Reduced unnecessary API calls
+
+**Example:**
+```tsx
+// Client-side validation (UX only)
+const validateForm = () => {
+  const errors = {};
+  if (!title.trim()) errors.title = "Required";
+  if (title.length > 255) errors.title = "Too long";
+  return errors;
+};
+
+// Backend will re-validate for security
+await api.createToolkit(formData); // Backend validates again
+```
+
+#### Mandatory Validation Locations
+
+**MUST validate at these layers:**
+
+1. **HTTP Request Layer** (`internal/infrastructure/adapter/http/request/`)
+   - Gin binding validation (`binding:"required,min=1,max=255"`)
+   - Basic format checks
+
+2. **Command/Query Handler Layer** (`internal/application/*/command/`, `internal/application/*/query/`)
+   - **ContentValidator usage (MANDATORY)**
+   - Business logic validation
+   - Sanitization before passing to repository
+
+3. **Repository Layer** (`internal/infrastructure/adapter/persistence/`)
+   - Use GORM parameterized queries (automatic SQL injection protection)
+   - Never use raw SQL with string concatenation
+
+#### Content Validation Reference
+
+**Location**: `internal/application/[module]/validation/content_validator.go`
+
+**Available validators (use these for ALL string inputs):**
+```go
+validator := validation.NewContentValidator()
+
+// For titles, names, short text
+sanitized, err := validator.ValidateAndSanitizeTitle(input)
+
+// For descriptions, summaries
+sanitized, err := validator.ValidateAndSanitizeDescription(input)
+
+// For markdown content (removes dangerous HTML)
+sanitized, err := validator.SanitizeMainContent(input)
+sanitized, err := validator.SanitizeHowToUse(input)
+sanitized, err := validator.SanitizeReference(input)
+sanitized, err := validator.SanitizeExample(input)
+
+// For URLs
+sanitized, err := validator.ValidateImageURL(input)
+
+// For IDs (alphanumeric + dash/underscore only)
+sanitized, err := validator.ValidateAndSanitizeID(input)
+
+// For tag arrays
+sanitized, err := validator.ValidateTags(tags)
+```
+
+#### When to Create New Validators
+
+If you're adding a new feature with string fields:
+1. Check if existing validators cover your use case
+2. If not, add new methods to `content_validator.go`
+3. Follow the same pattern: validate length, format, and sanitize
+4. Document the max length and validation rules
+
+**Example - Adding new validator:**
+```go
+// In content_validator.go
+const MaxEmailLength = 320 // RFC 5321
+
+func (v *ContentValidator) ValidateEmail(email string) (string, error) {
+    email = strings.TrimSpace(email)
+
+    if email == "" {
+        return "", fmt.Errorf("email: %w", ErrEmptyField)
+    }
+
+    if len(email) > MaxEmailLength {
+        return "", fmt.Errorf("email: %w (max %d)", ErrFieldTooLong, MaxEmailLength)
+    }
+
+    // Validate email format
+    emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+    if !emailRegex.MatchString(email) {
+        return "", fmt.Errorf("email: invalid format")
+    }
+
+    // HTML escape (defense in depth)
+    email = html.EscapeString(email)
+
+    return email, nil
+}
+```
+
 ### React Best Practices
 
 - **Controlled Components**: Use `value` prop on `<select>`, `<input>`, `<textarea>` - NEVER use `selected` on `<option>` or `checked` on `<input type="checkbox">` directly
@@ -85,6 +242,20 @@ As an AI agent for this project, you MUST:
   // exportService.ts: import type { VocExportData } from './export/types'
   // Result: exportService → types (NO LOOP)
   ```
+
+### TypeScript/JavaScript Regex Patterns
+
+- **ALWAYS escape forward slashes** (`/`) in regex patterns inside string literals
+- **Why**: Unescaped `</` in string literal causes parsing error (looks like closing tag)
+- **Examples**:
+  ```typescript
+  // ❌ BAD: Unescaped forward slash causes parse error
+  html = html.replace(/(<li.*</li>\n?)+/g, "<ul>$&</ul>");
+  
+  // ✅ GOOD: Escape forward slash with backslash
+  html = html.replace(/(<li.*<\/li>\n?)+/g, "<ul>$&</ul>");
+  ```
+- **Rule**: In regex inside `.replace()`, `.match()`, etc., write `<\/` not `</` for closing tags
 
 ## 🚫 Strict Rules (NEVER Break These)
 
