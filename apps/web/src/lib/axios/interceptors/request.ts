@@ -1,7 +1,7 @@
 import type { InternalAxiosRequestConfig } from 'axios';
 
 export const requestInterceptor = (config: InternalAxiosRequestConfig) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -21,7 +21,7 @@ export const requestInterceptor = (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
-export const requestErrorInterceptor = (error: any) => {
+export const requestErrorInterceptor = (error: unknown) => {
   console.error('❌ Request Error:', error);
   return Promise.reject(error);
 };

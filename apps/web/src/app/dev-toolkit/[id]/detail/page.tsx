@@ -33,7 +33,7 @@ export default function ToolkitDetailPage() {
         setError(null);
         const data = await toolkitService.getToolkitById(id);
         setToolkit(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error loading toolkit:", err);
         setError("ไม่พบข้อมูล Toolkit หรือเกิดข้อผิดพลาด");
       } finally {

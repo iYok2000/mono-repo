@@ -64,7 +64,7 @@ function DevToolkitContent() {
       setDeleteConfirm({ show: false, id: null });
       showModal("success", "สำเร็จ", "ลบ Toolkit สำเร็จแล้ว");
       refreshToolkits();
-    } catch (error: any) {
+    } catch (error: unknown) {
       setDeleteConfirm({ show: false, id: null });
       const message = mapToolkitError(error);
       showModal("error", "เกิดข้อผิดพลาด", message);

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"monorepo/backend-go/internal/application/devtoolkit/dto"
+	"monorepo/backend-go/internal/application/devtoolkit/validation"
 	"monorepo/backend-go/internal/core/domain/devtoolkit/entity"
 	"monorepo/backend-go/internal/core/domain/devtoolkit/repository"
 	apperrors "monorepo/backend-go/pkg/errors"
@@ -18,24 +19,44 @@ type CreateCategoryCommand struct {
 
 // CreateCategoryHandler handles the create category command
 type CreateCategoryHandler struct {
-	repo repository.CategoryRepository
+	repo      repository.CategoryRepository
+	validator *validation.ContentValidator
 }
 
 // NewCreateCategoryHandler creates a new CreateCategoryHandler
-func NewCreateCategoryHandler(repo repository.CategoryRepository) *CreateCategoryHandler {
-	return &CreateCategoryHandler{repo: repo}
+func NewCreateCategoryHandler(repo repository.CategoryRepository, validator *validation.ContentValidator) *CreateCategoryHandler {
+	return &CreateCategoryHandler{
+		repo:      repo,
+		validator: validator,
+	}
 }
 
 // Handle executes the create category command
 func (h *CreateCategoryHandler) Handle(ctx context.Context, cmd CreateCategoryCommand) (*dto.CategoryDTO, error) {
-	// Create domain entity with validation
-	category, err := entity.NewCategory(cmd.ID, cmd.NameEn, cmd.NameTh)
+	// Security: Validate and sanitize all inputs first (XSS protection)
+	sanitizedID, err := h.validator.ValidateAndSanitizeCategoryID(cmd.ID)
+	if err != nil {
+		return nil, apperrors.NewValidationError("id", err.Error())
+	}
+
+	sanitizedNameEn, err := h.validator.ValidateAndSanitizeCategoryName(cmd.NameEn, "name_en")
+	if err != nil {
+		return nil, apperrors.NewValidationError("name_en", err.Error())
+	}
+
+	sanitizedNameTh, err := h.validator.ValidateAndSanitizeCategoryName(cmd.NameTh, "name_th")
+	if err != nil {
+		return nil, apperrors.NewValidationError("name_th", err.Error())
+	}
+
+	// Create domain entity with sanitized data
+	category, err := entity.NewCategory(sanitizedID, sanitizedNameEn, sanitizedNameTh)
 	if err != nil {
 		return nil, apperrors.NewValidationErrorSimple(err.Error())
 	}
 
 	// Check if category already exists
-	existing, err := h.repo.GetByID(ctx, cmd.ID)
+	existing, err := h.repo.GetByID(ctx, sanitizedID)
 	if err != nil {
 		return nil, apperrors.NewInternalError("failed to check existing category", err)
 	}

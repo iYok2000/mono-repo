@@ -5,16 +5,18 @@ import type { ToolkitStatus, PredefinedTag } from "@/types/devtoolkit";
 import { TOOLKIT_STATUS_LABELS } from "@/types/devtoolkit";
 import { cx } from "@/lib/cx";
 
+interface ToolkitFormData {
+  id: string;
+  category_id: string;
+  title: string;
+  status: ToolkitStatus;
+  tags: string[];
+  image: string;
+  description: string;
+}
+
 interface ToolkitFormProps {
-  formData: {
-    id: string;
-    category_id: string;
-    title: string;
-    status: ToolkitStatus;
-    tags: string[];
-    image: string;
-    description: string;
-  };
+  formData: ToolkitFormData;
   formErrors: {
     id: string;
     category_id: string;
@@ -26,7 +28,7 @@ interface ToolkitFormProps {
   availableTags: readonly string[];
   isEditing: boolean;
   onSubmit: (e: React.FormEvent) => void;
-  onChange: (data: any) => void;
+  onChange: (updater: (prev: ToolkitFormData) => ToolkitFormData) => void;
   onTagToggle: (tag: string) => void;
 }
 
@@ -41,8 +43,8 @@ export const ToolkitForm = ({
   onChange,
   onTagToggle,
 }: ToolkitFormProps) => {
-  const handleChange = (field: string, value: any) => {
-    onChange((prev: any) => ({ ...prev, [field]: value }));
+  const handleChange = (field: keyof ToolkitFormData, value: string | string[] | ToolkitStatus) => {
+    onChange((prev) => ({ ...prev, [field]: value }));
   };
 
   return (

@@ -123,7 +123,7 @@ export default function CreateDevToolkitPage() {
       setTimeout(() => {
         router.push("/admin/devtoolkit");
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setModal({
         isOpen: true,
         type: "error",

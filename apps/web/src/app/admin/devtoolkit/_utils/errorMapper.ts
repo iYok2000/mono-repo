@@ -11,6 +11,7 @@ interface BackendError {
 interface ErrorResponse {
   response?: {
     data?: BackendError;
+    status?: number;
   };
   message?: string;
 }
@@ -18,12 +19,17 @@ interface ErrorResponse {
 /**
  * Map backend error to user-friendly message
  */
-export const mapToolkitError = (error: any): string => {
-  // Check if it's an axios error with response
-  const backendError = error?.response?.data as BackendError | undefined;
+export const mapToolkitError = (error: unknown): string => {
+  // Type guard for axios-like error
+  if (!error || typeof error !== 'object') {
+    return 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
+  }
+
+  const err = error as ErrorResponse;
+  const backendError = err?.response?.data;
 
   if (!backendError) {
-    return error?.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
+    return err?.message || "เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ";
   }
 
   const { code, message } = backendError;
@@ -127,8 +133,13 @@ const mapGenericError = (message: string): string => {
 /**
  * Get specific field error for form validation
  */
-export const getFieldError = (error: any, field: string): string | null => {
-  const backendError = error?.response?.data as BackendError | undefined;
+export const getFieldError = (error: unknown, field: string): string | null => {
+  if (!error || typeof error !== 'object') {
+    return null;
+  }
+
+  const err = error as ErrorResponse;
+  const backendError = err?.response?.data;
 
   if (!backendError?.message) {
     return null;

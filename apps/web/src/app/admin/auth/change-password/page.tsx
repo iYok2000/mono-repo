@@ -54,8 +54,9 @@ export default function ChangePasswordPage() {
     try {
       await changePassword(currentPassword, newPassword);
       // Will be redirected to login page after successful change
-    } catch (err: any) {
-      setError(err.message || "เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setError(error.message || "เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsLoading(false);
     }

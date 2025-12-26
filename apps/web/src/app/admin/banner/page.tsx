@@ -77,10 +77,11 @@ function BannerContent() {
       setDeleteConfirm({ show: false, id: null });
       showModal("success", "สำเร็จ", "ลบ Banner สำเร็จแล้ว");
       refreshBanners();
-    } catch (error: any) {
+    } catch (error: unknown) {
       setDeleteConfirm({ show: false, id: null });
+      const err = error as { response?: { data?: { message?: string } } };
       const message =
-        error.response?.data?.message || "เกิดข้อผิดพลาดในการลบ Banner";
+        err.response?.data?.message || "เกิดข้อผิดพลาดในการลบ Banner";
       showModal("error", "เกิดข้อผิดพลาด", message);
     }
   };
@@ -103,9 +104,10 @@ function BannerContent() {
         `${!currentStatus ? "เปิด" : "ปิด"}ใช้งาน Banner สำเร็จแล้ว`
       );
       refreshBanners();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       const message =
-        error.response?.data?.message ||
+        err.response?.data?.message ||
         "เกิดข้อผิดพลาดในการเปลี่ยนสถานะ Banner";
       showModal("error", "เกิดข้อผิดพลาด", message);
     }
@@ -146,9 +148,10 @@ function BannerContent() {
       await refreshBanners();
 
       showModal("success", "สำเร็จ", "เรียงลำดับ Banner สำเร็จแล้ว");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       const message =
-        error.response?.data?.message ||
+        err.response?.data?.message ||
         "เกิดข้อผิดพลาดในการเรียงลำดับ Banner";
       showModal("error", "เกิดข้อผิดพลาด", message);
     }

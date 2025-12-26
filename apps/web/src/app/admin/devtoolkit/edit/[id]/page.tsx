@@ -87,7 +87,7 @@ export default function EditDevToolkitPage() {
           reference: data.reference || "",
           example: data.example || "",
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         setModal({
           isOpen: true,
           type: "error",
@@ -160,7 +160,7 @@ export default function EditDevToolkitPage() {
       setTimeout(() => {
         router.push("/admin/devtoolkit");
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setModal({
         isOpen: true,
         type: "error",

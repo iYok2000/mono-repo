@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ContentEditorProps {
   label: string;
@@ -16,7 +18,7 @@ interface ContentEditorProps {
 
 /**
  * ContentEditor - Textarea with markdown support and character count
- * Security: All content is sanitized on backend, this is just the input UI
+ * Security: Uses react-markdown for safe rendering (no XSS vulnerability)
  */
 export function ContentEditor({
   label,
@@ -33,36 +35,6 @@ export function ContentEditor({
 
   const characterCount = value.length;
   const isOverLimit = maxLength ? characterCount > maxLength : false;
-
-  // Simple markdown preview (basic implementation)
-  const renderMarkdownPreview = (text: string) => {
-    if (!text) return "<p class='text-(--color-muted)'>No content</p>";
-
-    // Basic markdown rendering (for preview only - NOT used for final display)
-    // Final rendering will use a proper markdown library
-    let html = text;
-
-    // Headers
-    html = html.replace(/^### (.+)$/gm, "<h3 class='text-lg font-semibold mt-4 mb-2'>$1</h3>");
-    html = html.replace(/^## (.+)$/gm, "<h2 class='text-xl font-semibold mt-6 mb-3'>$1</h2>");
-    html = html.replace(/^# (.+)$/gm, "<h1 class='text-2xl font-bold mt-8 mb-4'>$1</h1>");
-
-    // Bold and italic
-    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-
-    // Lists
-    html = html.replace(/^- (.+)$/gm, "<li class='ml-4'>• $1</li>");
-    html = html.replace(/(<li.*<\/li>\n?)+/g, "<ul class='my-2'>$&</ul>");
-
-    // Links
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<a href='$2' class='text-(--color-primary) hover:underline' target='_blank' rel='noopener noreferrer'>$1</a>");
-
-    // Line breaks
-    html = html.replace(/\n/g, "<br/>");
-
-    return html;
-  };
 
   return (
     <div className="space-y-2">
@@ -85,10 +57,57 @@ export function ContentEditor({
       )}
 
       {showPreview ? (
-        <div
-          className="min-h-[200px] p-4 rounded-md border border-(--color-border) bg-(--color-surface) prose prose-sm max-w-none text-foreground"
-          dangerouslySetInnerHTML={{ __html: renderMarkdownPreview(value) }}
-        />
+        <div className="min-h-[200px] p-4 rounded-md border border-(--color-border) bg-(--color-surface) prose prose-sm max-w-none text-foreground">
+          {value ? (
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-2xl font-bold mt-8 mb-4">{children}</h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-xl font-semibold mt-6 mb-3">{children}</h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-lg font-semibold mt-4 mb-2">{children}</h3>
+                ),
+                ul: ({ children }) => (
+                  <ul className="my-2 ml-4 list-disc">{children}</ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="my-2 ml-4 list-decimal">{children}</ol>
+                ),
+                li: ({ children }) => <li className="ml-2">{children}</li>,
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    className="text-blue-600 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {children}
+                  </a>
+                ),
+                strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                code: ({ children }) => (
+                  <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-red-600 dark:text-red-400">
+                    {children}
+                  </code>
+                ),
+                pre: ({ children }) => (
+                  <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-x-auto my-4">
+                    {children}
+                  </pre>
+                ),
+              }}
+            >
+              {value}
+            </ReactMarkdown>
+          ) : (
+            <p className="text-(--color-muted)">No content</p>
+          )}
+        </div>
       ) : (
         <textarea
           value={value}

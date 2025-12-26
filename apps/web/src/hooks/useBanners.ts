@@ -21,9 +21,10 @@ export const useBanners = () => {
         .sort((a, b) => b.priority - a.priority);
       
       setBanners(activeBanners);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to fetch banners:", err);
-      setError(err.message || "Failed to load banners");
+      const error = err as { message?: string };
+      setError(error.message || "Failed to load banners");
     } finally {
       setLoading(false);
     }

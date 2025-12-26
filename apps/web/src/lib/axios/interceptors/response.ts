@@ -12,34 +12,36 @@ export const responseInterceptor = (response: AxiosResponse) => {
   return response;
 };
 
-export const responseErrorInterceptor = (error: any) => {
+export const responseErrorInterceptor = (error: unknown) => {
   // Network error or no response
-  if (!error.response) {
+  if (!error || typeof error !== 'object' || !('response' in error)) {
     if (process.env.NODE_ENV === 'development') {
+      const err = error as { message?: string; config?: { url?: string }; code?: string };
       console.error('❌ Network Error:', {
-        message: error.message,
-        url: error.config?.url,
-        code: error.code,
+        message: err.message,
+        url: err.config?.url,
+        code: err.code,
       });
     }
     return Promise.reject(error);
   }
 
   // HTTP error with response
-  const { status, data } = error.response;
+  const axiosError = error as { response: { status: number; data: unknown }; config?: { url?: string } };
+  const { status, data } = axiosError.response;
 
   if (process.env.NODE_ENV === 'development') {
     console.error('❌ Response Error:', {
       status,
-      url: error.config?.url,
+      url: axiosError.config?.url,
       data,
     });
   }
 
   if (status === 401) {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem('access_token');
+      window.location.href = '/admin/auth/login';
     }
   }
 

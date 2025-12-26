@@ -80,10 +80,8 @@ func (r *serviceRepositoryImpl) UpdateWithDetail(ctx context.Context, toolkit *m
 }
 
 func (r *serviceRepositoryImpl) Delete(ctx context.Context, id string) error {
+	// Detail will be cascade deleted automatically due to OnDelete:CASCADE constraint
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("toolkit_id = ?", id).Delete(&model.DevToolkitDetailModel{}).Error; err != nil {
-			return fmt.Errorf("delete toolkit detail: %w", err)
-		}
 		if err := tx.Where("id = ?", id).Delete(&model.DevToolkitModel{}).Error; err != nil {
 			return fmt.Errorf("delete toolkit: %w", err)
 		}

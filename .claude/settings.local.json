@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(go build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(tree:*)",
+      "Bash(xargs:*)",
+      "Bash(pnpm add:*)",
+      "Bash(for file in src/hooks/useBanners.ts src/app/admin/devtoolkit/edit/[id]/page.tsx src/app/admin/devtoolkit/page.tsx src/app/admin/banner/edit/[id]/page.tsx src/app/admin/banner/page.tsx src/app/admin/devtoolkit/create/page.tsx src/app/admin/banner/_hooks/useBanner.ts src/app/admin/banner/create/page.tsx src/app/admin/auth/change-password/page.tsx src/app/admin/auth/login/page.tsx src/app/dev-toolkit/[id]/detail/page.tsx)",
+      "Bash(do sed -i '' 's/catch *\\(error: *any\\)/catch \\(error: unknown\\)/g; s/catch *\\(err: *any\\)/catch \\(err: unknown\\)/g' \"$file\")",
+      "Bash(echo:*)",
+      "Bash(done)"
     ]
   }
 }

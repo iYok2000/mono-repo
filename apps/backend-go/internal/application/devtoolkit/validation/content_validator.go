@@ -11,16 +11,18 @@ import (
 
 // Content field length limits (performance & security)
 const (
-	MaxTitleLength       = 255
-	MaxDescriptionLength = 5000   // ~5KB
-	MaxMainContentLength = 50000  // ~50KB for articles
-	MaxHowToUseLength    = 10000  // ~10KB
-	MaxReferenceLength   = 5000   // ~5KB
-	MaxExampleLength     = 20000  // ~20KB for code examples
-	MaxImageURLLength    = 2048   // Standard URL limit
-	MaxIDLength          = 100
-	MaxTagCount          = 10
-	MaxTagLength         = 50
+	MaxTitleLength         = 255
+	MaxDescriptionLength   = 5000 // ~5KB
+	MaxMainContentLength   = 50000 // ~50KB for articles
+	MaxHowToUseLength      = 10000 // ~10KB
+	MaxReferenceLength     = 5000 // ~5KB
+	MaxExampleLength       = 20000 // ~20KB for code examples
+	MaxImageURLLength      = 2048 // Standard URL limit
+	MaxIDLength            = 100
+	MaxTagCount            = 10
+	MaxTagLength           = 50
+	MaxCategoryIDLength    = 50  // Category ID limit
+	MaxCategoryNameLength  = 100 // Category name limit
 )
 
 var (
@@ -224,10 +226,10 @@ func (v *ContentValidator) removeDangerousTags(content string) string {
 // ValidateStatus validates status value
 func (v *ContentValidator) ValidateStatus(status string) error {
 	validStatuses := map[string]bool{
-		"recommended":  true,
-		"new":          true,
-		"coming_soon":  true,
-		"default":      true,
+		"recommended": true,
+		"new":         true,
+		"coming_soon": true,
+		"default":     true,
 	}
 
 	if !validStatuses[status] {
@@ -235,4 +237,49 @@ func (v *ContentValidator) ValidateStatus(status string) error {
 	}
 
 	return nil
+}
+
+// ValidateAndSanitizeCategoryID validates and sanitizes category ID
+// Category ID should be alphanumeric, dash, underscore only (no spaces)
+func (v *ContentValidator) ValidateAndSanitizeCategoryID(id string) (string, error) {
+	id = strings.TrimSpace(id)
+
+	if id == "" {
+		return "", fmt.Errorf("category id: %w", ErrEmptyField)
+	}
+
+	if utf8.RuneCountInString(id) > MaxCategoryIDLength {
+		return "", fmt.Errorf("category id: %w (max %d)", ErrFieldTooLong, MaxCategoryIDLength)
+	}
+
+	// No spaces allowed in category ID
+	if strings.Contains(id, " ") {
+		return "", fmt.Errorf("category id: %w (spaces not allowed)", ErrInvalidCharacters)
+	}
+
+	// Only allow alphanumeric, dash, underscore
+	matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+$`, id)
+	if !matched {
+		return "", fmt.Errorf("category id: %w (only alphanumeric, dash, underscore allowed)", ErrInvalidCharacters)
+	}
+
+	return id, nil
+}
+
+// ValidateAndSanitizeCategoryName validates and sanitizes category name (English or Thai)
+func (v *ContentValidator) ValidateAndSanitizeCategoryName(name string, fieldName string) (string, error) {
+	name = strings.TrimSpace(name)
+
+	if name == "" {
+		return "", fmt.Errorf("%s: %w", fieldName, ErrEmptyField)
+	}
+
+	if utf8.RuneCountInString(name) > MaxCategoryNameLength {
+		return "", fmt.Errorf("%s: %w (max %d)", fieldName, ErrFieldTooLong, MaxCategoryNameLength)
+	}
+
+	// HTML escape to prevent XSS
+	name = html.EscapeString(name)
+
+	return name, nil
 }

@@ -2,7 +2,7 @@ package banner
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 
 	"monorepo/backend-go/internal/core/domain/banner/repository"
 	"monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/banner/model"
@@ -60,8 +60,10 @@ func (r *bannerRepositoryImpl) List(ctx context.Context, filters repository.List
 	}
 
 	if filters.SegmentTier != nil {
-		// JSONB contains filter - check if the array contains the specified tier
-		query = query.Where("segment_tiers @> ?", fmt.Sprintf(`["%s"]`, *filters.SegmentTier))
+		// JSONB contains filter - uses GIN index
+		// Use json.Marshal for safe parameter binding
+		tierJSON, _ := json.Marshal([]string{*filters.SegmentTier})
+		query = query.Where("segment_tiers @> ?", tierJSON)
 	}
 
 	if filters.StartDate != nil {
@@ -72,7 +74,7 @@ func (r *bannerRepositoryImpl) List(ctx context.Context, filters repository.List
 		query = query.Where("end_date <= ?", *filters.EndDate)
 	}
 
-	// Order by priority (descending), then created_at (descending)
+	// Order by priority (descending), then created_at (descending) - uses composite index
 	query = query.Order("priority DESC, created_at DESC")
 
 	var banners []*model.BannerModel
@@ -80,16 +82,31 @@ func (r *bannerRepositoryImpl) List(ctx context.Context, filters repository.List
 	return banners, err
 }
 
-// UpdatePriorities batch updates banner priorities in a transaction
+// UpdatePriorities batch updates banner priorities in a transaction using bulk update
 func (r *bannerRepositoryImpl) UpdatePriorities(ctx context.Context, updates []repository.PriorityUpdate) error {
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, update := range updates {
-			if err := tx.Model(&model.BannerModel{}).
-				Where("id = ?", update.ID).
-				Update("priority", update.Priority).Error; err != nil {
-				return fmt.Errorf("update priority for banner %s: %w", update.ID, err)
-			}
-		}
+	if len(updates) == 0 {
 		return nil
+	}
+
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// Build CASE WHEN statement for bulk update
+		var ids []string
+		var args []interface{}
+		caseStmt := "CASE id "
+
+		for _, update := range updates {
+			ids = append(ids, update.ID)
+			caseStmt += "WHEN ? THEN ? "
+			args = append(args, update.ID, update.Priority)
+		}
+		caseStmt += "END"
+
+		// Append ids for WHERE IN clause
+		args = append(args, ids)
+
+		// Single UPDATE query instead of N queries
+		return tx.Model(&model.BannerModel{}).
+			Where("id IN ?", ids).
+			Update("priority", gorm.Expr(caseStmt, args...)).Error
 	})
 }

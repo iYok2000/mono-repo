@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import { MobileNotSupported } from "@/components/layout/MobileNotSupported";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,14 +35,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <MobileNotSupported />
+          <ErrorBoundary>
+            <MobileNotSupported />
 
-          <div className="hidden md:flex min-h-screen flex-col">
-            <Header />
-            <div className="flex-1">
-              {children}
+            <div className="hidden md:flex min-h-screen flex-col">
+              <Header />
+              <div className="flex-1">
+                {children}
+              </div>
             </div>
-          </div>
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

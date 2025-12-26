@@ -15,8 +15,9 @@ export const useBanner = () => {
       setError(null);
       const data = await bannerService.getBanners();
       setBanners(data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || "เกิดข้อผิดพลาดในการโหลดข้อมูล");
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || "เกิดข้อผิดพลาดในการโหลดข้อมูล");
     } finally {
       setLoading(false);
     }
@@ -30,7 +31,7 @@ export const useBanner = () => {
     try {
       const data = await bannerService.getBanners();
       setBanners(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to refresh banners:", err);
     }
   }, []);

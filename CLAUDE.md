@@ -1,365 +1,267 @@
-# CLAUDE.md
+# AI Agent Rules
 
-> AI Agent Rules & Responsibilities
+## 🎯 Core Rules
 
-## 🎯 Core Responsibilities
+**MUST DO:**
+- Follow software engineering best practices (security, performance first)
+- Read `project_context.md` before starting tasks
+- Balance good design vs over-engineering
+- ASK before: deleting files, config changes, new libraries, breaking changes
 
-As an AI agent for this project, you MUST:
+**STRICT RULES:**
+1. ❌ NO file deletion without confirmation
+2. ❌ NO config changes without approval  
+3. ❌ NO new libraries without explanation
+4. ❌ NO breaking existing functionality
+5. ❌ NO creating .md files without permission
+6. ✅ ALWAYS analyze impact first
 
-1. **Write, Review, Debug, Create Features, and Explain Code**
+**Documentation Rules:**
+- ❌ NEVER create .md files without user approval
+- ✅ If approved, ONLY create in `project_context/` folder
+- ✅ ALWAYS check if topic already exists in existing files first
+- ✅ Read `PROJECT_CONTEXT.md` to see all documented features
+- ✅ Ask: "Should I document this?" before creating new files
 
-   - Follow software engineering best practices
-   - Balance between good design and avoiding over-engineering
-   - Always assess and evaluate before implementing
-   - Research best practices for security and performance FIRST
+## 📋 Code Standards
 
-2. **Maintain Context Awareness**
-   - Read `project_context.md` to understand project structure and business logic
-   - Remember what you've done and WHY
-   - Ensure changes don't break existing functionality
+**Quality:**
+- Error handling: comprehensive, not excessive
+- Naming: camelCase (JS/TS), PascalCase (components)
+- Comments: brief, only where needed
+- Files: reasonably sized, well-organized
 
-## 📋 Code Guidelines
+## 🔒 Security (MANDATORY)
 
-### File Management
+### Input Validation Pattern
 
-- **NEVER delete files** without explicit user confirmation
-- **ALWAYS ask before creating new files** or show examples first
-- Suggest file separation when it improves organization
-- Keep files reasonably sized (not too long)
-- **NEVER create unrelated files** to the given task
+**CRITICAL: ALL user inputs MUST be validated**
 
-### Configuration Changes
-
-- **ALWAYS ask before modifying critical configs**
-- Explain the impact of any config change
-- Get user confirmation for package.json, tsconfig, vite.config, etc.
-
-### Dependencies & Libraries
-
-- **ALWAYS ask before adding new libraries**
-- Provide clear reasoning: why this library? what problem does it solve?
-- Consider bundle size and security implications
-
-### Code Quality Standards
-
-- **Error handling**: Comprehensive but not excessive
-- **Security & Performance**: Top priority, follow researched best practices
-- **Naming conventions**: Use universal/standard conventions (camelCase for JS/TS, PascalCase for components, etc.)
-- **Comments**: Brief, descriptive only where needed - not everything
-- **Code length**: Keep functions and files manageable
-
-### Security Best Practices (MANDATORY)
-
-**CRITICAL RULE: ALL string fields MUST be validated and sanitized**
-
-#### Backend (Go) - Input Validation & Sanitization
-
-- **ALWAYS use ContentValidator** for any string input from users, APIs, or external sources
-- **NEVER directly use raw user input** in database operations, responses, or business logic
-- **MANDATORY protections** for every string field:
-  1. ✅ **XSS Protection**: HTML escaping, dangerous tag removal
-  2. ✅ **SQL Injection Prevention**: Use GORM parameterized queries (never raw SQL)
-  3. ✅ **Length Validation**: Enforce maximum length limits
-  4. ✅ **Format Validation**: Validate data format (URL, email, ID format, etc.)
-
-**Example - REQUIRED pattern for all command handlers:**
 ```go
-// ❌ BAD: Using raw input directly
-func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
-    model := &Model{
-        Title: cmd.Title,  // DANGEROUS! No validation/sanitization
-        Content: cmd.Content,
-    }
-    return h.repo.Create(ctx, model)
-}
+// ❌ BAD: Raw input
+model := &Model{Title: cmd.Title}
 
-// ✅ GOOD: Always validate and sanitize
-func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
-    // MANDATORY: Use ContentValidator
-    validator := validation.NewContentValidator()
-
-    // Validate and sanitize EVERY string field
-    sanitizedTitle, err := validator.ValidateAndSanitizeTitle(cmd.Title)
-    if err != nil {
-        return apperrors.NewValidationError("title", err.Error())
-    }
-
-    sanitizedContent, err := validator.SanitizeMainContent(cmd.Content)
-    if err != nil {
-        return apperrors.NewValidationError("content", err.Error())
-    }
-
-    // Now safe to use
-    model := &Model{
-        Title: sanitizedTitle,
-        Content: sanitizedContent,
-    }
-    return h.repo.Create(ctx, model)
-}
-```
-
-#### Frontend (React/Next.js) - Client-Side Validation
-
-- **Client validation is for UX only**, NOT security
-- **Backend validation is the primary defense**
-- Still provide client-side validation for:
-  - Better user experience
-  - Immediate feedback
-  - Reduced unnecessary API calls
-
-**Example:**
-```tsx
-// Client-side validation (UX only)
-const validateForm = () => {
-  const errors = {};
-  if (!title.trim()) errors.title = "Required";
-  if (title.length > 255) errors.title = "Too long";
-  return errors;
-};
-
-// Backend will re-validate for security
-await api.createToolkit(formData); // Backend validates again
-```
-
-#### Mandatory Validation Locations
-
-**MUST validate at these layers:**
-
-1. **HTTP Request Layer** (`internal/infrastructure/adapter/http/request/`)
-   - Gin binding validation (`binding:"required,min=1,max=255"`)
-   - Basic format checks
-
-2. **Command/Query Handler Layer** (`internal/application/*/command/`, `internal/application/*/query/`)
-   - **ContentValidator usage (MANDATORY)**
-   - Business logic validation
-   - Sanitization before passing to repository
-
-3. **Repository Layer** (`internal/infrastructure/adapter/persistence/`)
-   - Use GORM parameterized queries (automatic SQL injection protection)
-   - Never use raw SQL with string concatenation
-
-#### Content Validation Reference
-
-**Location**: `internal/application/[module]/validation/content_validator.go`
-
-**Available validators (use these for ALL string inputs):**
-```go
+// ✅ GOOD: Validate first
 validator := validation.NewContentValidator()
-
-// For titles, names, short text
-sanitized, err := validator.ValidateAndSanitizeTitle(input)
-
-// For descriptions, summaries
-sanitized, err := validator.ValidateAndSanitizeDescription(input)
-
-// For markdown content (removes dangerous HTML)
-sanitized, err := validator.SanitizeMainContent(input)
-sanitized, err := validator.SanitizeHowToUse(input)
-sanitized, err := validator.SanitizeReference(input)
-sanitized, err := validator.SanitizeExample(input)
-
-// For URLs
-sanitized, err := validator.ValidateImageURL(input)
-
-// For IDs (alphanumeric + dash/underscore only)
-sanitized, err := validator.ValidateAndSanitizeID(input)
-
-// For tag arrays
-sanitized, err := validator.ValidateTags(tags)
+title, err := validator.ValidateAndSanitizeTitle(cmd.Title)
+if err != nil { return apperrors.NewValidationError("title", err.Error()) }
+model := &Model{Title: title}
 ```
 
-#### When to Create New Validators
+**Required Protections:**
+1. XSS: HTML escape, remove dangerous tags
+2. SQL Injection: GORM parameterized queries only
+3. Length: Enforce max limits
+4. Format: URL, email, ID validation
 
-If you're adding a new feature with string fields:
-1. Check if existing validators cover your use case
-2. If not, add new methods to `content_validator.go`
-3. Follow the same pattern: validate length, format, and sanitize
-4. Document the max length and validation rules
+**Validation Layers:**
+- HTTP: Gin binding (`binding:"required,max=255"`)
+- Handler: ContentValidator (mandatory)
+- Repository: Parameterized queries
 
-**Example - Adding new validator:**
+**Available Validators:**
 ```go
-// In content_validator.go
-const MaxEmailLength = 320 // RFC 5321
+validator.ValidateAndSanitizeTitle(input)
+validator.ValidateAndSanitizeDescription(input)
+validator.SanitizeMainContent(input) // Markdown
+validator.ValidateImageURL(input)
+validator.ValidateAndSanitizeID(input)
+validator.ValidateTags(tags)
+```
 
-func (v *ContentValidator) ValidateEmail(email string) (string, error) {
-    email = strings.TrimSpace(email)
+## 🗄️ Database Query Rules
 
-    if email == "" {
-        return "", fmt.Errorf("email: %w", ErrEmptyField)
-    }
+### Index Strategy
 
-    if len(email) > MaxEmailLength {
-        return "", fmt.Errorf("email: %w (max %d)", ErrFieldTooLong, MaxEmailLength)
-    }
+**When to add:**
+- WHERE clauses (frequent)
+- ORDER BY columns
+- JOIN conditions
+- JSONB with `@>` queries
 
-    // Validate email format
-    emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-    if !emailRegex.MatchString(email) {
-        return "", fmt.Errorf("email: invalid format")
-    }
+**When NOT to add:**
+- Display fields (URLs, descriptions)
+- Primary keys (auto-indexed)
+- Unused in queries
 
-    // HTML escape (defense in depth)
-    email = html.EscapeString(email)
+**Types:**
+```go
+// Composite
+IsActive bool `gorm:"index:idx_name"`
+Priority int `gorm:"index:idx_name,priority:2"`
 
-    return email, nil
+// GIN (JSONB)
+Tags datatypes.JSON `gorm:"index:,type:gin"`
+```
+
+**Naming:** `idx_[table]_[columns]`
+
+### GORM Best Practices
+
+```go
+// ❌ Redundant Select() with all columns
+Select("id, name, email, created_at")
+
+// ✅ Let GORM auto-select or select only needed
+db.Model(&Model{})  // All
+Select("id, name")  // Optimization
+
+// ❌ SQL Injection risk
+fmt.Sprintf(`["%s"]`, input)
+
+// ✅ Safe escaping
+tierJSON, _ := json.Marshal([]string{input})
+query.Where("tags @> ?", tierJSON)
+
+// ❌ Slow bulk update
+for _, item := range items {
+    db.Where("id = ?", item.ID).Update("status", item.Status)
+}
+
+// ✅ Fast CASE WHEN
+caseStmt := "CASE id WHEN ? THEN ? ... END"
+db.Where("id IN ?", ids).Update("status", gorm.Expr(caseStmt, args...))
+
+// ✅ Always use context
+db.WithContext(ctx).Find(&models)
+```
+
+**Checklist:**
+- [ ] Indexed columns in WHERE/ORDER BY?
+- [ ] No `fmt.Sprintf()` in queries?
+- [ ] `json.Marshal()` for JSONB?
+- [ ] Bulk updates use CASE WHEN?
+- [ ] No redundant Select()?
+- [ ] WithContext() everywhere?
+
+## ⚛️ React/TypeScript Rules
+
+**Controlled Components:**
+```tsx
+// ❌ BAD
+<select><option selected>...</option></select>
+
+// ✅ GOOD
+<select value={val} onChange={handler}>...</select>
+```
+
+**No Circular Imports:**
+- Types in dedicated modules
+- Import direction: service → types (not reverse)
+
+**Regex Escaping:**
+```typescript
+// ❌ BAD
+.replace(/(<li.*</li>)+/g, "")
+
+// ✅ GOOD
+.replace(/(<li.*<\/li>)+/g, "")  // Escape </
+```
+
+## 🔄 Shared Code Changes (CRITICAL)
+
+**RULE: Code used in multiple places = HIGH RISK**
+
+When modifying:
+- Shared utilities/helpers
+- Common types/interfaces
+- Reusable components
+- Base classes/services
+- API contracts
+- Database schemas
+
+**MANDATORY Process:**
+
+1. **Identify ALL Usages**
+   - Search entire codebase for references
+   - List every file that imports/uses it
+   - Understand context in each location
+
+2. **Assess Complete Impact**
+   - What breaks if this changes?
+   - What errors will appear (TypeScript/compiler/runtime)?
+   - What edge cases exist in each usage?
+   - Are there different usage patterns?
+
+3. **Fix ALL Instances**
+   - Update EVERY affected file
+   - Handle ALL error cases
+   - Test each location works correctly
+   - DO NOT leave any location broken
+
+4. **Verify Completion**
+   - No TypeScript/compiler errors
+   - No IDE errors shown
+   - No runtime errors possible
+   - All tests pass
+
+**Example - Type Changes:**
+```typescript
+// ❌ WRONG: Change in 11 files, miss error handling
+catch (error: any) { }  →  catch (error: unknown) { }
+// Forgot: const message = error.response?.data?.message  // Type error!
+
+// ✅ CORRECT: Change type AND all usages
+catch (error: unknown) {
+    const err = error as ApiError;
+    const message = err.response?.data?.message || "Error";
 }
 ```
 
-### React Best Practices
+**Consequences of Incomplete Changes:**
+- ❌ IDE shows red squiggly lines everywhere
+- ❌ TypeScript errors block development
+- ❌ Runtime crashes in production
+- ❌ User loses trust in code quality
+- ❌ Wastes hours fixing preventable issues
 
-- **Controlled Components**: Use `value` prop on `<select>`, `<input>`, `<textarea>` - NEVER use `selected` on `<option>` or `checked` on `<input type="checkbox">` directly
-  ```tsx
-  // ❌ BAD: Uncontrolled pattern (HTML way)
-  <select>
-    <option value="1" selected>Option 1</option>
-  </select>
-  
-  // ✅ GOOD: Controlled component (React way)
-  <select value={value} onChange={handleChange}>
-    <option value="1">Option 1</option>
-  </select>
-  ```
-- **State as Single Source of Truth**: React manages selection through state, not DOM attributes
-- **Why**: Ensures consistency, prevents conflicts between React state and DOM state, avoids warnings
+**Checklist:**
+- [ ] Searched all usages codebase-wide?
+- [ ] Listed affected files completely?
+- [ ] Analyzed error cases in each location?
+- [ ] Fixed ALL files (not 10/11, ALL)?
+- [ ] Verified zero IDE/TypeScript errors?
+- [ ] Tested changes work in all contexts?
+- [ ] Prevented recurrence of same issue?
 
-### Module Structure & Imports
+**Golden Rule:** If it's used in N places, fix ALL N places. No exceptions.
 
-- **NO circular dependencies**: NEVER create import cycles (A imports B, B imports A)
-- **Type definitions location**: Place shared types/interfaces in dedicated type modules
-- **Import direction**: Always import from type modules, never re-export from service modules back to types
-- **Example of WRONG approach**:
-  ```typescript
-  // ❌ BAD: Circular dependency
-  // exportService.ts exports VocExportData
-  // types/data.ts: export type { VocExportData } from '../../exportService'
-  // exportService.ts: import { ... } from './export/types'
-  // Result: exportService → types → exportService (LOOP!)
-  ```
-- **Example of CORRECT approach**:
-  ```typescript
-  // ✅ GOOD: One-way import
-  // types/data.ts: export interface VocExportData { ... }
-  // exportService.ts: import type { VocExportData } from './export/types'
-  // Result: exportService → types (NO LOOP)
-  ```
+## 📝 Documentation
 
-### TypeScript/JavaScript Regex Patterns
+**Location:**
+- `PROJECT_CONTEXT.md` - Main overview + links
+- `project_context/[feature].md` - Individual features
 
-- **ALWAYS escape forward slashes** (`/`) in regex patterns inside string literals
-- **Why**: Unescaped `</` in string literal causes parsing error (looks like closing tag)
-- **Examples**:
-  ```typescript
-  // ❌ BAD: Unescaped forward slash causes parse error
-  html = html.replace(/(<li.*</li>\n?)+/g, "<ul>$&</ul>");
-  
-  // ✅ GOOD: Escape forward slash with backslash
-  html = html.replace(/(<li.*<\/li>\n?)+/g, "<ul>$&</ul>");
-  ```
-- **Rule**: In regex inside `.replace()`, `.match()`, etc., write `<\/` not `</` for closing tags
+**Creation Rules:**
+- ❌ NEVER create .md without user permission
+- ✅ Check existing files in `project_context/` first
+- ✅ Check if topic covered in other files
+- ✅ Only create in `project_context/` folder if approved
 
-## 🚫 Strict Rules (NEVER Break These)
+**When to update:**
+- NEW features: ASK "Should I document?" → Create in `project_context/`
+- EXISTING features: Update relevant file after changes
 
-1. **NO file deletion** unless explicitly instructed
-2. **NO config changes** without user approval
-3. **NO arbitrary modifications** - always analyze impact first
-4. **NO new libraries** without asking and explaining
-5. **NO breaking existing functionality** - verify compatibility before changes
+**Format:** Overview, Why, How, Code examples, Dependencies
+**Naming:** `kebab-case.md`
 
-## 📝 Documentation Requirements
+## 💬 Communication
 
-### Project Context Structure
-
-**Main file**: `PROJECT_CONTEXT.md` - Overview and links to feature docs  
-**Feature docs**: `project_context/[feature-name].md` - Detailed feature documentation
-
-### When Working on ANY Task:
-
-1. **For NEW features** (not documented yet):
-
-   - Ask clarifying questions FIRST
-   - After implementation, create new file in `project_context/[feature-name].md`
-   - Add reference link in main `PROJECT_CONTEXT.md`
-   - Include:
-     - Feature heading
-     - Brief explanation and reasoning
-     - Key code snippets or patterns
-     - Why this approach was chosen
-
-2. **For EXISTING features** (already documented):
-
-   - Read existing context from `project_context/[feature-name].md` first
-   - After modifications, ask: "Should I update the feature doc now?"
-   - Update the relevant feature file to reflect current state
-
-3. **File Organization Rules**:
-
-   - One feature = One file in `project_context/`
-   - File naming: `kebab-case.md` (e.g., `user-authentication.md`, `payment-system.md`)
-   - Always add/update link in main `PROJECT_CONTEXT.md`
-   - Keep each file focused on single feature or module
-
-4. **Format for feature files** (`project_context/[feature-name].md`):
-
-   ````markdown
-   # Feature Name
-
-   ## Overview
-
-   Brief description of what this feature does
-
-   ## Why
-
-   Reasoning and business requirements
-
-   ## How
-
-   Technical implementation approach
-
-   ## Code Examples
-
-   ```typescript
-   // Key code snippets or patterns
-   ```
-   ````
-
-   ## Dependencies
-
-   - Related features or packages
-
-   ## Notes
-
-   Important considerations, trade-offs, or gotchas
-
-   ```
-
-   ```
-
-## 💬 Communication Style
-
-- **Concise but detailed** explanations
+- Concise but complete
 - Mix English/Thai naturally
-- Show code examples when helpful
-- If uncertain, ASK before acting
-- Explain trade-offs when presenting options
+- Show code when helpful
+- ASK when uncertain
+- Explain trade-offs
 
-## 🔍 Before Making Changes
+## 🔍 Before Changes
 
-Always consider:
-
-1. ✅ Does this align with project architecture?
-2. ✅ Are there security implications?
-3. ✅ What's the performance impact?
-4. ✅ Will this break existing features?
-5. ✅ Is this the simplest solution that works?
-6. ✅ Should I ask the user first?
-
-## 🧠 Context Maintenance
-
-- **Read** `project_context.md` at the start of each task
-- **Update** it after completing significant work
-- **Preserve** the reasoning behind decisions
-- **Ensure** both humans and AI can understand the context
+1. Aligns with architecture?
+2. Security implications?
+3. Performance impact?
+4. Breaks existing features?
+5. Simplest solution?
+6. Should ask user first?
 
 ---
 
-**Remember**: Your role is to be a thoughtful, careful, and knowledgeable development partner - not just a code generator. Think before you act, ask when uncertain, and always prioritize project stability and quality.
+**Remember:** Think before acting. Ask when uncertain. Prioritize stability and quality.

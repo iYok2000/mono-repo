@@ -8,6 +8,7 @@ import (
 	bannerquery "monorepo/backend-go/internal/application/banner/query"
 	"monorepo/backend-go/internal/application/devtoolkit/command"
 	"monorepo/backend-go/internal/application/devtoolkit/query"
+	"monorepo/backend-go/internal/application/devtoolkit/validation"
 	"monorepo/backend-go/internal/config"
 	"monorepo/backend-go/internal/core/domain/auth"
 	bannerrepository "monorepo/backend-go/internal/core/domain/banner/repository"
@@ -85,9 +86,12 @@ func New(cfg *config.Config) (*Container, error) {
 	authRepo := auth.NewPostgresRepository(sqlDB)
 	authService := auth.NewService(authRepo, cfg.JWTSecret)
 
-	// Initialize command handlers
-	createCategoryHandler := command.NewCreateCategoryHandler(categoryRepo)
-	updateCategoryHandler := command.NewUpdateCategoryHandler(categoryRepo)
+	// Initialize validators
+	contentValidator := validation.NewContentValidator()
+
+	// Initialize command handlers (with validators for security)
+	createCategoryHandler := command.NewCreateCategoryHandler(categoryRepo, contentValidator)
+	updateCategoryHandler := command.NewUpdateCategoryHandler(categoryRepo, contentValidator)
 	deleteCategoryHandler := command.NewDeleteCategoryHandler(categoryRepo)
 	createToolkitHandler := command.NewCreateToolkitHandler(categoryRepo, serviceRepo)
 	updateToolkitHandler := command.NewUpdateToolkitHandler(categoryRepo, serviceRepo)

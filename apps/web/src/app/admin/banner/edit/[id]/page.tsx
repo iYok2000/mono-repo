@@ -25,7 +25,7 @@ export default function EditBannerPage() {
         setLoading(true);
         const data = await getBannerById(bannerId);
         setBanner(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to fetch banner:", err);
         setError(err.response?.data?.message || "Failed to load banner");
       } finally {
@@ -45,7 +45,7 @@ export default function EditBannerPage() {
       setTimeout(() => {
         router.push("/admin/banner");
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update banner:", error);
       setErrorMessage(
         error.response?.data?.message || "Failed to update banner"

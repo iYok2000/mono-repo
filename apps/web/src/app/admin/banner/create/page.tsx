@@ -20,7 +20,7 @@ export default function CreateBannerPage() {
       setTimeout(() => {
         router.push("/admin/banner");
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to create banner:", error);
       setErrorMessage(
         error.response?.data?.message || "Failed to create banner"

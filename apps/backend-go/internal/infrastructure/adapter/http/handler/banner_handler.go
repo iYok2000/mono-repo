@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"monorepo/backend-go/internal/application/banner/command"
 	"monorepo/backend-go/internal/application/banner/query"
 	"monorepo/backend-go/internal/core/domain/banner/repository"
+	"monorepo/backend-go/internal/core/domain/banner/valueobject"
 	"monorepo/backend-go/internal/infrastructure/adapter/http/request"
 	"monorepo/backend-go/internal/infrastructure/adapter/http/response"
 
@@ -59,9 +61,23 @@ func (h *BannerHandler) ListBanners(c *gin.Context) {
 		}
 	}
 
-	// Segment tier filter
+	// Segment tier filter - validate against predefined tiers
 	if tier := c.Query("segment_tier"); tier != "" {
-		filters.SegmentTier = &tier
+		tier = strings.TrimSpace(tier)
+		// Security: Validate tier value to prevent invalid JSONB queries
+		validTier := false
+		for _, predefinedTier := range valueobject.PredefinedSegmentTiers {
+			if tier == predefinedTier {
+				validTier = true
+				break
+			}
+		}
+		if validTier {
+			filters.SegmentTier = &tier
+		} else {
+			c.JSON(http.StatusBadRequest, response.NewErrorResponse("VALIDATION_ERROR", fmt.Sprintf("invalid segment_tier: must be one of %v", valueobject.PredefinedSegmentTiers)))
+			return
+		}
 	}
 
 	// Start date filter
