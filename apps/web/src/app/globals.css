@@ -3,17 +3,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fcfb;
-  --foreground: #0d1c19;
-  --color-primary: #66bb6a;
-  --color-secondary: #499c8d;
-  --color-border: #e7f4f1;
-  --color-button: #e7f4f1;
+  /* Brand Colors */
+  --primary: #10B981;
+  --primary-hover: #059669;
+  --primary-soft: rgba(16, 185, 129, 0.12);
+  --focus-ring: rgba(16, 185, 129, 0.35);
 
-  --color-surface: #ffffff;
-  --color-surface-alt: #f3faf6;
-  --color-muted: #4b615a;
+  /* Backgrounds / Surfaces */
+  --background: #FAFAF8;
+  --card: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-muted: #F5F5F2;
 
+  /* Text Colors */
+  --foreground: #1A1A1A;
+  --muted: #666666;
+  --subtle: #999999;
+
+  /* Borders */
+  --border: #E8E8E6;
+  --border-hover: #CCCCCC;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.06);
+  --shadow-md: 0 8px 24px rgba(26, 26, 26, 0.10);
+
+  /* Mascot (Byte) */
+  --byte-body: #1A1A1A;
+  --byte-body-light: #2D2D2D;
+  --byte-led: #10B981;
+
+  /* Accent Colors */
+  --violet: #8B5CF6;
+  --violet-hover: #7C3AED;
+  --violet-active: #6D28D9;
+  --amber: #F59E0B;
+
+  /* Squad Gradient Colors */
+  --squad-pink: #EC4899;
+  --squad-purple: #8B5CF6;
+  --squad-blue: #3B82F6;
+  --squad-gradient: linear-gradient(135deg, #EC4899 0%, #8B5CF6 50%, #3B82F6 100%);
+
+  /* Status Colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+
+  /* Legacy compatibility (for existing components) */
+  --color-primary: var(--primary);
+  --color-secondary: var(--primary-hover);
+  --color-border: var(--border);
+  --color-button: var(--surface-muted);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-muted);
+  --color-muted: var(--muted);
+
+  /* Fonts */
   --font-sans: "Inter", "Noto Sans", sans-serif;
   --font-chillax: "Chillax-Variable", sans-serif;
   --font-mono: var(--font-geist-mono);
@@ -43,4 +89,85 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* ===== Animations ===== */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Animation Utility Classes ===== */
+.animate-slide-in {
+  animation: slide-in 0.6s ease-out forwards;
+}
+
+.animate-pulse-led {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.7s ease-out forwards;
+}
+
+/* Staggered animation delays */
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
 }

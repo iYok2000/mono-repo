@@ -89,7 +89,7 @@ INSERT INTO admin_users (username, email, password_hash, full_name, role, must_c
 VALUES (
     'superadmin',
     'admin@localhost.local',
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIj.KM3K6i', -- Admin123!@#
+    '$2a$12$i5jgAVGdlj3V.3evreIRJuuFklVYJ5w0JFpc6F67eEPXNG2v0TK5u', -- Admin123!@#
     'Super Administrator',
     'super_admin',
     true -- Force password change on first login

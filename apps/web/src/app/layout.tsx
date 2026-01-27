@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import Header from "@/components/layout/Header";
+import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
+import { BodyLayout } from "@/components/layout/BodyLayout";
 import { MobileNotSupported } from "@/components/layout/MobileNotSupported";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -31,18 +32,16 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
           <ErrorBoundary>
-            <MobileNotSupported />
-
-            <div className="hidden md:flex min-h-screen flex-col">
-              <Header />
-              <div className="flex-1">
+            <div className="flex min-h-screen flex-col">
+              <ConditionalHeader />
+              <BodyLayout variant="default">
                 {children}
-              </div>
+              </BodyLayout>
             </div>
           </ErrorBoundary>
         </ThemeProvider>
