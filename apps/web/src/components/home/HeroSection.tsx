@@ -9,7 +9,7 @@ import { FaPeopleArrows } from "react-icons/fa";
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-[var(--background)]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text Content */}
           <div className="space-y-8 animate-slide-up">
@@ -25,22 +25,21 @@ export function HeroSection() {
             <div className="space-y-4">
               <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
                 <span className="text-[var(--primary)]">
-                  ของขวัญความทรงจำแบบ NFC
+                  ของขวัญวิดีโอแบบ NFC
                 </span>
                 <br />
                 <span className="text-[var(--foreground)]">
-                  ที่เปิดด้วยคลิปหรือข้อความแทนใจ
+                  ที่เปิดคลิปความทรงจำได้ทันที
                 </span>
               </h1>
 
               <p className="text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-xl font-normal">
-                ของขวัญวิดีโอที่แตะการ์ดแล้วเปิดได้ทันที — เหมาะสำหรับวันเกิด
-                ครบรอบ และทุกโอกาสพิเศษ
+                แตะการ์ดเพียงครั้งเดียว ก็เปิดคลิป วิดีโอ หรือข้อความแทนใจได้ทันที — ของขวัญสุดพิเศษสำหรับวันเกิด ครบรอบ และทุกโอกาสที่คุณอยากให้ความทรงจำอยู่ได้นาน
               </p>
             </div>
 
             {/* Micro-proof Badges */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--primary-soft)] flex items-center justify-center mt-0.5">
                   <Check className="w-3 h-3 text-[var(--primary)]" />
@@ -70,7 +69,7 @@ export function HeroSection() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 pt-1">
               <Button icon={<Play className="w-4 h-4" />} variant="large">
                 สั่งของขวัญด่วน
               </Button>
@@ -80,24 +79,6 @@ export function HeroSection() {
               <Button icon={<Play className="w-4 h-4" />} variant="link">
                 ดูตัวอย่างของขวัญ
               </Button>
-            </div>
-
-            {/* Anchor Links */}
-            <div className="flex items-center gap-2 pt-4 text-sm">
-              <span className="text-[var(--primary)]">•</span>
-              <a
-                href="#how-it-works"
-                className="text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors font-medium"
-              >
-                วิธีทำงาน
-              </a>
-              <span className="text-[var(--primary)]">•</span>
-              <a
-                href="#faq"
-                className="text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors font-medium"
-              >
-                FAQ
-              </a>
             </div>
           </div>
 
@@ -116,7 +97,7 @@ export function HeroSection() {
                     <div className="w-64 h-64 bg-[var(--byte-body)] rounded-[3rem] shadow-2xl flex items-center justify-center">
                       {/* LED Eye/Screen */}
                       <div className="w-32 h-32 bg-[var(--byte-led)] rounded-2xl animate-pulse-led shadow-lg shadow-[var(--primary)]/50 flex items-center justify-center">
-                        <div className="w-16 h-16 bg-white/20 rounded-xl"></div>
+                        <div className="w-16 h-16 bg-[var(--card)]/20 rounded-xl"></div>
                       </div>
                     </div>
 
@@ -151,8 +132,8 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[var(--card)] to-transparent pointer-events-none"></div>
+      {/* Bottom Gradient - moved down to avoid covering buttons */}
+      <div className="absolute -bottom-16 left-0 right-0 h-32 bg-gradient-to-t from-[var(--card)] to-transparent pointer-events-none"></div>
     </section>
   );
 }

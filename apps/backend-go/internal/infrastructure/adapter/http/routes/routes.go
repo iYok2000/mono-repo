@@ -14,7 +14,12 @@ import (
 func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Container) {
 	// Global middleware
 	router.Use(middleware.Logger())
+	router.Use(middleware.SecurityHeadersGin()) // Security headers
 	router.Use(middleware.CORS(cfg))
+
+	// Rate limiters
+	loginRateLimiter := middleware.NewLoginRateLimiter()
+	apiRateLimiter := middleware.NewAPIRateLimiter()
 
 	// Health check endpoints
 	router.GET("/", handler.Root(cfg))
@@ -30,14 +35,14 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 
 		auth := api.Group("/auth")
 		{
-			auth.POST("/login", authHandler.Login)
+			auth.POST("/login", loginRateLimiter.LimitGin(), authHandler.Login)
 			auth.POST("/refresh", authHandler.RefreshToken)
 			auth.POST("/logout", authHandler.Logout)
 			auth.GET("/me", authMiddleware.RequireAuth(), authHandler.Me)
 			auth.POST("/change-password", authMiddleware.RequireAuth(), authHandler.ChangePassword)
 		}
 
-		// Category endpoints
+		// Category endpoints - Protected with authentication
 		categoryHandler := handler.NewCategoryHandler(
 			cnt.CreateCategoryHandler,
 			cnt.UpdateCategoryHandler,
@@ -50,12 +55,13 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 		{
 			categories.GET("", categoryHandler.ListCategories)
 			categories.GET("/:id", categoryHandler.GetCategory)
-			categories.POST("", categoryHandler.CreateCategory)
-			categories.PUT("/:id", categoryHandler.UpdateCategory)
-			categories.DELETE("/:id", categoryHandler.DeleteCategory)
+			// Write operations require authentication
+			categories.POST("", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), categoryHandler.CreateCategory)
+			categories.PUT("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), categoryHandler.UpdateCategory)
+			categories.DELETE("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), categoryHandler.DeleteCategory)
 		}
 
-		// Toolkit endpoints
+		// Toolkit endpoints - Protected with authentication
 		toolkitHandler := handler.NewToolkitHandler(
 			cnt.CreateToolkitHandler,
 			cnt.UpdateToolkitHandler,
@@ -68,12 +74,13 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 		{
 			toolkits.GET("", toolkitHandler.ListToolkits)
 			toolkits.GET("/:id", toolkitHandler.GetToolkit)
-			toolkits.POST("", toolkitHandler.CreateToolkit)
-			toolkits.PUT("/:id", toolkitHandler.UpdateToolkit)
-			toolkits.DELETE("/:id", toolkitHandler.DeleteToolkit)
+			// Write operations require authentication
+			toolkits.POST("", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), toolkitHandler.CreateToolkit)
+			toolkits.PUT("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), toolkitHandler.UpdateToolkit)
+			toolkits.DELETE("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), toolkitHandler.DeleteToolkit)
 		}
 
-		// Banner endpoints
+		// Banner endpoints - Protected with authentication
 		bannerHandler := handler.NewBannerHandler(
 			cnt.CreateBannerHandler,
 			cnt.UpdateBannerHandler,
@@ -87,10 +94,11 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 		{
 			banners.GET("", bannerHandler.ListBanners)
 			banners.GET("/:id", bannerHandler.GetBanner)
-			banners.POST("", bannerHandler.CreateBanner)
-			banners.PUT("/:id", bannerHandler.UpdateBanner)
-			banners.DELETE("/:id", bannerHandler.DeleteBanner)
-			banners.POST("/reorder", bannerHandler.ReorderBanners)
+			// Write operations require authentication
+			banners.POST("", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), bannerHandler.CreateBanner)
+			banners.PUT("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), bannerHandler.UpdateBanner)
+			banners.DELETE("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), bannerHandler.DeleteBanner)
+			banners.POST("/reorder", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), bannerHandler.ReorderBanners)
 		}
 	}
 }

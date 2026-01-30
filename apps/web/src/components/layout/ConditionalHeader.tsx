@@ -1,15 +1,23 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 
-export function ConditionalHeader() {
+function ConditionalHeaderComponent() {
   const pathname = usePathname();
   
-  // Don't show header on /card routes
-  if (pathname.startsWith("/card")) {
-    return null;
-  }
+  // Check if we should hide the header
+  const shouldHideHeader = useMemo(() => {
+    return pathname.startsWith("/card");
+  }, [pathname]);
   
-  return <Header />;
+  // Always render Header, just hide it with CSS to prevent unmounting
+  return (
+    <div style={{ display: shouldHideHeader ? 'none' : 'block' }}>
+      <Header />
+    </div>
+  );
 }
+
+export const ConditionalHeader = memo(ConditionalHeaderComponent);

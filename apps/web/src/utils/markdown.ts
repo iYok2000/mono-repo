@@ -1,13 +1,17 @@
 /**
- * Markdown rendering utility with simple memoization
+ * Markdown rendering utility with simple memoization and XSS protection
  * Converts markdown text to HTML with custom styling
+ * Uses DOMPurify to sanitize HTML and prevent XSS attacks
  */
+
+import DOMPurify from 'isomorphic-dompurify';
 
 const markdownCache = new Map<string, string>();
 
 /**
  * Renders markdown to HTML with custom Tailwind classes
  * Uses memoization to avoid re-rendering the same content
+ * Sanitizes HTML to prevent XSS attacks
  */
 export function renderMarkdown(text: string): string {
   if (!text) return "";
@@ -81,10 +85,28 @@ export function renderMarkdown(text: string): string {
   // Single line breaks
   html = html.replace(/\n/g, "<br/>");
 
-  // Cache the result
-  markdownCache.set(text, html);
+  // Sanitize HTML to prevent XSS attacks
+  const sanitizedHtml = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: [
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'p', 'br', 'strong', 'em', 'u', 's',
+      'a', 'ul', 'ol', 'li',
+      'code', 'pre',
+      'blockquote',
+      'svg', 'path'
+    ],
+    ALLOWED_ATTR: [
+      'class', 'href', 'target', 'rel',
+      'fill', 'stroke', 'viewBox', 'stroke-linecap', 'stroke-linejoin', 'stroke-width', 'd'
+    ],
+    ALLOW_DATA_ATTR: false,
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+  });
 
-  return html;
+  // Cache the sanitized result
+  markdownCache.set(text, sanitizedHtml);
+
+  return sanitizedHtml;
 }
 
 /**

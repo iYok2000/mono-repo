@@ -17,7 +17,7 @@ const getVariantClasses = (variant: ButtonVariant): string => {
   const variants: Record<ButtonVariant, string> = {
     // Primary Button (Main CTA) - Height: 44px
     primary:
-      "bg-[var(--primary)] text-white border-none hover:bg-[var(--primary-hover)] active:bg-[var(--primary-hover)] py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium",
+      "bg-[var(--primary)] text-[var(--card)] border-none hover:bg-[var(--primary-hover)] active:bg-[var(--primary-hover)] py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium",
     
     // Secondary Button (Outline) - Height: 44px
     secondary:
@@ -25,11 +25,11 @@ const getVariantClasses = (variant: ButtonVariant): string => {
     
     // Large Button (Hero CTA) - Height: 56px
     large:
-      "bg-[var(--primary)] text-white border-none hover:bg-[var(--primary-hover)] py-3.5 px-8 rounded-xl text-[0.9375rem] font-medium min-w-[200px]",
+      "bg-[var(--primary)] text-[var(--card)] border-none hover:bg-[var(--primary-hover)] py-3.5 px-8 rounded-xl text-[0.9375rem] font-medium min-w-[200px]",
     
     // Small Button (Product Card) - Height: 36px
     small:
-      "bg-[var(--foreground)] text-white border-none hover:bg-black py-2 px-4 rounded-lg text-sm font-medium",
+      "bg-[var(--foreground)] text-[var(--card)] border-none hover:bg-[var(--foreground-hover)] py-2 px-4 rounded-lg text-sm font-medium",
     
     // Pill/Badge Button - Height: 32px
     pill:

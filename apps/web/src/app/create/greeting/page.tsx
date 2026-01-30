@@ -209,7 +209,12 @@ export default function CreateGreetingPage() {
                   onChange={(e) => handleChange("email", e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none transition-all"
                   placeholder="somchai@gybyte.com"
+                  pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                  required
                 />
+                {formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
+                  <p className="mt-1.5 text-sm text-red-500">กรุณากรอกอีเมลที่ถูกต้อง</p>
+                )}
               </div>
 
               {/* Phone */}

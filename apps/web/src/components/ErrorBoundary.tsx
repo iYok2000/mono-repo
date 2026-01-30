@@ -71,10 +71,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 </p>
                 {process.env.NODE_ENV === "development" && this.state.error && (
                   <details className="mb-4">
-                    <summary className="text-xs text-red-600 cursor-pointer mb-2">
+                    <summary className="text-xs text-[var(--error)] cursor-pointer mb-2">
                       รายละเอียดข้อผิดพลาด (Development only)
                     </summary>
-                    <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-auto max-h-40">
+                    <pre className="text-xs bg-[var(--surface-muted)] p-3 rounded overflow-auto max-h-40">
                       {this.state.error.toString()}
                       {"\n"}
                       {this.state.error.stack}
@@ -86,7 +86,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                     this.setState({ hasError: false, error: null });
                     window.location.reload();
                   }}
-                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors text-sm font-medium"
+                  className="w-full px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--card)] rounded-md transition-colors text-sm font-medium"
                 >
                   รีเฟรชหน้าเว็บ
                 </button>

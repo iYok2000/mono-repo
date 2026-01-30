@@ -1,6 +1,9 @@
 export { HeroSection } from "./HeroSection";
+export { WhatIsItSection } from "./WhatIsItSection";
 export { SKUSection } from "./SKUSection";
 export { HowItWorksSection } from "./HowItWorksSection";
+export { OccasionsSection } from "./OccasionsSection";
+export { WhyNFCSection } from "./WhyNFCSection";
 export { PreviewSection } from "./WhyUsSection";
 export { WhyUsSection } from "./WhyUsNewSection";
 export { FAQSection } from "./FAQSection";

@@ -70,6 +70,7 @@ project_context/
 - 📄 [DevToolkit Management](./project_context/devtoolkit-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
 - 📄 [Banner Management System](./project_context/BANNER_MANAGEMENT.md) - CRUD + Drag & Drop reordering with CQRS pattern, mobile preview, multi-language support (TH/EN), and segment tier filtering
 - 📄 [Admin Authentication](./project_context/ADMIN_AUTH_README.md) - JWT-based authentication system for Admin panel
+- 📄 [Digital Business Card](./project_context/business-card.md) - Interactive digital business cards with QR sharing, vCard export, email validation, click-to-call/email, social media integration, and brand-colored UI
 - 📄 [Utils Documentation](./project_context/utils-documentation.md) - Comprehensive guide to all utility functions, custom hooks, error mappers, and helpers with performance optimization patterns
 
 ---
@@ -215,6 +216,7 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
 
 ### Recent Additions
 
+- ✅ **Digital Business Card** - Interactive business cards with email validation, click-to-call/email, vCard export, social media links with brand colors, LINE official icon, and client-side URL encoding
 - ✅ **Banner Management System** - Complete CRUD with Drag & Drop reordering, mobile preview carousel, CQRS pattern, segment tier filtering, and bulk priority updates
 - ✅ **DevToolkit Content Management** - Complete CMS with separate create/edit pages, markdown editor, code examples with copy button, and 4 new content fields (main_content, how_to_use, reference, example)
 - ✅ **Security Implementation** - ContentValidator pattern with XSS protection, SQL injection prevention, input sanitization for all string fields

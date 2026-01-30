@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
+import Header from "@/components/layout/Header";
 import { BodyLayout } from "@/components/layout/BodyLayout";
 import { MobileNotSupported } from "@/components/layout/MobileNotSupported";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { HeaderVisibilityController } from "@/components/layout/HeaderVisibilityController";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,8 @@ export default function RootLayout({
         >
           <ErrorBoundary>
             <div className="flex min-h-screen flex-col">
-              <ConditionalHeader />
+              <HeaderVisibilityController />
+              <Header />
               <BodyLayout variant="default">
                 {children}
               </BodyLayout>

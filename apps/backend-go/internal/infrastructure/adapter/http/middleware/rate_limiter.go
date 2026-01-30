@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"monorepo/backend-go/internal/infrastructure/adapter/http/response"
+
+	"github.com/gin-gonic/gin"
 )
 
 // RateLimiter implements a simple in-memory rate limiter
@@ -141,4 +143,25 @@ func NewLoginRateLimiter() *RateLimiter {
 func NewAPIRateLimiter() *RateLimiter {
 	// 100 requests per minute
 	return NewRateLimiter(100, 1*time.Minute)
+}
+
+// LimitGin is a Gin middleware wrapper for the rate limiter
+func (rl *RateLimiter) LimitGin() func(*gin.Context) {
+	return func(c *gin.Context) {
+		ip := c.ClientIP()
+
+		if !rl.allow(ip) {
+			c.JSON(http.StatusTooManyRequests, gin.H{
+				"success": false,
+				"error": gin.H{
+					"code":    "RATE_LIMIT_EXCEEDED",
+					"message": "Too many requests. Please try again later.",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
 }

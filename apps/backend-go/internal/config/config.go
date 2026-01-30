@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -20,6 +22,18 @@ type Config struct {
 }
 
 func Load() *Config {
+	jwtSecret := os.Getenv("JWT_SECRET")
+
+	// Enforce JWT_SECRET requirement
+	if jwtSecret == "" {
+		log.Fatal("FATAL: JWT_SECRET environment variable must be set and cannot be empty")
+	}
+
+	// Warn if JWT_SECRET is too short
+	if len(jwtSecret) < 32 {
+		log.Println("WARNING: JWT_SECRET should be at least 32 characters for security")
+	}
+
 	return &Config{
 		EnableHTTP:         getEnvBool("ENABLE_HTTP", true),
 		EnableGRPC:         getEnvBool("ENABLE_GRPC", false),
@@ -30,8 +44,18 @@ func Load() *Config {
 		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
 		DatabaseURL:        getEnv("DATABASE_URL", ""),
 		CorsAllowedOrigins: getEnvArray("CORS_ALLOWED_ORIGINS", "http://localhost:3000"),
-		JWTSecret:          getEnv("JWT_SECRET", ""), // Must be set in production!
+		JWTSecret:          jwtSecret,
 	}
+}
+
+func Validate(cfg *Config) error {
+	if cfg.JWTSecret == "" {
+		return fmt.Errorf("JWT_SECRET is required")
+	}
+	if len(cfg.JWTSecret) < 32 {
+		return fmt.Errorf("JWT_SECRET must be at least 32 characters long")
+	}
+	return nil
 }
 
 func getEnv(key string, fallback string) string {

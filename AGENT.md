@@ -33,6 +33,19 @@
 
 ## 🔒 Security (MANDATORY)
 
+### ⚠️ Critical Security Checklist
+
+**BEFORE writing/modifying ANY code, CHECK these vulnerabilities:**
+
+1. ✅ **SQL Injection** - GORM parameterized queries only (NEVER raw SQL)
+2. ✅ **XSS (Cross-Site Scripting)** - HTML escape all user inputs
+3. ✅ **CSRF (Cross-Site Request Forgery)** - Token validation on state-changing requests
+4. ✅ **Brute Force** - Rate limiting + account locking implemented
+5. ✅ **API Key/Secret Leaks** - NO secrets in code, use env vars only
+6. ✅ **Directory Traversal** - Validate file paths, no `../` allowed
+7. ✅ **Command Injection** - NEVER pass user input to system commands
+8. ✅ **Authentication** - Verify user session/token on protected endpoints
+
 ### Input Validation Pattern
 
 **CRITICAL: ALL user inputs MUST be validated**
@@ -49,10 +62,11 @@ model := &Model{Title: title}
 ```
 
 **Required Protections:**
-1. XSS: HTML escape, remove dangerous tags
-2. SQL Injection: GORM parameterized queries only
-3. Length: Enforce max limits
-4. Format: URL, email, ID validation
+1. **XSS**: HTML escape, remove dangerous tags (`<script>`, event handlers)
+2. **SQL Injection**: GORM parameterized queries only (NEVER `fmt.Sprintf()` in queries)
+3. **Length**: Enforce max limits (prevent DoS)
+4. **Format**: URL, email, ID validation
+5. **Path Traversal**: Block `../`, `..\\`, validate file paths
 
 **Validation Layers:**
 - HTTP: Gin binding (`binding:"required,max=255"`)
@@ -67,6 +81,75 @@ validator.SanitizeMainContent(input) // Markdown
 validator.ValidateImageURL(input)
 validator.ValidateAndSanitizeID(input)
 validator.ValidateTags(tags)
+```
+
+### CSRF Protection
+
+**Status**: ✅ Implemented in middleware
+- CSRF token header: `X-CSRF-Token`
+- Token validation on POST/PUT/PATCH/DELETE
+- SameSite cookie policy
+
+### Brute Force Protection
+
+**Status**: ✅ Implemented
+- Max failed login attempts: 5
+- Account lock duration: 30 minutes
+- Automatic unlock after timeout
+- Failed attempts tracking per user
+
+**Code Location**: `internal/core/domain/auth/service.go`
+
+### API Secret Management
+
+**RULES:**
+- ❌ NEVER hardcode secrets/keys in code
+- ✅ ALWAYS use environment variables
+- ✅ Use `.env` for local dev (gitignored)
+- ✅ Validate secrets exist on startup
+
+```go
+// ✅ GOOD
+jwtSecret := os.Getenv("JWT_SECRET")
+if jwtSecret == "" {
+    log.Fatal("JWT_SECRET is required")
+}
+
+// ❌ BAD
+const jwtSecret = "my-secret-key-123"
+```
+
+### Directory Traversal Prevention
+
+```go
+// ❌ BAD: Directory traversal risk
+filePath := "/uploads/" + userInput
+
+// ✅ GOOD: Validate and sanitize
+func ValidateFilePath(input string) (string, error) {
+    // Block directory traversal
+    if strings.Contains(input, "..") {
+        return "", errors.New("invalid path")
+    }
+    // Whitelist allowed characters
+    if !regexp.MustCompile(`^[a-zA-Z0-9_\-\.]+$`).MatchString(input) {
+        return "", errors.New("invalid filename")
+    }
+    return filepath.Clean(input), nil
+}
+```
+
+### Command Injection Prevention
+
+```go
+// ❌ BAD: Command injection risk
+cmd := exec.Command("sh", "-c", "ls "+userInput)
+
+// ✅ GOOD: Use parameterized commands
+cmd := exec.Command("ls", userInput)
+
+// ✅ BETTER: Avoid system commands with user input entirely
+// Use native Go libraries instead (os.ReadDir, etc.)
 ```
 
 ## 🗄️ Database Query Rules

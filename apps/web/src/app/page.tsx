@@ -2,9 +2,12 @@
 
 import { DecorativeImage } from "@/components/decorative";
 import { 
-  HeroSection, 
+  HeroSection,
+  WhatIsItSection,
   SKUSection, 
-  HowItWorksSection, 
+  HowItWorksSection,
+  OccasionsSection,
+  WhyNFCSection,
   WhyUsSection,
   PreviewSection, 
   FAQSection,
@@ -19,11 +22,20 @@ export default function Home() {
       {/* Hero Section */}
       <HeroSection />
 
+      {/* What is it? */}
+      <WhatIsItSection />
+
       {/* SKU Selection */}
       <SKUSection />
 
       {/* How It Works */}
       <HowItWorksSection />
+
+      {/* Occasions */}
+      <OccasionsSection />
+
+      {/* Why NFC Gift? */}
+      <WhyNFCSection />
 
       {/* Why Us */}
       <WhyUsSection />

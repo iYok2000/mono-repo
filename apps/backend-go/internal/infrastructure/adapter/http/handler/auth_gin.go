@@ -102,9 +102,10 @@ func (h *AuthGinHandler) Login(c *gin.Context) {
 		int(auth.RefreshTokenDuration.Seconds()),
 		"/",
 		"",
-		false, // Set to true in production (HTTPS)
-		true,  // HTTP-only
+		true, // Secure - set to true (requires HTTPS in production)
+		true, // HTTP-only
 	)
+	c.SetSameSite(http.SameSiteStrictMode) // CSRF protection
 
 	// Return access token and user info
 	c.JSON(http.StatusOK, gin.H{
@@ -217,7 +218,8 @@ func (h *AuthGinHandler) Logout(c *gin.Context) {
 	}
 
 	// Clear refresh token cookie
-	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
+	c.SetCookie("refresh_token", "", -1, "/", "", true, true)
+	c.SetSameSite(http.SameSiteStrictMode)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

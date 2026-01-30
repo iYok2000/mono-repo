@@ -28,6 +28,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
+// In-memory token storage (more secure than localStorage)
+let accessToken: string | null = null;
+
+function setAccessToken(token: string) {
+  accessToken = token;
+  // Use sessionStorage as backup (cleared on tab close)
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem("access_token", token);
+  }
+}
+
+function getAccessToken(): string | null {
+  if (accessToken) return accessToken;
+  // Restore from sessionStorage if memory is cleared
+  if (typeof window !== 'undefined') {
+    accessToken = sessionStorage.getItem("access_token");
+    return accessToken;
+  }
+  return null;
+}
+
+function clearAccessToken() {
+  accessToken = null;
+  if (typeof window !== 'undefined') {
+    sessionStorage.removeItem("access_token");
+    // Also clear old localStorage tokens
+    localStorage.removeItem("access_token");
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,8 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Refresh authentication state
   const refreshAuth = useCallback(async () => {
     try {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
+      const token = getAccessToken();
+      if (!token) {
         setUser(null);
         setIsLoading(false);
         return;
@@ -47,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const response = await fetch(`${API_URL}/api/auth/me`, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -56,33 +86,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.success && data.data.user) {
           setUser(data.data.user);
         } else {
-          localStorage.removeItem("access_token");
+          clearAccessToken();
           setUser(null);
         }
       } else {
         // Try to refresh token
         const refreshResponse = await fetch(`${API_URL}/api/auth/refresh`, {
           method: "POST",
-          credentials: "include", // Send cookies
+          credentials: "include", // Send httpOnly refresh cookie
         });
 
         if (refreshResponse.ok) {
           const refreshData = await refreshResponse.json();
           if (refreshData.success && refreshData.data.access_token) {
-            localStorage.setItem("access_token", refreshData.data.access_token);
+            setAccessToken(refreshData.data.access_token);
             setUser(refreshData.data.user);
           } else {
-            localStorage.removeItem("access_token");
+            clearAccessToken();
             setUser(null);
           }
         } else {
-          localStorage.removeItem("access_token");
+          clearAccessToken();
           setUser(null);
         }
       }
     } catch (error) {
       console.error("Auth refresh error:", error);
-      localStorage.removeItem("access_token");
+      clearAccessToken();
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -113,7 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.success && data.data.access_token) {
-        localStorage.setItem("access_token", data.data.access_token);
+        setAccessToken(data.data.access_token);
         setUser(data.data.user);
 
         // Check if user must change password
@@ -134,21 +164,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Logout function
   const logout = async () => {
     try {
-      const accessToken = localStorage.getItem("access_token");
+      const token = getAccessToken();
       
-      if (accessToken) {
+      if (token) {
         await fetch(`${API_URL}/api/auth/logout`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
           },
-          credentials: "include",
+          credentials: "include", // Send httpOnly cookie
         });
       }
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      localStorage.removeItem("access_token");
+      clearAccessToken();
       setUser(null);
       router.push("/admin/auth/login");
     }
@@ -157,8 +187,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Change password function
   const changePassword = async (currentPassword: string, newPassword: string) => {
     try {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
+      const token = getAccessToken();
+      if (!token) {
         throw new Error("Not authenticated");
       }
 
@@ -166,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           current_password: currentPassword,

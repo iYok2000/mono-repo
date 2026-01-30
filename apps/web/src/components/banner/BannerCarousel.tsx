@@ -57,8 +57,8 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
               onClick={() => setCurrentIndex(index)}
               className={`h-2 rounded-full transition-all ${
                 index === currentIndex
-                  ? "w-8 bg-white shadow-lg"
-                  : "w-2 bg-white/50 hover:bg-white/75"
+                  ? "w-8 bg-[var(--card)] shadow-lg"
+                  : "w-2 bg-[var(--card)]/50 hover:bg-[var(--card)]/75"
               }`}
               aria-label={`Go to banner ${index + 1}`}
             />
