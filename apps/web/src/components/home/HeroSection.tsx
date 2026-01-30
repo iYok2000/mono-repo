@@ -22,8 +22,8 @@ export function HeroSection() {
             </div>
 
             {/* Main Heading with Green Highlight */}
-            <div className="space-y-4">
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+            <div className="space-y-3">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
                 <span className="text-[var(--primary)]">
                   ของขวัญวิดีโอแบบ NFC
                 </span>
@@ -33,7 +33,7 @@ export function HeroSection() {
                 </span>
               </h1>
 
-              <p className="text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-xl font-normal">
+              <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-lg font-normal">
                 แตะการ์ดเพียงครั้งเดียว ก็เปิดคลิป วิดีโอ หรือข้อความแทนใจได้ทันที — ของขวัญสุดพิเศษสำหรับวันเกิด ครบรอบ และทุกโอกาสที่คุณอยากให้ความทรงจำอยู่ได้นาน
               </p>
             </div>
