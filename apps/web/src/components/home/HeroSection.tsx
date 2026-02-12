@@ -52,8 +52,8 @@ export function HeroSection({ settings }: HeroSectionProps) {
             </div>
 
             {/* Main Heading with Green Highlight */}
-            <div className="space-y-4">
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+            <div className="space-y-3">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
                 <span className="text-[var(--primary)]">
                   {titleHighlight}
                 </span>
@@ -63,8 +63,13 @@ export function HeroSection({ settings }: HeroSectionProps) {
                 </span>
               </h1>
 
+<<<<<<< HEAD
               <p className="text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-xl font-normal">
                 {subtitle}
+=======
+              <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-lg font-normal">
+                แตะการ์ดเพียงครั้งเดียว ก็เปิดคลิป วิดีโอ หรือข้อความแทนใจได้ทันที — ของขวัญสุดพิเศษสำหรับวันเกิด ครบรอบ และทุกโอกาสที่คุณอยากให้ความทรงจำอยู่ได้นาน
+>>>>>>> 16fdc15ad3da1cdfab57488fcd4bafe5e0d61409
               </p>
             </div>
 
