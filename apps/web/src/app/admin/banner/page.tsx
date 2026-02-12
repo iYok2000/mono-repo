@@ -13,9 +13,12 @@ import * as bannerService from "@/services/bannerService";
 import { useBanner } from "./_hooks/useBanner";
 import { useBannerFilter } from "./_hooks/useBannerFilter";
 import type { Banner } from "@/types/banner";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 
 function BannerContent() {
   const router = useRouter();
+  const { showModal: showUnauthorizedModal, errorMessage: unauthorizedErrorMessage, handleModalClose: handleUnauthorizedModalClose } = useUnauthorizedHandler();
   const { banners, loading, error, refreshBanners } = useBanner();
 
   // Filter hook
@@ -253,12 +256,22 @@ function BannerContent() {
           isOpen={showAppPreview}
           onClose={() => setShowAppPreview(false)}
         />
+        
+        {/* Unauthorized Modal */}
+        <Modal
+          isOpen={showUnauthorizedModal}
+          onClose={handleUnauthorizedModalClose}
+          type="warning"
+          title="⚠️ Session หมดอายุ"
+          message={unauthorizedErrorMessage}
+          confirmText="เข้าสู่ระบบใหม่"
+        />
       </div>
     </main>
   );
 }
 
-export default function BannerPage() {
+function BannerPageWrapper() {
   return (
     <PageSuspense
       fallback={<LoadingFallback message="กำลังโหลดข้อมูล Banner..." />}
@@ -267,3 +280,5 @@ export default function BannerPage() {
     </PageSuspense>
   );
 }
+
+export default withAuthentication(BannerPageWrapper);

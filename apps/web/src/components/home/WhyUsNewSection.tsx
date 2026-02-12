@@ -1,21 +1,39 @@
 "use client";
 
-export function WhyUsSection() {
+interface WhyUsSettings {
+  title?: string;
+  subtitle?: string;
+  feature_1_title?: string;
+  feature_1_description?: string;
+  feature_2_title?: string;
+  feature_2_description?: string;
+  feature_3_title?: string;
+  feature_3_description?: string;
+}
+
+interface WhyUsSectionProps {
+  settings?: WhyUsSettings;
+}
+
+export function WhyUsSection({ settings }: WhyUsSectionProps) {
+  const title = settings?.title || "ทำไมต้องเรา?";
+  const subtitle = settings?.subtitle || "6 เหตุผลที่คุณควรเลือก GyByte";
+
   const reasons = [
     {
       icon: "⚡",
-      title: "ทำเสร็จเร็ว",
-      description: "ไม่ต้องรอนาน Express ใช้แค่ 5 นาที Squad รอแค่เพื่อนส่งครบ",
+      title: settings?.feature_1_title || "ทำเสร็จเร็ว",
+      description: settings?.feature_1_description || "ไม่ต้องรอนาน Express ใช้แค่ 5 นาที Squad รอแค่เพื่อนส่งครบ",
     },
     {
       icon: "🔒",
-      title: "ปลอดภัย",
-      description: "ไฟล์อยู่กับคุณใน Google Drive คุณคุมสิทธิ์เอง",
+      title: settings?.feature_2_title || "ปลอดภัย",
+      description: settings?.feature_2_description || "ไฟล์อยู่กับคุณใน Google Drive คุณคุมสิทธิ์เอง",
     },
     {
       icon: "📱",
-      title: "ใช้งานง่าย",
-      description: "ไม่ต้องโหลดแอป สแกนแล้วเปิดได้ทันที บนมือถือทุกรุ่น",
+      title: settings?.feature_3_title || "ใช้งานง่าย",
+      description: settings?.feature_3_description || "ไม่ต้องโหลดแอป สแกนแล้วเปิดได้ทันที บนมือถือทุกรุ่น",
     },
     {
       icon: "🎨",
@@ -40,10 +58,10 @@ export function WhyUsSection() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[var(--foreground)] mb-3">
-            ทำไมต้องเรา?
+            {title}
           </h2>
           <p className="text-lg text-[var(--muted)]">
-            6 เหตุผลที่คุณควรเลือก GyByte
+            {subtitle}
           </p>
         </div>
 

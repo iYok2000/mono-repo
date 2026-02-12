@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BannerForm } from "../_components/BannerForm";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 import { createBanner } from "@/services/bannerService";
 import { CreateBannerDTO, UpdateBannerDTO } from "@/types/banner";
 import { Modal } from "@/components/ui/Modal";
 
-export default function CreateBannerPage() {
+function CreateBannerPage() {
+  const { showModal: showUnauthorizedModal, errorMessage: unauthorizedError, handleModalClose } = useUnauthorizedHandler();
   const router = useRouter();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -22,8 +25,9 @@ export default function CreateBannerPage() {
       }, 1500);
     } catch (error: unknown) {
       console.error("Failed to create banner:", error);
+      const err = error as any;
       setErrorMessage(
-        error.response?.data?.message || "Failed to create banner"
+        err?.response?.data?.message || "Failed to create banner"
       );
       setShowErrorModal(true);
     }
@@ -73,7 +77,19 @@ export default function CreateBannerPage() {
           message={errorMessage}
           confirmText="ตกลง"
         />
+        
+        {/* Unauthorized Modal */}
+        <Modal
+          isOpen={showUnauthorizedModal}
+          onClose={handleModalClose}
+          type="warning"
+          title="⚠️ Session หมดอายุ"
+          message={unauthorizedError}
+          confirmText="เข้าสู่ระบบใหม่"
+        />
       </div>
     </main>
   );
 }
+
+export default withAuthentication(CreateBannerPage);

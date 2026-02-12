@@ -319,6 +319,37 @@ CREATE INDEX idx_banners_dates ON banners(start_date, end_date);
 - ไม่มี version history
 - ไม่มี approval workflow
 
+## Testing
+
+**Unit Tests**:
+- Location: `apps/backend-go/internal/application/banner/command/*_test.go`
+- Coverage: Command validation, business logic, priority calculations
+- Run: `go test ./internal/application/banner/...`
+
+**Integration Tests**:
+- Location: `apps/backend-go/internal/infrastructure/adapter/http/handler/banner_test.go`
+- Scenarios: CRUD operations, bulk reorder, filtering, error handling
+- Run: `go test -tags=integration ./internal/infrastructure/...`
+
+**Manual Testing Checklist**:
+1. Navigate to `/admin/banner`
+2. Create new banner with TH/EN images and URLs
+3. Verify banner appears in list
+4. Drag banner to change priority
+5. Confirm priority numbers update correctly
+6. Use filters (search, segment, status)
+7. Open mobile preview, verify active banners show
+8. Toggle language in preview
+9. Edit banner, change segment tiers
+10. Delete banner, confirm removal
+
 ## Related Features
 - Segment Tier Management (for filtering)
 - Multi-language support (TH/EN)
+
+---
+
+**Created**: 2024-12-15  
+**Last Updated**: 2026-02-03  
+**Author**: Backend Team  
+**Status**: Production-ready

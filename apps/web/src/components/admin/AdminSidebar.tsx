@@ -12,12 +12,16 @@ interface MenuItem {
 
 const MENU_ITEMS: MenuItem[] = [
   {
+    title: "จัดการหน้าแรก",
+    href: "/admin/home-settings",
+  },
+  {
     title: "จัดการหมวดหมู่",
     href: "/admin/category",
   },
   {
-    title: "จัดการ DevToolkit",
-    href: "/admin/devtoolkit",
+    title: "จัดการ Product",
+    href: "/admin/product",
   },
   {
     title: "จัดการ Banner",

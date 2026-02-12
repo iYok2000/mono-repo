@@ -67,7 +67,7 @@ project_context/
 - 📄 [Next.js 16 Setup](./project_context/nextjs-setup.md) - Frontend configuration and implementation details
 - 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
 - 📄 [Data Export Feature](./project_context/data-export.md) - CSV export functionality with RFC 4180 compliance, type safety, and accessibility support
-- 📄 [DevToolkit Management](./project_context/devtoolkit-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
+- 📄 [Product Management](./project_context/product-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
 - 📄 [Banner Management System](./project_context/BANNER_MANAGEMENT.md) - CRUD + Drag & Drop reordering with CQRS pattern, mobile preview, multi-language support (TH/EN), and segment tier filtering
 - 📄 [Admin Authentication](./project_context/ADMIN_AUTH_README.md) - JWT-based authentication system for Admin panel
 - 📄 [Digital Business Card](./project_context/business-card.md) - Interactive digital business cards with QR sharing, vCard export, email validation, click-to-call/email, social media integration, and brand-colored UI
@@ -98,6 +98,74 @@ For simple features that don't need full documentation:
 - Backend Go (gRPC): 50051
 
 **CORS**: Configured in Gin backend to allow frontend origin
+
+### Database & Migration Strategy
+
+**ORM**: GORM v2 with PostgreSQL  
+**Migration Pattern**: GORM AutoMigrate + Raw SQL Constraints (Hybrid Approach)
+
+**Why Hybrid Approach?**
+- GORM AutoMigrate: Fast development, handles table structure automatically
+- Raw SQL: For constraints GORM cannot handle (CHECK, partial indexes, complex validations)
+
+**Migration File Location**: `/internal/infrastructure/adapter/persistence/gorm/{feature}/migration.go`
+
+**Standard Pattern**:
+```go
+package feature
+
+import (
+	"path/to/model"
+	"gorm.io/gorm"
+)
+
+func AutoMigrate(db *gorm.DB) error {
+	// 1. Create tables with GORM
+	if err := db.AutoMigrate(&model.FeatureModel{}); err != nil {
+		return err
+	}
+
+	// 2. Add business rule constraints (GORM can't handle)
+	db.Exec(`
+		DO $$
+		BEGIN
+			IF NOT EXISTS (
+				SELECT 1 FROM pg_constraint 
+				WHERE conname = 'chk_feature_rule'
+			) THEN
+				ALTER TABLE features 
+				ADD CONSTRAINT chk_feature_rule 
+				CHECK (some_condition);
+			END IF;
+		END $$;
+	`)
+
+	return nil
+}
+```
+
+**Registration in container.go**:
+```go
+import (
+	gormfeature "monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/feature"
+)
+
+// Run migrations
+if err := gormfeature.AutoMigrate(db); err != nil {
+	return nil, fmt.Errorf("failed to run feature migrations: %w", err)
+}
+```
+
+**Reference Implementations**:
+- ✅ `banner/migration.go` - CHECK constraints, slug validation
+- ✅ `devtoolkit/migration.go` - Basic AutoMigrate pattern
+- ✅ `homesettings/migration.go` - Single-record table, partial unique index
+
+**⚠️ Important Notes**:
+- ❌ NO standalone SQL migration files (e.g., `001_create_tables.sql`) - Project has no SQL file runner
+- ✅ ALWAYS use GORM parameterized queries in repositories (never raw SQL with string interpolation)
+- ✅ Use `DO $$ ... END $$` blocks for idempotent constraint addition
+- ✅ Separate domain entity (`/core/domain/`) from persistence model (`/infrastructure/adapter/persistence/gorm/`)
 
 ### Error Handling
 
@@ -165,7 +233,7 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
 }
 ```
 
-**Reference Implementation**: See [DevToolkit Management](./project_context/devtoolkit-management.md) for complete security implementation example with ContentValidator.
+**Reference Implementation**: See [Product Management](./project_context/product-management.md) for complete security implementation example with ContentValidator.
 
 **Frontend (React/Next.js) - Client-Side Validation**:
 - Client-side validation is for UX only (not security)
@@ -218,9 +286,9 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
 
 - ✅ **Digital Business Card** - Interactive business cards with email validation, click-to-call/email, vCard export, social media links with brand colors, LINE official icon, and client-side URL encoding
 - ✅ **Banner Management System** - Complete CRUD with Drag & Drop reordering, mobile preview carousel, CQRS pattern, segment tier filtering, and bulk priority updates
-- ✅ **DevToolkit Content Management** - Complete CMS with separate create/edit pages, markdown editor, code examples with copy button, and 4 new content fields (main_content, how_to_use, reference, example)
+- ✅ **Product Content Management** - Complete CMS with separate create/edit pages, markdown editor, code examples with copy button, and 4 new content fields (main_content, how_to_use, reference, example)
 - ✅ **Security Implementation** - ContentValidator pattern with XSS protection, SQL injection prevention, input sanitization for all string fields
-- ✅ **DevToolkit Management** - Complete CRUD system with Admin Dashboard
+- ✅ **Product Management** - Complete CRUD system with Admin Dashboard
 - ✅ **Category Management** - Category CRUD with API integration
 - ✅ **Admin Layout** - Sidebar navigation for admin pages
 - ✅ **PostgreSQL Integration** - Database connected with GORM
@@ -230,7 +298,7 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
 - Complete Template Gallery (Phases 2-6)
 - Implement authentication system
 - Setup Docker for containerization
-- Add search and pagination to DevToolkit list
+- Add search and pagination to Product list
 - Image upload functionality
 - Permission management
 
@@ -240,14 +308,24 @@ func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
 - **Next.js 16** with App Router in `apps/web/`
 - **Golang Gin + gRPC** backend in `apps/backend-go/`
 - **PostgreSQL** database with GORM ORM (use parameterized queries, never raw SQL)
-- **Admin Pages** available at `/admin/category` and `/admin/devtoolkit`
-- **Content Management**: Create/edit pages at `/admin/devtoolkit/create` and `/admin/devtoolkit/edit/[id]`
+- **Admin Pages** available at `/admin/category` and `/admin/product`
+- **Content Management**: Create/edit pages at `/admin/product/create` and `/admin/product/edit/[id]`
 - Run `pnpm install` at root after adding new dependencies
 - Use TypeScript strict mode for type safety
 - Backend API at `http://localhost:8080/api`
 - Never use raw user input directly - always validate and sanitize first
 
+Rename / Migration Guard
+- Any rename (tables, routes, modules, types) must include:
+  1) A migration plan: SQL/Go migration for rename/reindex/FK rewire plus data backfill
+  2) A checklist: update DI container, routes, handlers, validators, repos/mappers, models (TableName/FK/index), FE slugs/services/types/links
+  3) Repo-wide search (rg) to ensure zero references to the old name before merge
+  4) Indexes on main queries (status, category_id, etc.) and FK constraints with OnDelete/OnUpdate
+- Do not deploy if AutoMigrate is used instead of migrations for rename/drop
+
+
 ---
 
 **Last Updated**: 2025-12-25
 **Updated By**: AI Agent (Claude) - Added Banner Management System with Drag & Drop reordering, CQRS pattern, mobile preview, and bulk priority updates
+

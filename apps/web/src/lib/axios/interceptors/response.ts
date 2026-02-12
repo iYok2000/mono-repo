@@ -40,8 +40,21 @@ export const responseErrorInterceptor = (error: unknown) => {
 
   if (status === 401) {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
-      window.location.href = '/admin/auth/login';
+      // Only dispatch event if not already on login page
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('/admin/auth/login')) {
+        // Dispatch custom event for 401 error
+        const errorMessage = typeof data === 'object' && data !== null && 'message' in data 
+          ? (data as { message: string }).message 
+          : 'Session หมดอายุ กรุณาเข้าสู่ระบบใหม่';
+        
+        const event = new CustomEvent('auth:unauthorized', {
+          detail: { message: errorMessage }
+        });
+        window.dispatchEvent(event);
+        
+        console.warn('🔒 Unauthorized:', errorMessage);
+      }
     }
   }
 

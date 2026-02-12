@@ -4,7 +4,7 @@ interface FormActionButtonsProps {
   mode: "create" | "edit";
   isSubmitting?: boolean;
   onCancel: () => void;
-  entityName?: string; // เช่น "หมวดหมู่", "DevToolkit", "Banner"
+  entityName?: string; // เช่น "หมวดหมู่", "Product", "Banner"
   submitText?: string; // Custom submit button text
   cancelText?: string; // Custom cancel button text
 }

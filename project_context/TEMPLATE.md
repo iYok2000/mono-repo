@@ -22,6 +22,8 @@ Brief description of what this feature does and its role in the system.
 - Key technical decisions
 - Patterns used
 - Integration points
+- Rename / Migration plan (if schema or routes change): explicit SQL/Go migration for rename/FK/index changes; avoid AutoMigrate for destructive/rename operations
+- GORM/DB notes: TableName, PK, FK with OnDelete/OnUpdate, indexes/unique constraints used in queries
 
 ## Code Examples
 
@@ -74,6 +76,7 @@ const result = exampleFunction({ id: '1', name: 'Example' });
 ```sql
 -- Table definitions or schema
 ```
+- Migration strategy: how to apply/rollback; data backfill or rename steps
 
 ## Configuration
 
@@ -89,6 +92,7 @@ const result = exampleFunction({ id: '1', name: 'Example' });
 **Unit Tests**: Location and coverage  
 **Integration Tests**: Key scenarios covered  
 **Manual Testing**: Steps to verify
+- Verification checklist: go build ./...; pnpm lint && pnpm typecheck; `rg <old-name>` cleaned; schema FK/index validated; pagination/default limits on list endpoints
 
 ## Notes
 

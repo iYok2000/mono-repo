@@ -9,8 +9,11 @@ import { CategoryForm } from "./_components/CategoryForm";
 import { CategoryList } from "./_components/CategoryList";
 import * as categoryService from "@/services/categoryService";
 import { CategoryServiceError } from "@/services/categoryService";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 
-export default function CategoryPage() {
+function CategoryPage() {
+  const { showModal: showUnauthorizedModal, errorMessage: unauthorizedErrorMessage, handleModalClose: handleUnauthorizedModalClose } = useUnauthorizedHandler();
   const [categories, setCategories] = useState<categoryService.Category[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -234,6 +237,18 @@ export default function CategoryPage() {
         showCancel={true}
         onConfirm={confirmDelete}
       />
+      
+      {/* Unauthorized Modal */}
+      <Modal
+        isOpen={showUnauthorizedModal}
+        onClose={handleUnauthorizedModalClose}
+        type="warning"
+        title="⚠️ Session หมดอายุ"
+        message={unauthorizedErrorMessage}
+        confirmText="เข้าสู่ระบบใหม่"
+      />
     </main>
   );
 }
+
+export default withAuthentication(CategoryPage);

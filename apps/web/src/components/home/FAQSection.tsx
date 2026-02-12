@@ -1,32 +1,45 @@
 "use client";
 
-export function FAQSection() {
+interface FAQSettings {
+  title?: string;
+  subtitle?: string;
+  faq_1_question?: string;
+  faq_1_answer?: string;
+  faq_2_question?: string;
+  faq_2_answer?: string;
+  faq_3_question?: string;
+  faq_3_answer?: string;
+  faq_4_question?: string;
+  faq_4_answer?: string;
+}
+
+interface FAQSectionProps {
+  settings?: FAQSettings;
+}
+
+export function FAQSection({ settings }: FAQSectionProps) {
+  // Build FAQ array from settings
   const faqs = [
     {
-      question: "NFC สแกนไม่ได้ทำไง?",
-      answer: "มี QR code สำรองทุกการ์ด สแกนได้แน่นอน",
+      question: settings?.faq_1_question || "NFC สแกนไม่ได้ทำไง?",
+      answer: settings?.faq_1_answer || "มี QR code สำรองทุกการ์ด สแกนได้แน่นอน",
     },
     {
-      question: "Google Drive ปลอดภัยไหม?",
-      answer: "ไฟล์อยู่กับคุณ คุณคุมสิทธิ์เอง เราแค่ดึงลิงก์มาแสดง",
+      question: settings?.faq_2_question || "Google Drive ปลอดภัยไหม?",
+      answer: settings?.faq_2_answer || "ไฟล์อยู่กับคุณ คุณคุมสิทธิ์เอง เราแค่ดึงลิงก์มาแสดง",
     },
     {
-      question: "ลิงก์เปิดไม่ได้?",
-      answer: "มีระบบทดสอบลิงก์ก่อนใช้งาน และมีปุ่มสำรองเปิดในเบราว์เซอร์",
+      question: settings?.faq_3_question || "ลิงก์เปิดไม่ได้?",
+      answer: settings?.faq_3_answer || "มีระบบทดสอบลิงก์ก่อนใช้งาน และมีปุ่มสำรองเปิดในเบราว์เซอร์",
     },
     {
-      question: "ต้องโหลดแอปไหม?",
-      answer: "ไม่ต้อง เปิดผ่านเว็บได้ทันที",
+      question: settings?.faq_4_question || "ต้องโหลดแอปไหม?",
+      answer: settings?.faq_4_answer || "ไม่ต้อง เปิดผ่านเว็บได้ทันที",
     },
-    {
-      question: "ใช้เวลานานแค่ไหน?",
-      answer: "Express: 5 นาที | Squad: ขึ้นอยู่กับเพื่อนส่งครบเมื่อไหร่",
-    },
-    {
-      question: "ราคาเท่าไหร่?",
-      answer: "Express ฿199 | Squad ฿499 มี add-ons เพิ่มได้",
-    },
-  ];
+  ].filter(faq => faq.question && faq.answer); // Only show FAQs with content
+
+  const title = settings?.title || "คำถามที่พบบ่อย";
+  const subtitle = settings?.subtitle || "ทุกอย่างที่คุณอยากรู้";
 
   return (
     <section className="relative py-16 lg:py-24" id="faq">
@@ -34,10 +47,10 @@ export function FAQSection() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[var(--foreground)] mb-3">
-            คำถามที่พบบ่อย
+            {title}
           </h2>
           <p className="text-lg text-[var(--muted)]">
-            ทุกอย่างที่คุณอยากรู้
+            {subtitle}
           </p>
         </div>
 

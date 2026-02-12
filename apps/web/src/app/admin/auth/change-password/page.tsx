@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 
-export default function ChangePasswordPage() {
+function ChangePasswordPage() {
+  const { showModal, errorMessage, handleModalClose } = useUnauthorizedHandler();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -63,7 +66,7 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 px-4">
       <div className="max-w-md w-full space-y-8">
         {/* Title */}
         <div className="text-center">
@@ -214,7 +217,12 @@ export default function ChangePasswordPage() {
             </button>
           </form>
         </div>
+        
+        {/* Unauthorized Modal */}
+        <UnauthorizedModal />
       </div>
     </div>
   );
 }
+
+export default withAuthentication(ChangePasswordPage);

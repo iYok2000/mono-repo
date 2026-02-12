@@ -1,8 +1,11 @@
 "use client";
 
 import { HealthDashboard } from "@/components/health/HealthDashboard";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 
-export default function HealthcheckPage() {
+function HealthcheckPage() {
+  const { showModal, errorMessage, handleModalClose } = useUnauthorizedHandler();
   return (
     <main className="min-h-screen bg-background px-6 py-12 font-sans text-foreground">
       <div className="mx-auto w-full max-w-5xl space-y-6">
@@ -19,7 +22,19 @@ export default function HealthcheckPage() {
         </header>
 
         <HealthDashboard />
+        
+        {/* Unauthorized Modal */}
+        <Modal
+          isOpen={showModal}
+          onClose={handleModalClose}
+          type="warning"
+          title="⚠️ Session หมดอายุ"
+          message={errorMessage}
+          confirmText="เข้าสู่ระบบใหม่"
+        />
       </div>
     </main>
   );
 }
+
+export default withAuthentication(HealthcheckPage);

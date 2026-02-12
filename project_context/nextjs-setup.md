@@ -297,6 +297,128 @@ export default nextConfig;
 
 ---
 
+## Testing
+
+### Development Testing
+
+**Run development server:**
+```bash
+pnpm dev
+# Server starts at http://localhost:3000
+```
+
+**Verify installation:**
+1. Open http://localhost:3000 in browser
+2. Should see Next.js default landing page
+3. Check console for errors (none expected)
+4. Verify hot reload works (edit page.tsx, see instant update)
+
+### Build Testing
+
+**Production build:**
+```bash
+pnpm build
+# Creates optimized production build in .next/
+
+pnpm start
+# Starts production server
+```
+
+**Verify build:**
+- Build should complete without errors
+- Check for TypeScript errors
+- Verify bundle size is reasonable
+- Test production server starts correctly
+
+### Integration Testing
+
+**Test API integration with Go backend:**
+
+```typescript
+// Test file: apps/web/src/app/__tests__/api-integration.test.ts
+import { render, screen, waitFor } from '@testing-library/react';
+import Home from '../page';
+
+describe('API Integration', () => {
+  it('should fetch and display backend health status', async () => {
+    render(<Home />);
+    
+    await waitFor(() => {
+      expect(screen.getByText(/Backend health:/)).toBeInTheDocument();
+    });
+  });
+});
+```
+
+**Manual API testing:**
+```bash
+# Terminal 1: Start Go backend
+cd apps/backend-go
+go run main.go
+
+# Terminal 2: Start Next.js
+cd apps/web
+pnpm dev
+
+# Terminal 3: Test API calls
+curl http://localhost:3000/api/go/health
+# Should proxy to Go backend and return health status
+```
+
+### Type Safety Testing
+
+**Test shared types integration:**
+
+```typescript
+// apps/web/src/app/test-types.tsx
+import { User, Product } from '@mono-repo/shared-types';
+
+// This should compile without errors
+const testUser: User = {
+  id: '1',
+  name: 'Test User',
+  email: 'test@example.com'
+};
+
+const testProduct: Product = {
+  id: 'prod-1',
+  title: 'Test Product',
+  category_id: 'cat-1'
+};
+```
+
+**Run TypeScript check:**
+```bash
+pnpm tsc --noEmit
+# Should complete with no errors
+```
+
+### Performance Testing
+
+**Check build performance:**
+- First build: ~30-60 seconds (normal)
+- Incremental builds: ~5-10 seconds
+- Development startup: ~2-5 seconds with Turbopack
+
+**Check runtime performance:**
+- Lighthouse score: Aim for 90+ on Performance
+- Time to Interactive (TTI): <3 seconds
+- First Contentful Paint (FCP): <1.5 seconds
+
+### Manual Testing Checklist
+
+- [ ] Development server starts without errors
+- [ ] Hot reload works (edit files, see changes instantly)
+- [ ] TypeScript errors show in editor
+- [ ] ESLint runs and shows warnings
+- [ ] Tailwind CSS classes work correctly
+- [ ] Production build completes successfully
+- [ ] Production server runs correctly
+- [ ] API calls to Go backend work
+- [ ] Shared types import correctly
+- [ ] Browser console shows no errors
+- [ ] Page loads in <3 seconds
+
 ## Notes
 
 ### Important Considerations:
@@ -346,6 +468,7 @@ export default nextConfig;
 
 ---
 
-**Created**: 2025-12-04
-**Created By**: AI Agent (Claude)
-**Status**: ✅ Completed - Next.js 16 successfully installed
+**Created**: December 4, 2025  
+**Last Updated**: February 3, 2026  
+**Author**: AI Agent (Claude)  
+**Status**: Production-ready
