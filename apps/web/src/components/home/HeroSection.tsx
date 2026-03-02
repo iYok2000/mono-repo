@@ -63,13 +63,8 @@ export function HeroSection({ settings }: HeroSectionProps) {
                 </span>
               </h1>
 
-<<<<<<< HEAD
-              <p className="text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-xl font-normal">
+              <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-xl font-normal">
                 {subtitle}
-=======
-              <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-lg font-normal">
-                แตะการ์ดเพียงครั้งเดียว ก็เปิดคลิป วิดีโอ หรือข้อความแทนใจได้ทันที — ของขวัญสุดพิเศษสำหรับวันเกิด ครบรอบ และทุกโอกาสที่คุณอยากให้ความทรงจำอยู่ได้นาน
->>>>>>> 16fdc15ad3da1cdfab57488fcd4bafe5e0d61409
               </p>
             </div>
 
