@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { Github } from "lucide-react";
 import ThemeSwitchToggle from "../troggle/themeSwitchTroggle";
 import { DecorativeImage } from "../decorative";
@@ -14,6 +15,7 @@ const navLinks = [
 
 const Header = () => {
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
+  const pathname = usePathname();
 
   const handlePressStart = () => {
     pressTimer.current = setTimeout(() => {
@@ -26,6 +28,18 @@ const Header = () => {
       clearTimeout(pressTimer.current);
       pressTimer.current = null;
     }
+  };
+
+  // Handle logo click - scroll to top if on home page, otherwise navigate
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+    // If not on home page, let the default <a> behavior handle navigation
   };
 
   // Smooth scroll handler for anchor links
@@ -61,6 +75,7 @@ const Header = () => {
         {/* Logo - GyByte */}
         <a 
           href="/"
+          onClick={handleLogoClick}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
         >
           <div className="w-8 h-8 bg-[var(--primary)] rounded-lg flex items-center justify-center">

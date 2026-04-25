@@ -18,7 +18,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<{ redirectTo: string; mustChangePassword: boolean }>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
@@ -146,12 +146,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setAccessToken(data.data.access_token);
         setUser(data.data.user);
 
-        // Check if user must change password
-        if (data.data.must_change_password) {
-          router.push("/admin/auth/change-password");
+        // Return redirect path instead of navigating here
+        const mustChangePassword = !!data.data.must_change_password;
+        let redirectTo = "/admin/category";
+
+        if (mustChangePassword) {
+          redirectTo = "/admin/auth/change-password";
         } else {
-          router.push("/admin/category");
+          // Check for saved redirect path
+          const savedPath = typeof window !== 'undefined' 
+            ? sessionStorage.getItem('redirect_after_login') 
+            : null;
+          
+          if (savedPath) {
+            redirectTo = savedPath;
+            sessionStorage.removeItem('redirect_after_login');
+          }
         }
+
+        return { redirectTo, mustChangePassword };
       } else {
         throw new Error("Invalid response from server");
       }

@@ -27,7 +27,7 @@ import {
 // Single source of truth for all tags
 // Add/remove tags here - it will automatically sync everywhere
 export const TAG_CONFIG = {
-  // Main DevToolkit categories
+  // Main Product categories
   API: {
     label: "API",
     icon: SiGraphql,
@@ -112,7 +112,7 @@ export const TAG_CONFIG = {
   import: { label: "Import", icon: FiBox, color: "text-green-500" },
 } as const;
 
-// Export predefined tags for DevToolkit insert dropdown
+// Export predefined tags for Product insert dropdown
 export const PREDEFINED_TAGS = [
   "API",
   "Authentication",

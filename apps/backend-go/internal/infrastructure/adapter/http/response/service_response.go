@@ -1,6 +1,6 @@
 package response
 
-import "monorepo/backend-go/internal/application/devtoolkit/dto"
+import "monorepo/backend-go/internal/application/product/dto"
 
 // ServiceItemResponse represents the HTTP response for a service item
 type ServiceItemResponse struct {

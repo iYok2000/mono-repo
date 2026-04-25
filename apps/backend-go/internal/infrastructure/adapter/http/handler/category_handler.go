@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"monorepo/backend-go/internal/application/devtoolkit/command"
-	"monorepo/backend-go/internal/application/devtoolkit/query"
+	"monorepo/backend-go/internal/application/product/command"
+	"monorepo/backend-go/internal/application/product/query"
 	"monorepo/backend-go/internal/infrastructure/adapter/http/request"
 	"monorepo/backend-go/internal/infrastructure/adapter/http/response"
 

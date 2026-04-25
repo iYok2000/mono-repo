@@ -1,8 +1,11 @@
 "use client";
 
 import { HealthDashboard } from "@/components/health/HealthDashboard";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 
-export default function HealthcheckPage() {
+function HealthcheckPage() {
+  const { showModal, errorMessage, handleModalClose } = useUnauthorizedHandler();
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
@@ -21,3 +24,5 @@ export default function HealthcheckPage() {
     </div>
   );
 }
+
+export default withAuthentication(HealthcheckPage);

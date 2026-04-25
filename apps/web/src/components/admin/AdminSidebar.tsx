@@ -24,8 +24,8 @@ const MENU_ITEMS: MenuItem[] = [
     icon: Tag,
   },
   {
-    title: "จัดการ DevToolkit",
-    href: "/admin/devtoolkit",
+    title: "จัดการ Product",
+    href: "/admin/product",
     icon: Wrench,
   },
   {

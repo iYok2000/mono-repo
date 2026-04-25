@@ -1,6 +1,19 @@
 "use client";
 
-export function PreviewSection() {
+interface PreviewSettings {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+}
+
+interface PreviewSectionProps {
+  settings?: PreviewSettings;
+}
+
+export function PreviewSection({ settings }: PreviewSectionProps) {
+  const title = settings?.title || "ตัวอย่างการ์ด";
+  const subtitle = settings?.subtitle || "ดูว่าจะออกมาหน้าตาแบบไหน";
+  
   const examples = [
     {
       type: "Express",
@@ -24,10 +37,10 @@ export function PreviewSection() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[var(--foreground)] mb-3">
-            ตัวอย่างการ์ด
+            {title}
           </h2>
           <p className="text-lg text-[var(--muted)]">
-            ดูว่าจะออกมาหน้าตาแบบไหน
+            {subtitle}
           </p>
         </div>
 

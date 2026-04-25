@@ -6,15 +6,19 @@ import (
 
 	bannercommand "monorepo/backend-go/internal/application/banner/command"
 	bannerquery "monorepo/backend-go/internal/application/banner/query"
-	"monorepo/backend-go/internal/application/devtoolkit/command"
-	"monorepo/backend-go/internal/application/devtoolkit/query"
-	"monorepo/backend-go/internal/application/devtoolkit/validation"
+	homesettingscommand "monorepo/backend-go/internal/application/homesettings/command"
+	homesettingsquery "monorepo/backend-go/internal/application/homesettings/query"
+	productcommand "monorepo/backend-go/internal/application/product/command"
+	productquery "monorepo/backend-go/internal/application/product/query"
+	productvalidation "monorepo/backend-go/internal/application/product/validation"
 	"monorepo/backend-go/internal/config"
 	"monorepo/backend-go/internal/core/domain/auth"
 	bannerrepository "monorepo/backend-go/internal/core/domain/banner/repository"
-	"monorepo/backend-go/internal/core/domain/devtoolkit/repository"
+	homesettingsrepository "monorepo/backend-go/internal/core/domain/homesettings/repository"
+	productrepository "monorepo/backend-go/internal/core/domain/product/repository"
 	gormbanner "monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/banner"
-	gormdevtoolkit "monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/devtoolkit"
+	gormhomesettings "monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/homesettings"
+	gormproduct "monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/product"
 	"monorepo/backend-go/internal/infrastructure/adapter/persistence/postgres"
 
 	"gorm.io/gorm"
@@ -25,34 +29,42 @@ type Container struct {
 	SqlDB *sql.DB
 
 	// Repositories (Domain Ports)
-	CategoryRepo repository.CategoryRepository
-	ServiceRepo  repository.ServiceRepository
-	BannerRepo   bannerrepository.BannerRepository
-	AuthRepo     auth.Repository
+	BannerRepo       bannerrepository.BannerRepository
+	HomeSettingsRepo homesettingsrepository.HomeSettingsRepository
+	CategoryRepo     productrepository.CategoryRepository
+	ServiceRepo      productrepository.ServiceRepository
+	AuthRepo         auth.Repository
 
 	// Services
 	AuthService *auth.Service
 
-	// Command Handlers (Write Operations)
-	CreateCategoryHandler  *command.CreateCategoryHandler
-	UpdateCategoryHandler  *command.UpdateCategoryHandler
-	DeleteCategoryHandler  *command.DeleteCategoryHandler
-	CreateToolkitHandler   *command.CreateToolkitHandler
-	UpdateToolkitHandler   *command.UpdateToolkitHandler
-	DeleteToolkitHandler   *command.DeleteToolkitHandler
-	CreateBannerHandler    *bannercommand.CreateBannerHandler
-	UpdateBannerHandler    *bannercommand.UpdateBannerHandler
-	DeleteBannerHandler    *bannercommand.DeleteBannerHandler
-	ReorderBannersHandler  *bannercommand.ReorderBannersHandler
+	// Banner Command Handlers
+	CreateBannerHandler   *bannercommand.CreateBannerHandler
+	UpdateBannerHandler   *bannercommand.UpdateBannerHandler
+	DeleteBannerHandler   *bannercommand.DeleteBannerHandler
+	ReorderBannersHandler *bannercommand.ReorderBannersHandler
 
-	// Query Handlers (Read Operations)
-	ListCategoriesHandler *query.ListCategoriesHandler
-	GetCategoryHandler    *query.GetCategoryHandler
-	ListServicesHandler   *query.ListServicesHandler
-	ListToolkitsHandler   *query.ListToolkitsHandler
-	GetToolkitHandler     *query.GetToolkitHandler
-	ListBannersHandler    *bannerquery.ListBannersHandler
-	GetBannerHandler      *bannerquery.GetBannerHandler
+	// Banner Query Handlers
+	ListBannersHandler *bannerquery.ListBannersHandler
+	GetBannerHandler   *bannerquery.GetBannerHandler
+
+	// HomeSettings Handlers
+	GetHomeSettingsHandler    *homesettingsquery.GetHomeSettingsHandler
+	UpdateHomeSettingsHandler *homesettingscommand.UpdateHomeSettingsHandler
+
+	// Product Command Handlers
+	CreateProductHandler  *productcommand.CreateProductHandler
+	UpdateProductHandler  *productcommand.UpdateProductHandler
+	DeleteProductHandler  *productcommand.DeleteProductHandler
+	CreateCategoryHandler *productcommand.CreateCategoryHandler
+	UpdateCategoryHandler *productcommand.UpdateCategoryHandler
+	DeleteCategoryHandler *productcommand.DeleteCategoryHandler
+
+	// Product Query Handlers
+	ListProductsHandler   *productquery.ListProductsHandler
+	GetProductHandler     *productquery.GetProductHandler
+	ListCategoriesHandler *productquery.ListCategoriesHandler
+	GetCategoryHandler    *productquery.GetCategoryHandler
 }
 
 // New creates and initializes a new Container with all dependencies
@@ -70,32 +82,28 @@ func New(cfg *config.Config) (*Container, error) {
 	}
 
 	// Run migrations
-	if err := gormdevtoolkit.AutoMigrate(db); err != nil {
-		return nil, fmt.Errorf("failed to run devtoolkit migrations: %w", err)
-	}
 	if err := gormbanner.AutoMigrate(db); err != nil {
 		return nil, fmt.Errorf("failed to run banner migrations: %w", err)
 	}
+	if err := gormhomesettings.AutoMigrate(db); err != nil {
+		return nil, fmt.Errorf("failed to run homesettings migrations: %w", err)
+	}
+	if err := gormproduct.AutoMigrate(db); err != nil {
+		return nil, fmt.Errorf("failed to run product migrations: %w", err)
+	}
 
 	// Initialize repositories (Adapters implementing Domain Ports)
-	categoryRepo := gormdevtoolkit.NewCategoryRepository(db)
-	serviceRepo := gormdevtoolkit.NewServiceRepository(db)
 	bannerRepo := gormbanner.NewBannerRepository(db)
+	homeSettingsRepo := gormhomesettings.NewHomeSettingsRepository(db)
+	categoryRepo := gormproduct.NewCategoryRepository(db)
+	serviceRepo := gormproduct.NewServiceRepository(db)
 
 	// Initialize auth repository and service
 	authRepo := auth.NewPostgresRepository(sqlDB)
 	authService := auth.NewService(authRepo, cfg.JWTSecret)
 
 	// Initialize validators
-	contentValidator := validation.NewContentValidator()
-
-	// Initialize command handlers (with validators for security)
-	createCategoryHandler := command.NewCreateCategoryHandler(categoryRepo, contentValidator)
-	updateCategoryHandler := command.NewUpdateCategoryHandler(categoryRepo, contentValidator)
-	deleteCategoryHandler := command.NewDeleteCategoryHandler(categoryRepo)
-	createToolkitHandler := command.NewCreateToolkitHandler(categoryRepo, serviceRepo)
-	updateToolkitHandler := command.NewUpdateToolkitHandler(categoryRepo, serviceRepo)
-	deleteToolkitHandler := command.NewDeleteToolkitHandler(serviceRepo)
+	contentValidator := productvalidation.NewContentValidator()
 
 	// Initialize banner command handlers
 	createBannerHandler := bannercommand.NewCreateBannerHandler(bannerRepo)
@@ -103,40 +111,55 @@ func New(cfg *config.Config) (*Container, error) {
 	deleteBannerHandler := bannercommand.NewDeleteBannerHandler(bannerRepo)
 	reorderBannersHandler := bannercommand.NewReorderBannersHandler(bannerRepo)
 
-	// Initialize query handlers
-	listCategoriesHandler := query.NewListCategoriesHandler(categoryRepo)
-	getCategoryHandler := query.NewGetCategoryHandler(categoryRepo)
-	listServicesHandler := query.NewListServicesHandler(serviceRepo)
-	listToolkitsHandler := query.NewListToolkitsHandler(serviceRepo)
-	getToolkitHandler := query.NewGetToolkitHandler(serviceRepo)
+	// Initialize banner query handlers
 	listBannersHandler := bannerquery.NewListBannersHandler(bannerRepo)
 	getBannerHandler := bannerquery.NewGetBannerHandler(bannerRepo)
 
+	// Initialize home settings handlers
+	getHomeSettingsHandler := homesettingsquery.NewGetHomeSettingsHandler(homeSettingsRepo)
+	updateHomeSettingsHandler := homesettingscommand.NewUpdateHomeSettingsHandler(homeSettingsRepo)
+
+	// Initialize product command handlers
+	createProductHandler := productcommand.NewCreateProductHandler(categoryRepo, serviceRepo)
+	updateProductHandler := productcommand.NewUpdateProductHandler(categoryRepo, serviceRepo)
+	deleteProductHandler := productcommand.NewDeleteProductHandler(serviceRepo)
+	createCategoryHandler := productcommand.NewCreateCategoryHandler(categoryRepo, contentValidator)
+	updateCategoryHandler := productcommand.NewUpdateCategoryHandler(categoryRepo, contentValidator)
+	deleteCategoryHandler := productcommand.NewDeleteCategoryHandler(categoryRepo)
+
+	// Initialize product query handlers
+	listProductsHandler := productquery.NewListProductsHandler(serviceRepo)
+	getProductHandler := productquery.NewGetProductHandler(serviceRepo)
+	listCategoriesHandler := productquery.NewListCategoriesHandler(categoryRepo)
+	getCategoryHandler := productquery.NewGetCategoryHandler(categoryRepo)
+
 	return &Container{
-		DB:                    db,
-		SqlDB:                 sqlDB,
-		CategoryRepo:          categoryRepo,
-		ServiceRepo:           serviceRepo,
-		BannerRepo:            bannerRepo,
-		AuthRepo:              authRepo,
-		AuthService:           authService,
-		CreateCategoryHandler: createCategoryHandler,
-		UpdateCategoryHandler: updateCategoryHandler,
-		DeleteCategoryHandler: deleteCategoryHandler,
-		CreateToolkitHandler:  createToolkitHandler,
-		UpdateToolkitHandler:  updateToolkitHandler,
-		DeleteToolkitHandler:  deleteToolkitHandler,
-		CreateBannerHandler:   createBannerHandler,
-		UpdateBannerHandler:   updateBannerHandler,
-		DeleteBannerHandler:   deleteBannerHandler,
-		ReorderBannersHandler: reorderBannersHandler,
-		ListCategoriesHandler: listCategoriesHandler,
-		GetCategoryHandler:    getCategoryHandler,
-		ListServicesHandler:   listServicesHandler,
-		ListToolkitsHandler:   listToolkitsHandler,
-		GetToolkitHandler:     getToolkitHandler,
-		ListBannersHandler:    listBannersHandler,
-		GetBannerHandler:      getBannerHandler,
+		DB:                        db,
+		SqlDB:                     sqlDB,
+		BannerRepo:                bannerRepo,
+		HomeSettingsRepo:          homeSettingsRepo,
+		CategoryRepo:              categoryRepo,
+		ServiceRepo:               serviceRepo,
+		AuthRepo:                  authRepo,
+		AuthService:               authService,
+		CreateBannerHandler:       createBannerHandler,
+		UpdateBannerHandler:       updateBannerHandler,
+		DeleteBannerHandler:       deleteBannerHandler,
+		ReorderBannersHandler:     reorderBannersHandler,
+		ListBannersHandler:        listBannersHandler,
+		GetBannerHandler:          getBannerHandler,
+		GetHomeSettingsHandler:    getHomeSettingsHandler,
+		UpdateHomeSettingsHandler: updateHomeSettingsHandler,
+		CreateProductHandler:      createProductHandler,
+		UpdateProductHandler:      updateProductHandler,
+		DeleteProductHandler:      deleteProductHandler,
+		CreateCategoryHandler:     createCategoryHandler,
+		UpdateCategoryHandler:     updateCategoryHandler,
+		DeleteCategoryHandler:     deleteCategoryHandler,
+		ListProductsHandler:       listProductsHandler,
+		GetProductHandler:         getProductHandler,
+		ListCategoriesHandler:     listCategoriesHandler,
+		GetCategoryHandler:        getCategoryHandler,
 	}, nil
 }
 

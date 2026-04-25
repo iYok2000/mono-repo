@@ -1,7 +1,10 @@
 import type { InternalAxiosRequestConfig } from 'axios';
 
 export const requestInterceptor = (config: InternalAxiosRequestConfig) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  // Try to get token from sessionStorage (AuthContext stores it there)
+  const token = typeof window !== 'undefined' 
+    ? (sessionStorage.getItem('access_token') || localStorage.getItem('access_token'))
+    : null;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

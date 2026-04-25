@@ -42,6 +42,7 @@ Don't create separate doc for:
 
    - Check if similar feature doc exists
    - Read relevant docs to understand patterns
+   - Read root `Document.md`, `AGENT.md`, `PROJECT_CONTEXT.md`, `DEVELOPMENT.md` for the mandatory pre-flight rules (rename/migration guard, GORM FK/index requirements, build/type-check expectations)
 
 2. **After implementing feature**:
 

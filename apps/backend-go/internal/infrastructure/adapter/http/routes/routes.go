@@ -61,23 +61,24 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 			categories.DELETE("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), categoryHandler.DeleteCategory)
 		}
 
-		// Toolkit endpoints - Protected with authentication
-		toolkitHandler := handler.NewToolkitHandler(
-			cnt.CreateToolkitHandler,
-			cnt.UpdateToolkitHandler,
-			cnt.DeleteToolkitHandler,
-			cnt.ListToolkitsHandler,
-			cnt.GetToolkitHandler,
+		// Product endpoints - Protected with authentication
+		productHandler := handler.NewProductHandler(
+			cnt.CreateProductHandler,
+			cnt.UpdateProductHandler,
+			cnt.DeleteProductHandler,
+			cnt.ListProductsHandler,
+			cnt.GetProductHandler,
 		)
 
-		toolkits := api.Group("/toolkits")
+		products := api.Group("/products")
 		{
-			toolkits.GET("", toolkitHandler.ListToolkits)
-			toolkits.GET("/:id", toolkitHandler.GetToolkit)
-			// Write operations require authentication
-			toolkits.POST("", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), toolkitHandler.CreateToolkit)
-			toolkits.PUT("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), toolkitHandler.UpdateToolkit)
-			toolkits.DELETE("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), toolkitHandler.DeleteToolkit)
+			// Read operations with rate limiting (prevent abuse)
+			products.GET("", apiRateLimiter.LimitGin(), productHandler.ListProducts)
+			products.GET("/:id", apiRateLimiter.LimitGin(), productHandler.GetProduct)
+			// Write operations require authentication + rate limiting
+			products.POST("", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), productHandler.CreateProduct)
+			products.PUT("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), productHandler.UpdateProduct)
+			products.DELETE("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), productHandler.DeleteProduct)
 		}
 
 		// Banner endpoints - Protected with authentication

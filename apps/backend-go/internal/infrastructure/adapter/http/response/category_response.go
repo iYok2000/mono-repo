@@ -1,6 +1,6 @@
 package response
 
-import "monorepo/backend-go/internal/application/devtoolkit/dto"
+import "monorepo/backend-go/internal/application/product/dto"
 
 // CategoryResponse represents the HTTP response for a category
 // This is HTTP-specific and can have framework tags

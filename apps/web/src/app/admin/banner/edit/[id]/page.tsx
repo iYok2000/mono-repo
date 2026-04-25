@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { BannerForm } from "../../_components/BannerForm";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 import { getBannerById, updateBanner } from "@/services/bannerService";
-import { Banner, UpdateBannerDTO } from "@/types/banner";
+import { Banner, UpdateBannerDTO, CreateBannerDTO } from "@/types/banner";
 import { Modal } from "@/components/ui/Modal";
 
-export default function EditBannerPage() {
+function EditBannerPage() {
+  const { showModal: showUnauthorizedModal, errorMessage: unauthorizedErrorMessage, handleModalClose: handleUnauthorizedModalClose } = useUnauthorizedHandler();
   const router = useRouter();
   const params = useParams();
   const bannerId = params.id as string;
@@ -27,7 +30,8 @@ export default function EditBannerPage() {
         setBanner(data);
       } catch (err: unknown) {
         console.error("Failed to fetch banner:", err);
-        setError(err.response?.data?.message || "Failed to load banner");
+        const error = err as any;
+        setError(error?.response?.data?.message || "Failed to load banner");
       } finally {
         setLoading(false);
       }
@@ -47,8 +51,9 @@ export default function EditBannerPage() {
       }, 1500);
     } catch (error: unknown) {
       console.error("Failed to update banner:", error);
+      const err = error as any;
       setErrorMessage(
-        error.response?.data?.message || "Failed to update banner"
+        err?.response?.data?.message || "Failed to update banner"
       );
       setShowErrorModal(true);
     }
@@ -128,7 +133,17 @@ export default function EditBannerPage() {
           message={errorMessage}
           confirmText="ตกลง"
         />
+        <Modal
+          isOpen={showUnauthorizedModal}
+          onClose={handleUnauthorizedModalClose}
+          type="warning"
+          title="⚠️ Session หมดอายุ"
+          message={unauthorizedErrorMessage}
+          confirmText="เข้าสู่ระบบใหม่"
+        />
       </div>
     </div>
   );
 }
+
+export default withAuthentication(EditBannerPage);

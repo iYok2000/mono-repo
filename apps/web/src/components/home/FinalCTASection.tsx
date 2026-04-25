@@ -2,7 +2,21 @@
 
 import Link from "next/link";
 
-export function FinalCTASection() {
+interface FinalCTASettings {
+  title?: string;
+  subtitle?: string;
+  button_text?: string;
+}
+
+interface FinalCTASectionProps {
+  settings?: FinalCTASettings;
+}
+
+export function FinalCTASection({ settings }: FinalCTASectionProps) {
+  const title = settings?.title || 'พร้อมทำของขวัญที่\n"แตะแล้วเป็นความทรงจำ"\nไหม?';
+  const subtitle = settings?.subtitle || "เริ่มสร้างการ์ดความทรงจำของคุณได้เลย ไม่ว่าจะเป็นของขวัญวันเกิด ครบรอบ หรือโมเมนต์พิเศษ";
+  const buttonText = settings?.button_text || "เริ่มทำ Express";
+
   return (
     <section className="relative py-20 lg:py-28">
       <div className="mx-auto w-full max-w-5xl">
@@ -19,13 +33,11 @@ export function FinalCTASection() {
           <div className="relative z-10 space-y-8">
             {/* Headline */}
             <div className="space-y-4">
-              <h2 className="text-3xl lg:text-5xl font-bold text-white leading-tight">
-                พร้อมทำของขวัญที่<br />
-                <span className="text-white/90">"แตะแล้วเป็นความทรงจำ"</span><br />
-                ไหม?
+              <h2 className="text-3xl lg:text-5xl font-bold text-white leading-tight" style={{ whiteSpace: 'pre-line' }}>
+                {title}
               </h2>
               <p className="text-lg lg:text-xl text-white/80 max-w-2xl mx-auto">
-                เริ่มสร้างการ์ดความทรงจำของคุณได้เลย ไม่ว่าจะเป็นของขวัญวันเกิด ครบรอบ หรือโมเมนต์พิเศษ
+                {subtitle}
               </p>
             </div>
 
@@ -36,7 +48,7 @@ export function FinalCTASection() {
                 className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl bg-white text-[var(--primary)] hover:bg-white/90 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[var(--primary)] min-w-[200px]"
               >
                 <span className="mr-2">⚡</span>
-                เริ่มทำ Express
+                {buttonText}
               </Link>
               <Link
                 href="/create/squad"

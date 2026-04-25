@@ -6,7 +6,37 @@ import Link from "next/link";
 import { BsPeople } from "react-icons/bs";
 import { FaPeopleArrows } from "react-icons/fa";
 
-export function HeroSection() {
+interface HeroSettings {
+  badge_text?: string;
+  badge_icon?: string;
+  title_highlight?: string;
+  title_rest?: string;
+  subtitle?: string;
+  feature_1?: string;
+  feature_2?: string;
+  feature_3?: string;
+  cta_primary?: string;
+  cta_secondary?: string;
+  cta_tertiary?: string;
+}
+
+interface HeroSectionProps {
+  settings?: HeroSettings;
+}
+
+export function HeroSection({ settings }: HeroSectionProps) {
+  // Fallback to default values if settings not provided
+  const badgeText = settings?.badge_text || "ของขวัญความทรงจำ • Digital Gift to Thailand";
+  const titleHighlight = settings?.title_highlight || "ของขวัญวิดีโอแบบ NFC";
+  const titleRest = settings?.title_rest || "ที่เปิดคลิปความทรงจำได้ทันที";
+  const subtitle = settings?.subtitle || "แตะการ์ดเพียงครั้งเดียว ก็เปิดคลิป วิดีโอ หรือข้อความแทนใจได้ทันที — ของขวัญสุดพิเศษสำหรับวันเกิด ครบรอบ และทุกโอกาสที่คุณอยากให้ความทรงจำอยู่ได้นาน";
+  const feature1 = settings?.feature_1 || "มี QR สำรอง สแกนได้ทุกเครื่อง";
+  const feature2 = settings?.feature_2 || "ไฟล์อยู่ใน Google Drive ของคุณ—คุมสิทธิ์เอง";
+  const feature3 = settings?.feature_3 || "ตั้งเวลาเปิด + ใส่รหัส ได้";
+  const ctaPrimary = settings?.cta_primary || "สั่งของขวัญด่วน";
+  const ctaSecondary = settings?.cta_secondary || "Squad 7-10 คน";
+  const ctaTertiary = settings?.cta_tertiary || "ดูตัวอย่างของขวัญ";
+
   return (
     <section className="relative overflow-hidden bg-[var(--background)]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-12">
@@ -17,7 +47,7 @@ export function HeroSection() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--primary-soft)] rounded-full">
               <span className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse-led"></span>
               <span className="text-[var(--primary)] text-sm font-medium">
-                ของขวัญความทรงจำ • Digital Gift to Thailand
+                {badgeText}
               </span>
             </div>
 
@@ -25,16 +55,16 @@ export function HeroSection() {
             <div className="space-y-3">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
                 <span className="text-[var(--primary)]">
-                  ของขวัญวิดีโอแบบ NFC
+                  {titleHighlight}
                 </span>
                 <br />
                 <span className="text-[var(--foreground)]">
-                  ที่เปิดคลิปความทรงจำได้ทันที
+                  {titleRest}
                 </span>
               </h1>
 
-              <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-lg font-normal">
-                แตะการ์ดเพียงครั้งเดียว ก็เปิดคลิป วิดีโอ หรือข้อความแทนใจได้ทันที — ของขวัญสุดพิเศษสำหรับวันเกิด ครบรอบ และทุกโอกาสที่คุณอยากให้ความทรงจำอยู่ได้นาน
+              <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-xl font-normal">
+                {subtitle}
               </p>
             </div>
 
@@ -45,7 +75,7 @@ export function HeroSection() {
                   <Check className="w-3 h-3 text-[var(--primary)]" />
                 </div>
                 <p className="text-base text-[var(--muted)] font-normal leading-relaxed">
-                  มี QR สำรอง สแกนได้ทุกเครื่อง
+                  {feature1}
                 </p>
               </div>
 
@@ -54,7 +84,7 @@ export function HeroSection() {
                   <Check className="w-3 h-3 text-[var(--primary)]" />
                 </div>
                 <p className="text-base text-[var(--muted)] font-normal leading-relaxed">
-                  ไฟล์อยู่ใน Google Drive ของคุณ—คุมสิทธิ์เอง
+                  {feature2}
                 </p>
               </div>
 
@@ -63,7 +93,7 @@ export function HeroSection() {
                   <Check className="w-3 h-3 text-[var(--primary)]" />
                 </div>
                 <p className="text-base text-[var(--muted)] font-normal leading-relaxed">
-                  ตั้งเวลาเปิด + ใส่รหัส ได้
+                  {feature3}
                 </p>
               </div>
             </div>
@@ -71,13 +101,13 @@ export function HeroSection() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 pt-1">
               <Button icon={<Play className="w-4 h-4" />} variant="large">
-                สั่งของขวัญด่วน
+                {ctaPrimary}
               </Button>
 
-              <Button variant="secondary">Squad 7-10 คน</Button>
+              <Button variant="secondary">{ctaSecondary}</Button>
 
               <Button icon={<Play className="w-4 h-4" />} variant="link">
-                ดูตัวอย่างของขวัญ
+                {ctaTertiary}
               </Button>
             </div>
           </div>

@@ -51,7 +51,25 @@ const squadSteps = [
   },
 ];
 
-export function HowItWorksSection() {
+interface HowItWorksSettings {
+  title?: string;
+  subtitle?: string;
+  step_1_title?: string;
+  step_1_description?: string;
+  step_2_title?: string;
+  step_2_description?: string;
+  step_3_title?: string;
+  step_3_description?: string;
+}
+
+interface HowItWorksSectionProps {
+  settings?: HowItWorksSettings;
+}
+
+export function HowItWorksSection({ settings }: HowItWorksSectionProps) {
+  const title = settings?.title || "ใช้งานยังไง? แค่ 3 ขั้นตอนง่ายๆ";
+  const subtitle = settings?.subtitle || "";
+
   return (
     <section className="py-32 px-6 bg-[var(--background)]" id="how-it-works">
       <div className="max-w-7xl mx-auto">
@@ -59,8 +77,13 @@ export function HowItWorksSection() {
         {/* Section Header */}
         <div className="text-center mb-20">
           <h2 className="text-4xl lg:text-5xl font-bold text-[var(--foreground)] mb-6">
-            ใช้งานยังไง? แค่ 3 ขั้นตอนง่ายๆ
+            {title}
           </h2>
+          {subtitle && (
+            <p className="text-lg text-[var(--muted)] mt-4">
+              {subtitle}
+            </p>
+          )}
         </div>
 
         {/* Express + Squad Grid */}

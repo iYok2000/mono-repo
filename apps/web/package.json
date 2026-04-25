@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:home": "tsx scripts/initHomeSettings.ts"
   },
   "dependencies": {
     "@mono-repo/shared-types": "workspace:*",

@@ -1,121 +1,70 @@
 # Digital Business Card Feature
 
-> Interactive digital business card with QR code, vCard export, and social media integration
+## Overview
+Digital business card system that enables users to create, share, and manage interactive business cards through a web interface. Users can generate shareable URLs containing their contact information, professional details, and social media links. Recipients can view the card, interact with contact fields (click-to-call, click-to-email), and save contacts directly to their devices via vCard export.
 
-**Created**: 2026-01-29  
-**Status**: ✅ Active  
-**Route**: `/card/[data]`, `/create/greeting`
+## Why
 
----
+**Business Requirements**:
+- Contactless networking solution for modern business interactions
+- Eco-friendly alternative to paper business cards
+- Easy sharing via QR code, URL, or direct link
+- Instant contact saving without manual data entry
+- Support for multiple languages (Thai/English) for international business
+- Professional social media integration (LINE, Instagram, Facebook, LinkedIn)
+- Zero infrastructure cost with client-side only implementation
 
-## 📋 Overview
+**Technical Reasoning**:
+- **URL-based data storage**: Eliminates need for backend database and user authentication. All data encoded in shareable URL for maximum portability and privacy
+- **Base64 encoding with compression**: Short key mapping (e.g., `n` for name, `e` for email) reduces URL length while maintaining readability
+- **Client-side only architecture**: No server-side processing means instant page loads, no hosting costs, and complete user privacy
+- **vCard standard**: Ensures compatibility with all devices (iOS, Android, desktop) for contact saving
+- **Responsive design**: Single codebase serves both desktop and mobile with optimized layouts for each
 
-### What
-Digital business card system that allows users to create shareable business cards with:
-- Personal/professional information
-- Contact details (email, phone, website)
-- Social media links (LINE, Instagram, Facebook, LinkedIn)
-- QR code generation for easy sharing
-- vCard (.vcf) export for contact saving
+**Alternatives Considered**:
+- Backend database storage → Rejected: Adds complexity, cost, and privacy concerns
+- JWT tokens for data → Rejected: Unnecessary overhead for public data
+- Server-side rendering → Rejected: Client-side only meets requirements and reduces complexity
 
-### Why
-- **Contactless sharing**: Share business information via QR code or URL
-- **Interactive contacts**: Click-to-call, click-to-email, social media links
-- **Modern networking**: Eco-friendly alternative to paper business cards
-- **Easy updates**: Update card information without reprinting
+## How
 
-### How
-1. User fills out business card form at `/create/greeting`
-2. Data encoded in URL-safe base64 format
-3. Shareable URL generated: `/card/[encoded-data]`
-4. Recipients can view card, click contacts, save to phone
-
----
-
-## 🎨 Features
-
-### 1. Business Card Display (`/card/[data]`)
-
-**Information Fields**:
-- Name (Thai/English)
-- Position/Title
-- Company name
-- Company logo
-- Email (validated, click to send)
-- Phone (click to call)
-- Website (click to open)
-- Social media handles
-
-**Interactive Elements**:
-- **Email**: 
-  - ✅ Email validation (regex pattern)
-  - Click → Opens mail app
-  - Hover → Copy button appears
-- **Phone**: 
-  - Click → Opens phone dialer
-  - Hover → "Save Contact" button (downloads .vcf)
-- **Website**: Click → Opens in new tab
-- **Social Media**: Click → Opens respective platform
-
-**Social Media Styling**:
-- LINE: Official LINE icon, green brand color (#00B900)
-- Instagram: Gradient background (pink to purple)
-- Facebook: Blue brand color (#1877F2)
-- LinkedIn: Blue brand color (#0A66C2)
-- All cards have hover effects with brand colors
-
-### 2. Card Creation (`/create/greeting`)
-
-**Form Fields**:
-- Name (Thai)
-- Name (English) - optional
-- Position (Thai)
-- Position (English) - optional
-- Company name
-- Company logo URL
-- Theme color picker
-- Email (required, validated)
-- Phone (required)
-- Website
-- LINE ID
-- Instagram handle
-- Facebook handle
-- LinkedIn handle
-
-**URL Generation**:
-- Data compressed using short keys (e.g., `n` for name, `e` for email)
-- UTF-8 encoded → Base64 → URL-safe format (`-` for `+`, `_` for `/`, `~` for `=`)
-- One-click copy to clipboard
-- Live preview on desktop/mobile
-
-**Preview Modes**:
-- Desktop view (landscape)
-- Mobile view (portrait)
-- Real-time updates as user types
-
-### 3. Contact Export
-
-**vCard Generation**:
-```vcard
-BEGIN:VCARD
-VERSION:3.0
-FN:Name
-TITLE:Position
-ORG:Company
-EMAIL:email@example.com
-TEL:+66812345678
-URL:website.com
-END:VCARD
+**Architecture**:
+```
+User Input (Form) → Data Encoding → URL Generation → Shareable Link
+                                                           ↓
+                                                   Recipient Opens URL
+                                                           ↓
+                                            URL Decoding → Card Display
+                                                           ↓
+                                            Interactive Actions (Call/Email/Save)
 ```
 
-**Download**: Saves as `[Name].vcf` file, compatible with all devices
+**Components**:
+1. **Card Creation Page** (`/create/greeting`): Form for entering business card data
+2. **Card Display Page** (`/card/[data]`): Renders the business card from encoded URL
+3. **URL Encoder/Decoder**: Handles data compression and base64 transformation
+4. **vCard Generator**: Creates `.vcf` files for contact export
 
----
+**Data Flow**:
+1. User fills form with personal/professional information
+2. Client validates required fields (email format, required fields)
+3. Data mapped to short keys and JSON stringified
+4. UTF-8 encoding → Base64 → URL-safe transformation
+5. Shareable URL generated and copied to clipboard
+6. Recipient opens URL → Reverse transformation → Card rendered
+7. Interactive elements trigger native actions (tel:, mailto:, vCard download)
 
-## 🔧 Technical Implementation
+**Implementation Details**:
+- Next.js 14+ with App Router for file-based routing
+- TypeScript for type safety on data structures
+- Tailwind CSS for responsive design and brand color consistency
+- Lucide React for consistent iconography
+- Native browser APIs (TextEncoder, btoa/atob) for encoding
+- No external API dependencies
+
+## Code Examples
 
 ### Data Structure
-
 ```typescript
 interface BusinessCardData {
   name: string;           // Full name (Thai)
@@ -128,229 +77,297 @@ interface BusinessCardData {
   email: string;          // Email (validated)
   phone: string;          // Phone number
   website: string;        // Website URL
-  lineId: string;         // LINE ID (with or without @)
+  lineId: string;         // LINE ID
   instagram: string;      // Instagram handle
   facebook: string;       // Facebook username
   linkedin: string;       // LinkedIn username
 }
 ```
 
-### URL Encoding/Decoding
-
-**Encoding Process** (Create page):
+### URL Encoding (Create Page)
 ```typescript
-// 1. Map to short keys
+// Compress data with short keys
 const shortData = {
   n: formData.name,
+  ne: formData.nameEn,
   p: formData.position,
+  pe: formData.positionEn,
+  c: formData.company,
+  l: formData.logo,
+  tc: formData.themeColor,
   e: formData.email,
   ph: formData.phone,
-  // ... other fields
+  w: formData.website,
+  li: formData.lineId,
+  ig: formData.instagram,
+  fb: formData.facebook,
+  ln: formData.linkedin
 };
 
-// 2. JSON → UTF-8 → Base64 → URL-safe
+// JSON → UTF-8 → Base64 → URL-safe
 const jsonString = JSON.stringify(shortData);
 const utf8Bytes = new TextEncoder().encode(jsonString);
 let base64 = btoa(String.fromCharCode(...utf8Bytes));
 base64 = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '~');
 
-// 3. Generate URL
-const url = `${window.location.origin}/card/${base64}`;
+const shareableUrl = `${window.location.origin}/card/${base64}`;
 ```
 
-**Decoding Process** (Card page):
+### URL Decoding (Card Page)
 ```typescript
-// 1. URL-safe → Standard Base64
-let base64 = encodedData.replace(/-/g, '+').replace(/_/g, '/').replace(/~/g, '=');
+// URL-safe → Standard Base64
+let base64 = encodedData
+  .replace(/-/g, '+')
+  .replace(/_/g, '/')
+  .replace(/~/g, '=');
 
-// 2. Base64 → UTF-8 → JSON
+// Base64 → UTF-8 → JSON → Data
 const binaryString = atob(base64);
 const bytes = new Uint8Array(binaryString.length);
 for (let i = 0; i < binaryString.length; i++) {
   bytes[i] = binaryString.charCodeAt(i);
 }
 const jsonString = new TextDecoder().decode(bytes);
-const data = JSON.parse(jsonString);
+const cardData = JSON.parse(jsonString);
 ```
 
-### Components
-
-**Files**:
-- `/apps/web/src/app/card/[data]/page.tsx` - Card display page
-- `/apps/web/src/app/create/greeting/page.tsx` - Card creation form
-
-**Icons**:
-- Lucide icons: Mail, Phone, Globe, Instagram, Facebook, Linkedin
-- Custom LINE icon (SVG component with official logo)
-
----
-
-## 🔒 Security Considerations
-
-### Input Validation
-
-**Email Validation**:
+### Email Validation
 ```typescript
-const isValidEmail = (email: string) => {
+const isValidEmail = (email: string): boolean => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 ```
 
-**XSS Prevention**:
-- ✅ All user data rendered via JSX (auto-escaped)
-- ✅ No use of `dangerouslySetInnerHTML`
-- ✅ URL validation for external links
+### vCard Generation
+```typescript
+function generateVCard(data: BusinessCardData): string {
+  return `BEGIN:VCARD
+VERSION:3.0
+FN:${data.name}
+TITLE:${data.position}
+ORG:${data.company}
+EMAIL:${data.email}
+TEL:${data.phone}
+URL:${data.website}
+END:VCARD`;
+}
 
-**Data Size**:
-- URL length limited by browser (typically ~2000 chars)
-- Consider backend storage for larger datasets
+// Trigger download
+const blob = new Blob([vCardContent], { type: 'text/vcard' });
+const url = window.URL.createObjectURL(blob);
+const link = document.createElement('a');
+link.href = url;
+link.download = `${data.name}.vcf`;
+link.click();
+```
 
-### Privacy
+### Interactive Contact Elements
+```typescript
+// Click-to-call
+<a href={`tel:${cardData.phone}`} className="...">
+  <Phone className="h-4 w-4" />
+  {cardData.phone}
+</a>
 
-**Client-Side Only**:
-- ✅ No data sent to backend/server
-- ✅ No database storage
-- ✅ User controls all information
-- ✅ Data only in URL (shareable link)
+// Click-to-email
+<a href={`mailto:${cardData.email}`} className="...">
+  <Mail className="h-4 w-4" />
+  {cardData.email}
+</a>
 
-**Recommendations**:
-- Users should not include sensitive information
-- Consider encryption for sensitive use cases
-- Option to add password protection (future enhancement)
+// Social media links with brand colors
+<a 
+  href={`https://line.me/ti/p/~${cardData.lineId}`}
+  className="bg-[#00B900] hover:bg-[#00A000]"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <LineIcon /> LINE
+</a>
+```
 
----
+## Dependencies
 
-## 🎨 UI/UX Details
+### Internal Dependencies
+- `apps/web/src/app/card/[data]/page.tsx` - Card display component
+- `apps/web/src/app/create/greeting/page.tsx` - Card creation form
+- Shared Tailwind configuration for consistent styling
 
-### Color Scheme
+### External Dependencies
+- `next@14+` - App Router for dynamic routes and server components
+- `react@18+` - UI component framework
+- `lucide-react@latest` - Icon library (Mail, Phone, Globe, Instagram, Facebook, Linkedin)
+- `tailwindcss@3+` - Utility-first CSS framework
 
-**Brand Colors**:
-- LINE: `#00B900` (Green)
-- Instagram: `#E4405F` (Pink) with gradient effect
-- Facebook: `#1877F2` (Blue)
-- LinkedIn: `#0A66C2` (Blue)
+### Browser APIs
+- `TextEncoder/TextDecoder` - UTF-8 encoding/decoding
+- `btoa/atob` - Base64 encoding/decoding
+- `Blob` - vCard file generation
+- `window.URL.createObjectURL` - File download
 
-**Theme Colors**:
-- User-selectable theme color for accents
-- Applied to icons, headings, and interactive elements
+## API Endpoints
+No backend API endpoints. All functionality is client-side only.
 
-### Responsive Design
+## Database Schema
+No database required. All data stored in URL parameters.
 
-**Desktop** (`lg:` breakpoint):
-- Landscape layout
-- Two-column design
-- Larger text and spacing
+## Configuration
 
-**Mobile** (default):
-- Portrait layout
-- Single column
-- Touch-optimized buttons
-- Stacked information
+**Environment Variables**:
+None required. Fully client-side implementation.
 
-### Accessibility
+**Key Settings**:
+- **Route paths**: 
+  - Display: `/card/[data]` (dynamic route)
+  - Creation: `/create/greeting` (static route)
+- **Brand Colors** (hardcoded):
+  - LINE: `#00B900`
+  - Instagram: `#E4405F` with gradient
+  - Facebook: `#1877F2`
+  - LinkedIn: `#0A66C2`
+- **Validation Rules**:
+  - Email: Standard regex pattern
+  - Required fields: name, position, company, email, phone
+- **URL Length Limit**: ~2000 characters (browser limitation)
 
-**Interactive Elements**:
-- ✅ Clickable phone numbers (`tel:` links)
-- ✅ Clickable emails (`mailto:` links)
-- ✅ External links open in new tabs
-- ✅ Clear hover states on all interactive elements
-- ✅ Copy/Save buttons appear on hover for discoverability
+**Responsive Breakpoints**:
+- Mobile: default (< 1024px)
+- Desktop: `lg:` breakpoint (≥ 1024px)
 
-**Visual Feedback**:
-- Hover effects on all clickable items
-- Button state changes (Copy → ✓ Copied)
-- Smooth transitions
+## Testing
 
----
+**Unit Tests**: 
+- Location: Not yet implemented
+- Coverage needed:
+  - Email validation function
+  - URL encoding/decoding functions
+  - vCard generation
+  - Short key mapping correctness
 
-## 📱 Use Cases
+**Integration Tests**:
+- Location: Not yet implemented
+- Scenarios to cover:
+  - Full flow: Create card → Generate URL → Decode → Display
+  - Copy to clipboard functionality
+  - vCard download trigger
+  - Social media link construction
 
-### 1. Business Networking
-- Generate card after meeting
-- Share via QR code at events
-- Email link after video calls
+**Manual Testing**:
+1. Navigate to `/create/greeting`
+2. Fill all form fields with test data
+3. Verify email validation on invalid input
+4. Click "Generate Card" button
+5. Verify URL is copied to clipboard
+6. Open generated URL in new tab/browser
+7. Verify all fields display correctly
+8. Test all interactive elements:
+   - Click email → Opens mail app
+   - Click phone → Opens dialer
+   - Click website → Opens in new tab
+   - Click social media → Opens correct platform
+9. Click "Save Contact" → Downloads `.vcf` file
+10. Import `.vcf` to phone contacts → Verify data
+11. Test on mobile device for responsive layout
+12. Test with Thai/Unicode characters
+13. Test with very long data (near URL limit)
+14. Test with missing optional fields
 
-### 2. Job Applications
-- Include in email signatures
-- Add to LinkedIn profile
-- Share with recruiters
+## Notes
 
-### 3. Freelancers/Consultants
-- Quick client onboarding
-- Portfolio integration
-- Easy contact sharing
+### Important Considerations
 
-### 4. Sales/Marketing
-- Lead generation
-- Event networking
-- Follow-up materials
+**Security**:
+- All user input auto-escaped by React JSX rendering (XSS prevention)
+- No use of `dangerouslySetInnerHTML`
+- External links validated before rendering
+- Client-side only = no server-side attack surface
+- Users advised not to include sensitive information in cards
 
----
+**Performance**:
+- Zero backend calls = instant page loads
+- Static generation possible for create page
+- Encoding/decoding operations are O(n) on data size
+- No database queries or API latency
 
-## 🚀 Future Enhancements
+**Privacy**:
+- No tracking or analytics
+- No data sent to servers
+- No cookies or local storage
+- User controls all information
+- Shareable URL is only copy of data
 
-### Potential Features
+**Browser Compatibility**:
+- Requires modern browsers with TextEncoder/TextDecoder support
+- Base64 encoding supported in all major browsers
+- vCard download works on all platforms
 
-**Backend Integration**:
-- [ ] Database storage for analytics
-- [ ] Click tracking (how many views)
-- [ ] QR code generator API
+### Known Issues
+
+**Current Limitations**:
+1. URL length limited to ~2000 characters (browser constraint)
+2. No way to edit card after URL is generated (must create new)
+3. No analytics on card views or link clicks
+4. No backend persistence or user accounts
+5. No QR code generation (planned enhancement)
+6. Thai text may increase encoded URL length significantly
+
+**Edge Cases Handled**:
+- ✅ Invalid email format → Form validation error
+- ✅ Empty required fields → Submit button disabled
+- ✅ Invalid base64 data in URL → Graceful error handling
+- ✅ Missing optional fields → Fields hidden in display
+- ✅ Very long data → Warning shown during creation
+- ✅ Special characters in URLs → Properly URL-encoded
+
+### Trade-offs Made
+
+**Client-Side Only vs Backend**:
+- ✅ Benefit: Zero cost, instant deployment, complete privacy
+- ❌ Sacrifice: No analytics, no user accounts, no edit functionality
+- Why: Meets core requirements without unnecessary complexity
+
+**URL-based vs Database Storage**:
+- ✅ Benefit: Portable, shareable, no infrastructure
+- ❌ Sacrifice: URL length limitations, no version history
+- Why: Simplicity and privacy outweigh advanced features for this use case
+
+**No Edit Feature**:
+- ✅ Benefit: Simpler implementation, no state management
+- ❌ Sacrifice: Must generate new URL for updates
+- Why: Stateless design aligns with URL-based architecture
+
+### Future Enhancements
+
+**High Priority**:
+- [ ] QR code generation for each card
+- [ ] Copy individual field values (email, phone)
+- [ ] Custom themes/templates selection
+- [ ] Multi-language auto-detection
+
+**Medium Priority**:
+- [ ] Backend API for analytics (opt-in)
 - [ ] Custom short URLs (e.g., `/c/john-doe`)
-
-**Additional Fields**:
-- [ ] Multiple phone numbers
-- [ ] Address with map integration
-- [ ] Business hours
-- [ ] Profile photo/avatar
-- [ ] Multiple email addresses
-
-**Advanced Features**:
-- [ ] Password-protected cards
+- [ ] Password protection for sensitive cards
 - [ ] Expiration dates for temporary sharing
-- [ ] Custom themes/templates
-- [ ] Multi-language support (auto-detect)
+- [ ] Profile photo/avatar upload
+
+**Low Priority**:
 - [ ] NFC tag integration
 - [ ] Calendar integration (schedule meeting button)
-
-**Analytics** (with user consent):
-- [ ] View count
-- [ ] Click tracking per field
-- [ ] Geographic location of viewers
-- [ ] Device type statistics
-
-**Social Proof**:
-- [ ] Testimonials section
-- [ ] Portfolio/work samples
-- [ ] Certificate displays
-- [ ] Skills badges
+- [ ] Multiple email addresses/phone numbers
 
 ---
 
-## 🐛 Known Issues & Limitations
-
-### Current Limitations
-
-1. **URL Length**: Very long data may exceed browser URL limits
-2. **No Edit Feature**: Once shared, can't update (must create new link)
-3. **No Analytics**: Can't track who viewed the card
-4. **No Backend**: All client-side, no persistence
-
-### Edge Cases Handled
-
-✅ Invalid email format → Validation error shown  
-✅ Empty required fields → Form validation  
-✅ Invalid base64 data → Fallback to default values  
-✅ Missing social media → Fields not displayed  
-
----
-
-## 📚 Related Documentation
-
-- [Project Context](../PROJECT_CONTEXT.md) - Main project overview
-- [Next.js Setup](./nextjs-setup.md) - Frontend architecture
-
----
-
-**Last Updated**: 2026-01-29  
+**Created**: 2026-01-29  
+**Last Updated**: 2026-02-03  
 **Author**: AI Agent (Claude)  
-**Version**: 1.0
+**Status**: Active
+- [ ] Address with map integration
+- [ ] Skills badges and certifications display
+
+---
+
+**Created**: 2026-01-29  
+**Last Updated**: 2026-02-03  
+**Author**: AI Agent (Claude)  
+**Status**: Active

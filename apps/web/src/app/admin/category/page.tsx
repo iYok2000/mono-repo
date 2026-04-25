@@ -9,8 +9,11 @@ import { CategoryForm } from "./_components/CategoryForm";
 import { CategoryList } from "./_components/CategoryList";
 import * as categoryService from "@/services/categoryService";
 import { CategoryServiceError } from "@/services/categoryService";
+import { withAuthentication } from "@/hoc";
+import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 
-export default function CategoryPage() {
+function CategoryPage() {
+  const { showModal: showUnauthorizedModal, errorMessage: unauthorizedErrorMessage, handleModalClose: handleUnauthorizedModalClose } = useUnauthorizedHandler();
   const [categories, setCategories] = useState<categoryService.Category[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -236,3 +239,5 @@ export default function CategoryPage() {
     </div>
   );
 }
+
+export default withAuthentication(CategoryPage);
