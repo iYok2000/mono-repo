@@ -34,15 +34,14 @@ export default function CreateBannerPage() {
   };
 
   return (
-    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
-      <div className="mx-auto w-full max-w-6xl space-y-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">เพิ่ม Banner</h1>
-            <p className="mt-2 text-(--color-muted)">
-              สร้าง Banner ใหม่สำหรับระบบ
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">เพิ่ม Banner</h1>
+          <p className="mt-1 text-sm text-(--muted)">
+            สร้าง Banner ใหม่สำหรับระบบ
+          </p>
+        </div>
           <button
             type="button"
             onClick={handleCancel}
@@ -50,7 +49,7 @@ export default function CreateBannerPage() {
           >
             ← กลับ
           </button>
-        </header>
+        </div>
 
         <div className="bg-(--color-surface) rounded-lg border border-(--color-border) p-6">
           <BannerForm mode="create" onSubmit={handleSubmit} onCancel={handleCancel} />
@@ -74,6 +73,6 @@ export default function CreateBannerPage() {
           confirmText="ตกลง"
         />
       </div>
-    </main>
+    </div>
   );
 }

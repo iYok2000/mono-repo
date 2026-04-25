@@ -36,7 +36,7 @@ export function PreviewSection() {
           {examples.map((example, index) => (
             <div
               key={index}
-              className="group relative overflow-hidden rounded-2xl border-2 border-[var(--border)] bg-[var(--card)] transition-all duration-300 hover:border-[var(--primary)] hover:shadow-[var(--shadow-md)]"
+              className="group relative overflow-hidden rounded-2xl glass-panel shadow-(--shadow-sm) transition-all duration-300 hover:border-(--primary) hover:shadow-(--shadow-md)"
             >
               <div className="aspect-[4/3] bg-gradient-to-br from-[var(--primary-soft)] to-[var(--surface-muted)] flex items-center justify-center">
                 <span className="text-9xl">{example.image}</span>

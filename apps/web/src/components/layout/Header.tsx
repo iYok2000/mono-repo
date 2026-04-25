@@ -45,7 +45,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-md text-foreground">
+    <nav className="sticky top-4 z-50 mx-auto w-[calc(100%-1rem)] flex items-center justify-between px-6 py-3 rounded-2xl border border-(--border) bg-(--card)/80 backdrop-blur-xl shadow-xl shadow-black/5 text-foreground">
       {/* Admin Secret Access - Press and hold logo for 3.5 seconds */}
       <div
         onMouseDown={handlePressStart}
@@ -58,7 +58,6 @@ const Header = () => {
       >
         <DecorativeImage variant="top-center" opacity={0.78} zIndex={2} />
       </div>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 lg:px-8">
         {/* Logo - GyByte */}
         <a 
           href="/"
@@ -78,7 +77,7 @@ const Header = () => {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleAnchorClick(e, link.href)}
-                className="text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+                className="text-sm font-medium text-[var(--muted)] px-3 py-1.5 rounded-lg hover:bg-emerald-500 hover:text-white transition-all duration-200"
               >
                 {link.name}
               </a>
@@ -101,7 +100,6 @@ const Header = () => {
           </a>
           <ThemeSwitchToggle />
         </div>
-      </div>
     </nav>
   );
 };

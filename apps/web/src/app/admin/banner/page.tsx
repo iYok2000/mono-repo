@@ -172,15 +172,14 @@ function BannerContent() {
   }
 
   return (
-    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
-      <div className="mx-auto w-full max-w-6xl space-y-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">จัดการ Banner</h1>
-            <p className="mt-2 text-(--color-muted)">
-              สร้าง แก้ไข และจัดการ Banner สำหรับระบบ
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">จัดการ Banner</h1>
+          <p className="mt-1 text-sm text-(--muted)">
+            สร้าง แก้ไข และจัดการ Banner สำหรับระบบ
+          </p>
+        </div>
           <div className="flex gap-3">
             <Button
               onClick={() => setShowAppPreview(true)}
@@ -205,7 +204,7 @@ function BannerContent() {
               <Button>+ เพิ่ม Banner</Button>
             </Link>
           </div>
-        </header>
+        </div>
 
         <BannerFilter
           searchQuery={searchQuery}
@@ -254,7 +253,7 @@ function BannerContent() {
           onClose={() => setShowAppPreview(false)}
         />
       </div>
-    </main>
+    </div>
   );
 }
 

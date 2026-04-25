@@ -184,13 +184,12 @@ export default function EditDevToolkitPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
-      <div className="mx-auto w-full max-w-6xl space-y-8">
-        {/* Header */}
-        <header className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold">แก้ไข DevToolkit</h1>
-            <p className="mt-2 text-(--color-muted)">
+            <h1 className="text-2xl font-bold text-foreground">แก้ไข DevToolkit</h1>
+            <p className="mt-1 text-sm text-(--muted)">
               แก้ไขข้อมูล: {formData.title}
             </p>
           </div>
@@ -199,7 +198,7 @@ export default function EditDevToolkitPage() {
               ← กลับ
             </Button>
           </Link>
-        </header>
+        </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -429,6 +428,6 @@ export default function EditDevToolkitPage() {
         type={modal.type}
       />
       </div>
-    </main>
+    </div>
   );
 }

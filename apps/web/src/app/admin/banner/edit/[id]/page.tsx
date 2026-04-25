@@ -71,50 +71,28 @@ export default function EditBannerPage() {
 
   if (error || !banner) {
     return (
-      <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
-        <div className="mx-auto w-full max-w-6xl">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-6 h-6 text-red-600 dark:text-red-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-2">
-              เกิดข้อผิดพลาด
-            </h3>
-            <p className="text-red-700 dark:text-red-300 mb-4">{error || "ไม่พบ Banner"}</p>
-            <button
-              onClick={() => router.push("/admin/banner")}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              กลับหน้ารายการ
-            </button>
-          </div>
+      <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 text-center">
+        <div className="w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </div>
-      </main>
+        <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-2">เกิดข้อผิดพลาด</h3>
+        <p className="text-red-700 dark:text-red-300 mb-4">{error || "ไม่พบ Banner"}</p>
+        <button onClick={() => router.push("/admin/banner")} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+          กลับหน้ารายการ
+        </button>
+      </div>
     );
   }
 
   return (
-    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
-      <div className="mx-auto w-full max-w-6xl space-y-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">แก้ไข Banner</h1>
-            <p className="mt-2 text-(--color-muted)">
-              แก้ไขข้อมูล Banner
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">แก้ไข Banner</h1>
+          <p className="mt-1 text-sm text-(--muted)">แก้ไขข้อมูล Banner</p>
+        </div>
           <button
             type="button"
             onClick={handleCancel}
@@ -122,7 +100,7 @@ export default function EditBannerPage() {
           >
             ← กลับ
           </button>
-        </header>
+        </div>
 
         <div className="bg-(--color-surface) rounded-lg border border-(--color-border) p-6">
           <BannerForm
@@ -151,6 +129,6 @@ export default function EditBannerPage() {
           confirmText="ตกลง"
         />
       </div>
-    </main>
+    </div>
   );
 }

@@ -21,11 +21,12 @@ export default function AdminLayout({
       ) : (
         // Protected admin pages
         <AdminAuthMiddleware>
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen pt-16">
+            <div className="hidden md:block w-64 shrink-0" />
             <AdminSidebar />
-            <main className="flex-1 p-4 sm:p-6 md:p-8 bg-background">
+            <div className="flex-1 p-4 sm:p-6 md:p-8 bg-background min-w-0">
               {children}
-            </main>
+            </div>
           </div>
         </AdminAuthMiddleware>
       )}

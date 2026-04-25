@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { Anuphan } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Header from "@/components/layout/Header";
@@ -8,11 +9,23 @@ import { MobileNotSupported } from "@/components/layout/MobileNotSupported";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { HeaderVisibilityController } from "@/components/layout/HeaderVisibilityController";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Plus Jakarta Sans - Primary font for English (Friendly + Modern Geometric)
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
+// Anuphan - Thai font (Modern Sans-serif with Human Touch)
+const anuphan = Anuphan({
+  variable: "--font-anuphan",
+  subsets: ["thai", "latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+// Keep Geist Mono for code blocks
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -29,8 +42,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}>
+    <html lang="th" suppressHydrationWarning>
+      <body className={`${plusJakartaSans.variable} ${anuphan.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

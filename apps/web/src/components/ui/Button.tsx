@@ -1,6 +1,6 @@
 import { cx } from "@/lib/cx";
 
-export type ButtonVariant = "primary" | "secondary" | "large" | "small" | "pill" | "link";
+export type ButtonVariant = "primary" | "secondary" | "large" | "small" | "pill" | "link" | "ghost";
 export type ButtonSize = "default" | "small" | "large";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,29 +15,66 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const getVariantClasses = (variant: ButtonVariant): string => {
   const variants: Record<ButtonVariant, string> = {
-    // Primary Button (Main CTA) - Height: 44px
-    primary:
-      "bg-[var(--primary)] text-[var(--card)] border-none hover:bg-[var(--primary-hover)] active:bg-[var(--primary-hover)] py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium",
+    // Primary Button (Main CTA) - Premium feel with glow
+    primary: [
+      "bg-[var(--primary)] text-white border-none",
+      "hover:bg-[var(--primary-hover)] hover:-translate-y-0.5",
+      "active:translate-y-0 active:scale-[0.98]",
+      "py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium",
+      "shadow-[0_4px_14px_rgba(16,185,129,0.25)]",
+      "hover:shadow-[0_6px_20px_rgba(16,185,129,0.35)]",
+    ].join(" "),
     
-    // Secondary Button (Outline) - Height: 44px
-    secondary:
-      "bg-[var(--card)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--border-hover)] hover:text-[var(--foreground)] hover:bg-[var(--surface-muted)] py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium",
+    // Secondary Button (Outline) - Clean and subtle
+    secondary: [
+      "bg-[var(--surface)] text-[var(--foreground)]",
+      "border border-[var(--border)]",
+      "hover:border-[var(--border-hover)] hover:bg-[var(--surface-muted)]",
+      "active:scale-[0.98]",
+      "py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium",
+    ].join(" "),
     
-    // Large Button (Hero CTA) - Height: 56px
-    large:
-      "bg-[var(--primary)] text-[var(--card)] border-none hover:bg-[var(--primary-hover)] py-3.5 px-8 rounded-xl text-[0.9375rem] font-medium min-w-[200px]",
+    // Ghost Button - Minimal
+    ghost: [
+      "bg-transparent text-[var(--muted)]",
+      "hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]",
+      "active:scale-[0.98]",
+      "py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium",
+    ].join(" "),
     
-    // Small Button (Product Card) - Height: 36px
-    small:
-      "bg-[var(--foreground)] text-[var(--card)] border-none hover:bg-[var(--foreground-hover)] py-2 px-4 rounded-lg text-sm font-medium",
+    // Large Button (Hero CTA) - Bold and prominent
+    large: [
+      "bg-[var(--primary)] text-white border-none",
+      "hover:bg-[var(--primary-hover)] hover:-translate-y-1",
+      "active:translate-y-0 active:scale-[0.98]",
+      "py-4 px-8 rounded-2xl text-base font-semibold min-w-[200px]",
+      "shadow-[0_8px_30px_rgba(16,185,129,0.3)]",
+      "hover:shadow-[0_12px_40px_rgba(16,185,129,0.4)]",
+    ].join(" "),
     
-    // Pill/Badge Button - Height: 32px
-    pill:
-      "bg-[var(--card)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--border-hover)] py-1.5 px-3.5 rounded-full text-[0.8125rem] font-medium",
+    // Small Button (Product Card) - Compact
+    small: [
+      "bg-[var(--foreground)] text-[var(--card)]",
+      "hover:bg-[var(--foreground-hover)]",
+      "active:scale-[0.98]",
+      "py-2 px-4 rounded-lg text-sm font-medium",
+    ].join(" "),
     
-    // Link Button (Text Link)
-    link:
-      "bg-transparent text-[var(--primary)] border-none hover:gap-2 text-[0.9375rem] font-medium p-0",
+    // Pill/Badge Button - Rounded
+    pill: [
+      "bg-[var(--surface)] text-[var(--muted)]",
+      "border border-[var(--border)]",
+      "hover:border-[var(--primary)]/50 hover:text-[var(--primary)]",
+      "py-1.5 px-4 rounded-full text-[0.8125rem] font-medium",
+    ].join(" "),
+    
+    // Link Button (Text Link) - Minimal with animation
+    link: [
+      "bg-transparent text-[var(--primary)] border-none",
+      "hover:gap-2",
+      "text-[0.9375rem] font-medium p-0",
+      "underline-offset-4 hover:underline",
+    ].join(" "),
   };
   return variants[variant];
 };
@@ -73,20 +110,27 @@ export const Button = ({
       aria-busy={loading}
       aria-disabled={isDisabled}
       className={cx(
-        "inline-flex items-center justify-center transition-all duration-150 ease-in-out cursor-pointer",
-        // Special gap handling for link variant (animated)
+        // Base styles with GPU acceleration
+        "inline-flex items-center justify-center cursor-pointer",
+        "transition-all duration-200 ease-out",
+        "will-change-transform",
+        
+        // Gap handling
         isLinkVariant ? "gap-1" : "gap-2",
         
-        // Focus states
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2",
+        // Focus states - accessible ring
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
 
+        // Variant styles
         getVariantClasses(variant),
 
-        // Only apply size classes if size is not default
+        // Size overrides
         size !== "default" && getSizeClasses(size),
 
-        isDisabled && "cursor-not-allowed opacity-60",
+        // Disabled state
+        isDisabled && "cursor-not-allowed opacity-50 pointer-events-none",
 
+        // Full width
         fullWidth && "w-full",
 
         className

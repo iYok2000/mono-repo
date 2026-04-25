@@ -48,6 +48,8 @@ db-migrate:
 	@sleep 2
 	@echo "   ↳ Creating admin authentication tables..."
 	@docker exec -i mono-repo-postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < apps/backend-go/internal/infrastructure/adapter/persistence/migrations/001_create_admin_users.sql 2>&1 | grep -v "already exists" || true
+	@echo "   ↳ Creating home settings table..."
+	@docker exec -i mono-repo-postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < apps/backend-go/internal/infrastructure/adapter/persistence/migrations/002_create_home_settings.sql 2>&1 | grep -v "already exists" || true
 	@echo "✅ Migrations completed!"
 	@echo ""
 	@echo "🔑 Default admin account:"
@@ -76,6 +78,6 @@ rundev:
 	@echo ""
 	@echo "🚀 Starting applications with pnpm..."
 	@echo "   - Next.js will be at http://localhost:3000"
-	@echo "   - Go Backend will be at http://localhost:8080"
+	@echo "   - Go Backend will be at http://localhost:9000"
 	@echo ""
 	@pnpm dev

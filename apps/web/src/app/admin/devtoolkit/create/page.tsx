@@ -147,13 +147,12 @@ export default function CreateDevToolkitPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
-      <div className="mx-auto w-full max-w-6xl space-y-8">
-        {/* Header */}
-        <header className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold">เพิ่ม DevToolkit</h1>
-            <p className="mt-2 text-(--color-muted)">
+            <h1 className="text-2xl font-bold text-foreground">เพิ่ม DevToolkit</h1>
+            <p className="mt-1 text-sm text-(--muted)">
               สร้างเครื่องมือใหม่สำหรับนักพัฒนา
             </p>
           </div>
@@ -162,7 +161,7 @@ export default function CreateDevToolkitPage() {
               ← กลับ
             </Button>
           </Link>
-        </header>
+        </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -397,6 +396,6 @@ export default function CreateDevToolkitPage() {
         type={modal.type}
       />
       </div>
-    </main>
+    </div>
   );
 }

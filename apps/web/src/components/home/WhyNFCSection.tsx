@@ -45,7 +45,7 @@ export function WhyNFCSection() {
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className="flex gap-6 p-8 bg-[var(--background)] border border-[var(--border)] rounded-2xl hover:border-[var(--primary)] hover:shadow-lg transition-all duration-300 group"
+              className="flex gap-6 p-8 glass-panel rounded-2xl shadow-(--shadow-sm) hover:border-(--primary) hover:shadow-lg transition-all duration-300 group"
             >
               {/* Icon */}
               <div className="flex-shrink-0">

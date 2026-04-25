@@ -177,40 +177,39 @@ export default function CategoryPage() {
   };
 
   return (
-    <main className="relative min-h-screen bg-background px-6 py-12 font-sans text-foreground">
-      <div className="mx-auto w-full max-w-6xl space-y-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">จัดการหมวดหมู่</h1>
-            <p className="mt-2 text-(--color-muted)">
-              สร้าง แก้ไข และจัดการหมวดหมู่ต่างๆ ในระบบ
-            </p>
-          </div>
-          <Button onClick={() => setShowForm(!showForm)}>
-            {showForm ? "ยกเลิก" : "+ เพิ่มหมวดหมู่"}
-          </Button>
-        </header>
-
-        {showForm && (
-          <CategoryForm
-            formData={formData}
-            formErrors={formErrors}
-            editingId={editingId}
-            onSubmit={handleSubmit}
-            onCancel={handleCancelForm}
-            onChange={handleInputChange}
-            onClearError={clearFormError}
-          />
-        )}
-
-        <CategoryStats totalCategories={categories.length} />
-
-        <CategoryList
-          categories={categories}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">จัดการหมวดหมู่</h1>
+          <p className="mt-1 text-sm text-(--muted)">
+            สร้าง แก้ไข และจัดการหมวดหมู่ต่างๆ ในระบบ
+          </p>
+        </div>
+        <Button onClick={() => setShowForm(!showForm)}>
+          {showForm ? "ยกเลิก" : "+ เพิ่มหมวดหมู่"}
+        </Button>
       </div>
+
+      {showForm && (
+        <CategoryForm
+          formData={formData}
+          formErrors={formErrors}
+          editingId={editingId}
+          onSubmit={handleSubmit}
+          onCancel={handleCancelForm}
+          onChange={handleInputChange}
+          onClearError={clearFormError}
+        />
+      )}
+
+      <CategoryStats totalCategories={categories.length} />
+
+      <CategoryList
+        categories={categories}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
       {/* Result Modal */}
       <Modal
@@ -234,6 +233,6 @@ export default function CategoryPage() {
         showCancel={true}
         onConfirm={confirmDelete}
       />
-    </main>
+    </div>
   );
 }

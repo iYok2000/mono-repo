@@ -82,48 +82,84 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right: Mascot "Byte" */}
+          {/* Right: Mascot "Byte" - Premium Ceramic Black Design */}
           <div className="relative lg:h-[600px] flex items-center justify-center animate-fade-in delay-300">
             <div className="relative">
-              {/* Background Glow */}
-              <div className="absolute inset-0 bg-[var(--primary-soft)] rounded-full blur-3xl animate-pulse-led"></div>
+              {/* Background Violet Magic Glow */}
+              <div className="absolute inset-0 bg-[var(--violet)]/20 rounded-full blur-[100px] animate-magic-glow"></div>
+              {/* Emerald Inner Glow */}
+              <div className="absolute inset-8 bg-[var(--primary)]/15 rounded-full blur-[60px] animate-pulse-led"></div>
 
               {/* Mascot Container */}
               <div className="relative w-80 h-80 lg:w-96 lg:h-96">
-                {/* Simple Byte Mascot - Dark rounded character with LED eye */}
+                {/* Premium Byte Mascot - Ceramic Black with Emerald Running Lights */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
-                    {/* Body */}
-                    <div className="w-64 h-64 bg-[var(--byte-body)] rounded-[3rem] shadow-2xl flex items-center justify-center">
-                      {/* LED Eye/Screen */}
-                      <div className="w-32 h-32 bg-[var(--byte-led)] rounded-2xl animate-pulse-led shadow-lg shadow-[var(--primary)]/50 flex items-center justify-center">
-                        <div className="w-16 h-16 bg-[var(--card)]/20 rounded-xl"></div>
+                    {/* Outer Glow Ring */}
+                    <div className="absolute -inset-4 rounded-[4rem] bg-gradient-to-r from-[var(--primary)]/0 via-[var(--primary)]/20 to-[var(--primary)]/0 blur-xl animate-running-lights"></div>
+                    
+                    {/* Body - Ceramic Black Finish */}
+                    <div className="byte-ceramic w-64 h-64 rounded-[3rem] flex items-center justify-center relative overflow-hidden">
+                      {/* Ceramic Shine Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-white/[0.02] pointer-events-none"></div>
+                      
+                      {/* LED Running Light Strips - Top */}
+                      <div className="absolute top-3 left-8 right-8 h-[2px] byte-led-strip rounded-full"></div>
+                      
+                      {/* LED Running Light Strips - Bottom */}
+                      <div className="absolute bottom-3 left-8 right-8 h-[2px] byte-led-strip rounded-full" style={{ animationDelay: "0.5s" }}></div>
+                      
+                      {/* LED Running Light Strips - Left */}
+                      <div className="absolute left-3 top-8 bottom-8 w-[2px] byte-led-strip rounded-full" style={{ animationDelay: "1s" }}></div>
+                      
+                      {/* LED Running Light Strips - Right */}
+                      <div className="absolute right-3 top-8 bottom-8 w-[2px] byte-led-strip rounded-full" style={{ animationDelay: "1.5s" }}></div>
+                      
+                      {/* LED Eye/Screen - Emerald Glow */}
+                      <div className="relative">
+                        <div className="absolute -inset-4 bg-[var(--primary)]/30 rounded-3xl blur-2xl animate-pulse-led"></div>
+                        <div className="w-32 h-32 bg-[var(--byte-led)] rounded-2xl animate-pulse-led flex items-center justify-center relative overflow-hidden"
+                             style={{ boxShadow: "0 0 60px rgba(16, 185, 129, 0.5), inset 0 0 30px rgba(16, 185, 129, 0.3)" }}>
+                          {/* Eye Reflection */}
+                          <div className="absolute top-2 left-2 w-8 h-8 bg-white/20 rounded-lg blur-sm"></div>
+                          <div className="w-16 h-16 bg-black/30 rounded-xl backdrop-blur-sm"></div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Antenna/NFC Symbol */}
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                      <div className="w-12 h-12 bg-[var(--primary-soft)] rounded-full flex items-center justify-center">
-                        <div className="w-6 h-6 bg-[var(--primary)] rounded-full animate-pulse-led"></div>
+                    {/* Antenna/NFC Symbol with Premium Glow */}
+                    <div className="absolute -top-10 left-1/2 -translate-x-1/2">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-[var(--primary)]/40 rounded-full blur-xl animate-pulse-led"></div>
+                        <div className="w-14 h-14 bg-gradient-to-b from-[var(--byte-body-light)] to-[var(--byte-body)] rounded-full flex items-center justify-center border border-[var(--primary)]/30 shadow-lg"
+                             style={{ boxShadow: "0 0 30px rgba(16, 185, 129, 0.3)" }}>
+                          <div className="w-6 h-6 bg-[var(--primary)] rounded-full animate-pulse-led"
+                               style={{ boxShadow: "0 0 20px rgba(16, 185, 129, 0.8)" }}></div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Floating NFC Icon */}
+                {/* Floating NFC Card - Matte Black with Spot UV */}
                 <div className="absolute top-10 right-0 animate-bounce">
-                  <div className="bg-[var(--card)] shadow-lg rounded-xl px-3 py-2 border border-[var(--border)]">
-                    <span className="text-2xl">📱</span>
+                  <div className="card-premium rounded-xl px-4 py-3 border border-[var(--primary)]/20 animate-magic-glow"
+                       style={{ boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(167, 139, 250, 0.2)" }}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">📱</span>
+                      <span className="text-[var(--primary)] text-xs font-semibold animate-spot-uv">NFC</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Floating QR Code Icon */}
-                <div
-                  className="absolute bottom-20 left-0 animate-bounce"
-                  style={{ animationDelay: "0.5s" }}
-                >
-                  <div className="bg-[var(--card)] shadow-lg rounded-xl px-3 py-2 border border-[var(--border)]">
-                    <span className="text-2xl">🔲</span>
+                {/* Floating QR Code - Premium Style */}
+                <div className="absolute bottom-20 left-0 animate-bounce" style={{ animationDelay: "0.5s" }}>
+                  <div className="card-premium rounded-xl px-4 py-3 border border-[var(--violet)]/20"
+                       style={{ boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(167, 139, 250, 0.2)" }}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🔲</span>
+                      <span className="text-[var(--violet)] text-xs font-semibold animate-spot-uv">QR</span>
+                    </div>
                   </div>
                 </div>
               </div>

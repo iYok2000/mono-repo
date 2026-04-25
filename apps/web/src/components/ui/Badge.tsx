@@ -6,7 +6,9 @@ export type BadgeVariant =
   | "success"
   | "warning"
   | "error"
-  | "outline";
+  | "outline"
+  | "violet"
+  | "glow";
 export type BadgeSize = "xs" | "sm" | "md" | "lg";
 
 export interface BadgeProps {
@@ -17,30 +19,59 @@ export interface BadgeProps {
   className?: string;
   onClick?: () => void;
   onRemove?: () => void;
+  pulse?: boolean;
 }
 
 const getVariantClasses = (variant: BadgeVariant): string => {
   const variants: Record<BadgeVariant, string> = {
-    default:
-      "bg-[var(--color-button)] text-[var(--foreground)] border-[var(--color-border)]",
-    primary:
-      "bg-[var(--color-primary)] text-[var(--background)] border-[var(--color-primary)]",
-    success:
-      "bg-emerald-100 text-emerald-900 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-100 dark:border-emerald-800",
-    warning:
-      "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-900/40 dark:text-amber-100 dark:border-amber-800",
-    error:
-      "bg-red-100 text-red-900 border-red-200 dark:bg-red-900/40 dark:text-red-100 dark:border-red-800",
-    outline:
-      "bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-border)]",
+    default: [
+      "bg-[var(--surface-muted)] text-[var(--foreground)]",
+      "border border-[var(--border)]",
+    ].join(" "),
+    
+    primary: [
+      "bg-[var(--primary-soft)] text-[var(--primary)]",
+      "border border-[var(--primary)]/20",
+    ].join(" "),
+    
+    success: [
+      "bg-[rgba(16,185,129,0.1)] text-[var(--success)]",
+      "border border-[var(--success)]/20",
+    ].join(" "),
+    
+    warning: [
+      "bg-[rgba(251,191,36,0.1)] text-[var(--warning)]",
+      "border border-[var(--warning)]/20",
+    ].join(" "),
+    
+    error: [
+      "bg-[rgba(239,68,68,0.1)] text-[var(--error)]",
+      "border border-[var(--error)]/20",
+    ].join(" "),
+    
+    violet: [
+      "bg-[rgba(139,92,246,0.1)] text-[var(--violet)]",
+      "border border-[var(--violet)]/20",
+    ].join(" "),
+    
+    outline: [
+      "bg-transparent text-[var(--muted)]",
+      "border border-[var(--border)]",
+    ].join(" "),
+    
+    glow: [
+      "bg-[var(--primary)] text-white",
+      "border border-transparent",
+      "shadow-[0_0_12px_var(--byte-glow)]",
+    ].join(" "),
   };
   return variants[variant];
 };
 
 const getSizeClasses = (size: BadgeSize): string => {
   const sizes: Record<BadgeSize, string> = {
-    xs: "px-1.5 py-0.5 text-[10px]",
-    sm: "px-2 py-0.5 text-xs",
+    xs: "px-2 py-0.5 text-[10px]",
+    sm: "px-2.5 py-0.5 text-xs",
     md: "px-3 py-1 text-sm",
     lg: "px-4 py-1.5 text-base",
   };
@@ -55,6 +86,7 @@ export const Badge = ({
   className,
   onClick,
   onRemove,
+  pulse = false,
 }: BadgeProps) => {
   const isInteractive = Boolean(onClick) || Boolean(onRemove);
 
@@ -64,15 +96,16 @@ export const Badge = ({
     <Component
       onClick={onClick}
       className={cx(
-        "inline-flex items-center gap-1.5 rounded-full border font-semibold",
+        "inline-flex items-center gap-1.5 rounded-full font-medium",
+        "transition-all duration-150",
 
         getVariantClasses(variant),
-
         getSizeClasses(size),
 
-        isInteractive && "cursor-pointer transition-all hover:scale-105",
-        isInteractive &&
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-primary) focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
+        isInteractive && "cursor-pointer hover:scale-105 active:scale-100",
+        isInteractive && "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2",
+        
+        pulse && "animate-pulse",
 
         className
       )}

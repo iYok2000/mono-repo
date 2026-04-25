@@ -100,5 +100,13 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 			banners.DELETE("/:id", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), bannerHandler.DeleteBanner)
 			banners.POST("/reorder", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), bannerHandler.ReorderBanners)
 		}
+
+		// Settings endpoints
+		settingsHandler := handler.NewSettingsHandler(cnt.SqlDB)
+		settings := api.Group("/settings")
+		{
+			settings.GET("/home-sections", settingsHandler.GetHomeSections)
+			settings.PUT("/home-sections", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), settingsHandler.UpdateHomeSections)
+		}
 	}
 }
