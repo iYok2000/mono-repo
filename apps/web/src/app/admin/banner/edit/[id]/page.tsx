@@ -141,7 +141,6 @@ function EditBannerPage() {
           message={unauthorizedErrorMessage}
           confirmText="เข้าสู่ระบบใหม่"
         />
-      </div>
     </div>
   );
 }

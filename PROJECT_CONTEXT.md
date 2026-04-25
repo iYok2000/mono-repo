@@ -63,15 +63,16 @@ project_context/
 
 **Current Features**:
 
-- 📄 [Installation Guide](./project_context/installation-guide.md) - Complete setup guide for Next.js 16 + Gin monorepo
-- 📄 [Next.js 16 Setup](./project_context/nextjs-setup.md) - Frontend configuration and implementation details
+- 📄 [Installation Guide](./project_context/installation-guide.md) - Complete setup guide for Next.js + Gin monorepo
+- 📄 [Next.js Setup](./project_context/nextjs-setup.md) - Frontend configuration and implementation details
 - 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
 - 📄 [Data Export Feature](./project_context/data-export.md) - CSV export functionality with RFC 4180 compliance, type safety, and accessibility support
 - 📄 [Product Management](./project_context/product-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
 - 📄 [Banner Management System](./project_context/BANNER_MANAGEMENT.md) - CRUD + Drag & Drop reordering with CQRS pattern, mobile preview, multi-language support (TH/EN), and segment tier filtering
-- 📄 [Admin Authentication](./project_context/ADMIN_AUTH_README.md) - JWT-based authentication system for Admin panel
+- 📄 [Admin Authentication](./project_context/ADMIN_AUTH_README.md) - JWT-based authentication system for Admin panel with `withAuthentication` HOC and `useUnauthorizedHandler` hook
 - 📄 [Digital Business Card](./project_context/business-card.md) - Interactive digital business cards with QR sharing, vCard export, email validation, click-to-call/email, social media integration, and brand-colored UI
 - 📄 [Utils Documentation](./project_context/utils-documentation.md) - Comprehensive guide to all utility functions, custom hooks, error mappers, and helpers with performance optimization patterns
+- 📄 [Home Section Settings](./project_context/home-section-settings.md) - Landing page section visibility management with admin toggle UI and Go backend settings handler
 
 ---
 
@@ -93,8 +94,8 @@ For simple features that don't need full documentation:
 **Pattern**: RESTful API + gRPC
 **Ports**:
 
-- Next.js (Frontend): 3000
-- Backend Go (Gin HTTP): 8080
+- Next.js (Frontend): 3001 (dev via pnpm)
+- Backend Go (Gin HTTP): **9000** (not 8080 — Docker Desktop occupies 8080)
 - Backend Go (gRPC): 50051
 
 **CORS**: Configured in Gin backend to allow frontend origin
@@ -174,8 +175,8 @@ if err := gormfeature.AutoMigrate(db); err != nil {
 
 ### State Management
 
-**Frontend**: React Server Components (Next.js 16 default) + Client State (TBD)
-**Why**: Leverage Next.js 16 App Router for server-side rendering and data fetching
+**Frontend**: React Client Components (`"use client"`) + Server Components where applicable
+**Why**: Next.js App Router with `useCallback`/`useState` for interactive admin pages; Server Components for static/SSR content
 
 ### Security Guidelines
 

@@ -7,8 +7,9 @@ This file explains how the project runs so you can reason about changes correctl
 ## 🏃 How the project runs
 
 * `make setup` → install deps + start DB + run migrations
-* `make rundev` → start frontend (3000) + backend (8080) + auto-migrate if needed
-* PostgreSQL runs in Docker
+* `make rundev` → start Postgres in Docker + frontend (3001) + backend (9000) + auto-migrate if needed
+* PostgreSQL runs in Docker (`mono-repo-postgres`)
+* Backend Go binary must be restarted manually after route changes (`pkill -f 'go run cmd/server'`)
 
 You DO NOT manage containers, ports, or credentials.
 
@@ -42,7 +43,7 @@ rg <old-name>
 | Command           | Purpose                        |
 | ----------------- | ------------------------------ |
 | `make setup`      | First-time environment setup   |
-| `make rundev`     | Start development              |
+| `make rundev`     | Start development (Postgres + pnpm dev) |
 | `make db-migrate` | Run migrations manually        |
 | `make db-reset`   | Reset DB and re-run migrations |
 

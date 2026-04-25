@@ -51,8 +51,10 @@ Enterprise-grade authentication system for admin users built with Go (Backend) a
   - `internal/infrastructure/adapter/persistence/` - Database repositories
 - **Frontend (Next.js)**:
   - `app/admin/auth/` - Login and password change pages
-  - `contexts/AuthContext.tsx` - Global auth state management
-  - `components/admin/AdminAuthMiddleware.tsx` - Protected route wrapper
+  - `contexts/AuthContext.tsx` - Global auth state management (`fetch`-based, not axios)
+  - `hoc/withAuthentication.tsx` - HOC to protect admin pages
+  - `hooks/useUnauthorizedHandler.ts` - Handles 401 events globally
+  - `lib/axios/interceptors/response.ts` - Dispatches `auth:unauthorized` event on 401
 
 **Data Flow**:
 1. User submits credentials → Login handler
@@ -180,29 +182,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### Example 4: Protected Route
+### Example 4: Protected Route (HOC Pattern)
 ```typescript
-// apps/web/src/components/admin/AdminAuthMiddleware.tsx
-export function AdminAuthMiddleware({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+// apps/web/src/hoc/withAuthentication.tsx
+export function withAuthentication<P extends object>(Component: ComponentType<P>) {
+  return function AuthenticatedComponent(props: P) {
+    const { isAuthenticated, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+      if (!isLoading && !isAuthenticated) {
+        sessionStorage.setItem('redirect_after_login', window.location.pathname);
+        router.push('/admin/auth/login?reason=unauthorized');
+      }
+    }, [isLoading, isAuthenticated, router]);
+
+    if (isLoading) return <AuthLoadingSpinner />;
+    if (!isAuthenticated) return <AuthRedirecting />;
+    return <Component {...props} />;
+  };
+}
+
+// Usage on any admin page:
+export default withAuthentication(MyAdminPage);
+```
+
+### Example 4b: 401 Handler Hook
+```typescript
+// apps/web/src/hooks/useUnauthorizedHandler.ts
+// Listens for auth:unauthorized event dispatched by axios interceptor on 401
+export function useUnauthorizedHandler() {
+  const [showModal, setShowModal] = useState(false);
+  const { logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/admin/auth/login');
-    }
-  }, [user, loading, router]);
+    const handler = (event: Event) => {
+      const { message } = (event as CustomEvent).detail;
+      setShowModal(true);
+    };
+    window.addEventListener('auth:unauthorized', handler);
+    return () => window.removeEventListener('auth:unauthorized', handler);
+  }, []);
 
-  if (loading) return <LoadingSpinner />;
-  if (!user) return null;
-
-  // Force password change on first login
-  if (user.must_change_password && !router.pathname.includes('change-password')) {
-    router.push('/admin/auth/change-password');
-    return null;
-  }
-
-  return <>{children}</>;
+  // handleModalClose() → logout() → redirect to /admin/auth/login?reason=session_expired
 }
 ```
 

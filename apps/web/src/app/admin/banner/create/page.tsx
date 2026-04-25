@@ -86,7 +86,6 @@ function CreateBannerPage() {
           message={unauthorizedError}
           confirmText="เข้าสู่ระบบใหม่"
         />
-      </div>
     </div>
   );
 }

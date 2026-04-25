@@ -1,3 +1,4 @@
+import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 
 export const responseInterceptor = (response: AxiosResponse) => {
@@ -13,47 +14,63 @@ export const responseInterceptor = (response: AxiosResponse) => {
 };
 
 export const responseErrorInterceptor = (error: unknown) => {
-  // Network error or no response
-  if (!error || typeof error !== 'object' || !('response' in error)) {
+  // Use axios.isAxiosError for proper type narrowing
+  if (!axios.isAxiosError(error)) {
     if (process.env.NODE_ENV === 'development') {
-      const err = error as { message?: string; config?: { url?: string }; code?: string };
+      console.error('❌ Unknown Error:', error);
+    }
+    return Promise.reject(error);
+  }
+
+  // Network error — no response from server (ECONNREFUSED, timeout, etc.)
+  if (!error.response) {
+    if (process.env.NODE_ENV === 'development') {
       console.error('❌ Network Error:', {
-        message: err.message,
-        url: err.config?.url,
-        code: err.code,
+        message: error.message,
+        url: error.config?.url,
+        code: error.code,
       });
     }
     return Promise.reject(error);
   }
 
   // HTTP error with response
-  const axiosError = error as { response: { status: number; data: unknown }; config?: { url?: string } };
-  const { status, data } = axiosError.response;
+  const status = error.response?.status;
+  const data = error.response?.data;
+  const url = error.config?.url;
 
   if (process.env.NODE_ENV === 'development') {
-    console.error('❌ Response Error:', {
-      status,
-      url: axiosError.config?.url,
-      data,
-    });
+    if (typeof status === 'number') {
+      const logFn = status >= 500 ? console.error : console.warn;
+      logFn(`❌ Response Error [${status}]:`, { url, data });
+    } else {
+      // Malformed response — log raw error for diagnosis
+      console.error('❌ Response Error (malformed):', {
+        url,
+        responseKeys: error.response ? Object.keys(error.response) : null,
+        message: error.message,
+        code: error.code,
+      });
+    }
   }
 
   if (status === 401) {
     if (typeof window !== 'undefined') {
-      // Only dispatch event if not already on login page
       const currentPath = window.location.pathname;
       if (!currentPath.includes('/admin/auth/login')) {
-        // Dispatch custom event for 401 error
-        const errorMessage = typeof data === 'object' && data !== null && 'message' in data 
-          ? (data as { message: string }).message 
-          : 'Session หมดอายุ กรุณาเข้าสู่ระบบใหม่';
-        
+        const errorMessage =
+          typeof data === 'object' && data !== null && 'message' in (data as object)
+            ? (data as { message: string }).message
+            : 'Session หมดอายุ กรุณาเข้าสู่ระบบใหม่';
+
         const event = new CustomEvent('auth:unauthorized', {
-          detail: { message: errorMessage }
+          detail: { message: errorMessage },
         });
         window.dispatchEvent(event);
-        
-        console.warn('🔒 Unauthorized:', errorMessage);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('🔒 Unauthorized:', errorMessage);
+        }
       }
     }
   }
@@ -62,9 +79,10 @@ export const responseErrorInterceptor = (error: unknown) => {
     console.error('Access denied');
   }
 
-  if (status >= 500) {
+  if (typeof status === 'number' && status >= 500) {
     console.error('Server error:', data);
   }
 
   return Promise.reject(error);
 };
+

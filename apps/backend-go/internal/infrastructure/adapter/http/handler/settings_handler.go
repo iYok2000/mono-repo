@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,39 +34,66 @@ func NewSettingsHandler(db *sql.DB) *SettingsHandler {
 }
 
 // GetHomeSections GET /api/settings/home-sections
-// Public endpoint — no auth required (landing page fetches this)
+// Public endpoint — reads *_enabled columns from the GORM-managed home_settings table
 func (h *SettingsHandler) GetHomeSections(c *gin.Context) {
-	var rawValue []byte
+	var (
+		heroEnabled       bool
+		whatIsItEnabled   bool
+		skuEnabled        bool
+		howItWorksEnabled bool
+		occasionsEnabled  bool
+		whyNFCEnabled     bool
+		whyUsEnabled      bool
+		previewEnabled    bool
+		faqEnabled        bool
+		finalCTAEnabled   bool
+	)
 
 	err := h.db.QueryRowContext(
 		c.Request.Context(),
-		`SELECT value FROM home_settings WHERE key = 'section_visibility' LIMIT 1`,
-	).Scan(&rawValue)
+		`SELECT
+			hero_enabled,
+			what_is_it_enabled,
+			sku_enabled,
+			how_it_works_enabled,
+			occasions_enabled,
+			why_nfc_enabled,
+			why_us_enabled,
+			preview_enabled,
+			faq_enabled,
+			final_cta_enabled
+		FROM home_settings WHERE id = 'default' LIMIT 1`,
+	).Scan(
+		&heroEnabled,
+		&whatIsItEnabled,
+		&skuEnabled,
+		&howItWorksEnabled,
+		&occasionsEnabled,
+		&whyNFCEnabled,
+		&whyUsEnabled,
+		&previewEnabled,
+		&faqEnabled,
+		&finalCTAEnabled,
+	)
 
-	if err == sql.ErrNoRows {
-		c.JSON(http.StatusOK, gin.H{"sections": defaultSectionVisibility})
-		return
-	}
 	if err != nil {
-		// Return defaults on DB error to not break landing page
+		// Return defaults on any error (table not seeded yet, etc.)
 		c.JSON(http.StatusOK, gin.H{"sections": defaultSectionVisibility})
 		return
 	}
 
-	var sections SectionVisibility
-	if err := json.Unmarshal(rawValue, &sections); err != nil {
-		c.JSON(http.StatusOK, gin.H{"sections": defaultSectionVisibility})
-		return
-	}
-
-	// Merge with defaults to ensure all keys exist
-	for k, v := range defaultSectionVisibility {
-		if _, exists := sections[k]; !exists {
-			sections[k] = v
-		}
-	}
-
-	c.JSON(http.StatusOK, gin.H{"sections": sections})
+	c.JSON(http.StatusOK, gin.H{"sections": SectionVisibility{
+		"hero":         heroEnabled,
+		"what_is_it":   whatIsItEnabled,
+		"sku":          skuEnabled,
+		"how_it_works": howItWorksEnabled,
+		"occasions":    occasionsEnabled,
+		"why_nfc":      whyNFCEnabled,
+		"why_us":       whyUsEnabled,
+		"preview":      previewEnabled,
+		"faq":          faqEnabled,
+		"final_cta":    finalCTAEnabled,
+	}})
 }
 
 // UpdateHomeSections PUT /api/settings/home-sections (auth required)
@@ -93,23 +119,44 @@ func (h *SettingsHandler) UpdateHomeSections(c *gin.Context) {
 		}
 	}
 
-	value, err := json.Marshal(req.Sections)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to serialize settings"})
-		return
+	// Merge with defaults so all keys are present
+	merged := make(SectionVisibility)
+	for k, v := range defaultSectionVisibility {
+		merged[k] = v
+	}
+	for k, v := range req.Sections {
+		merged[k] = v
 	}
 
-	_, err = h.db.ExecContext(
+	_, err := h.db.ExecContext(
 		c.Request.Context(),
-		`INSERT INTO home_settings (key, value)
-		 VALUES ('section_visibility', $1)
-		 ON CONFLICT (key) DO UPDATE SET value = $1, updated_at = CURRENT_TIMESTAMP`,
-		value,
+		`UPDATE home_settings SET
+			hero_enabled         = $1,
+			what_is_it_enabled   = $2,
+			sku_enabled          = $3,
+			how_it_works_enabled = $4,
+			occasions_enabled    = $5,
+			why_nfc_enabled      = $6,
+			why_us_enabled       = $7,
+			preview_enabled      = $8,
+			faq_enabled          = $9,
+			final_cta_enabled    = $10
+		WHERE id = 'default'`,
+		merged["hero"],
+		merged["what_is_it"],
+		merged["sku"],
+		merged["how_it_works"],
+		merged["occasions"],
+		merged["why_nfc"],
+		merged["why_us"],
+		merged["preview"],
+		merged["faq"],
+		merged["final_cta"],
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save settings: " + err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update settings"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"sections": req.Sections, "message": "settings saved"})
+	c.JSON(http.StatusOK, gin.H{"sections": merged})
 }

@@ -75,4 +75,4 @@ These docs are designed to be readable by both humans and AI assistants. They se
 ---
 
 **Maintained by**: AI Agents + Human Developers  
-**Last Updated**: [Date]
+**Last Updated**: April 2026

@@ -438,7 +438,6 @@ function EditProductPage() {
         message={unauthorizedErrorMessage}
         confirmText="เข้าสู่ระบบใหม่"
       />
-      </div>
     </div>
   );
 }
