@@ -1,303 +1,106 @@
 # PROJECT_CONTEXT.md
 
-> Business Logic, Technical Decisions & Architecture
-
-## 📖 Project Overview
-
-**Project Name**: Multi-Framework Monorepo
-**Type**: Monorepo (Next.js 16 + Golang)
-**Purpose**: Full-stack application with Next.js frontend and Golang backend (Gin)
+> Architecture overview. For **file maps & commands** → `DEVELOPMENT.md`. For **domain ownership** → `DOMAIN_MAP.md`.
 
 ---
 
-## 📚 Documentation Structure
+## Stack
 
-This file serves as the **main index** and overview. Detailed feature documentation is organized in the `project_context/` folder:
+| Layer | Tech | Location |
+|-------|------|----------|
+| Frontend | Next.js 16 + TypeScript + Tailwind | `apps/web/` |
+| Backend | Go + Gin v1.11 + GORM v2 | `apps/backend-go/` |
+| Database | PostgreSQL 18.1 (Docker) | `postgres_data/` |
+| Monorepo | pnpm workspaces + Turborepo | root `pnpm-workspace.yaml` |
 
-```
-project_context/
-├── README.md           # Documentation guide
-├── TEMPLATE.md         # Template for new features
-└── [feature-name].md   # Individual feature docs
-```
-
-**How to use**:
-
-- Read this file for **overview and architecture**
-- Check `project_context/[feature-name].md` for **detailed feature docs**
-- AI agents will automatically maintain this structure
+**Ports**: FE `3000` / BE `8080` / DB `5432`
 
 ---
 
-## 🏗️ Architecture Decisions
+## Feature Index
 
-### Monorepo Structure
+Detailed docs in `project_context/`:
 
-**Why**: Centralized codebase for easier dependency management and code sharing  
-**How**: Using pnpm workspaces + Turborepo  
-**Structure**:
-
-```
-- apps/web (Next.js 16 + TypeScript)
-- apps/backend-go (Golang + Gin Framework)
-```
-
-**Package Names**:
-- `@mono-repo/web` - Next.js 16 frontend
-- `@mono-repo/backend-go` - Golang Gin backend (separate Go module)
+| Feature | Doc | Admin Page | Public Page |
+|---------|-----|------------|-------------|
+| Homepage Sections (content + visibility) | [home-section-settings.md](./project_context/home-section-settings.md) | `/admin`, `/admin/home-settings` | `/` |
+| Banner Management | [BANNER_MANAGEMENT.md](./project_context/BANNER_MANAGEMENT.md) | `/admin/banner` | `/project` |
+| Product/Category CRUD | [product-management.md](./project_context/product-management.md) | `/admin/product`, `/admin/category` | `/project` |
+| Admin Auth (JWT) | [ADMIN_AUTH_README.md](./project_context/ADMIN_AUTH_README.md) | `/admin/auth` | — |
+| Digital Business Card | [business-card.md](./project_context/business-card.md) | — | `/card/[slug]` |
+| Data Export (CSV) | [data-export.md](./project_context/data-export.md) | Admin tables | — |
+| Utils & Hooks | [utils-documentation.md](./project_context/utils-documentation.md) | — | — |
+| Installation | [installation-guide.md](./project_context/installation-guide.md) | — | — |
 
 ---
 
-## 🎯 Features & Implementation
+## Architecture Patterns
 
-> Detailed feature documentation is organized in `project_context/` folder.  
-> Each feature has its own file for better organization and maintainability.
+### Backend (Go) — Clean Architecture + CQRS
 
-### Feature Index
-
-<!-- AI Agent: Add new feature links here when creating new features -->
-
-**Example format**:
-
-- 📄 [Feature Name](./project_context/feature-name.md) - Brief description
-
-**Current Features**:
-
-- 📄 [Installation Guide](./project_context/installation-guide.md) - Complete setup guide for Next.js + Gin monorepo
-- 📄 [Next.js Setup](./project_context/nextjs-setup.md) - Frontend configuration and implementation details
-- 📄 [Golang gRPC Implementation](./project_context/golang-grpc-implementation.md) - Dual-server setup (Gin + gRPC) with interceptors and graceful shutdown
-- 📄 [Data Export Feature](./project_context/data-export.md) - CSV export functionality with RFC 4180 compliance, type safety, and accessibility support
-- 📄 [Product Management](./project_context/product-management.md) - Full CRUD system for developer tools with Admin Dashboard, Sidebar navigation, and predefined status/tags configuration
-- 📄 [Banner Management System](./project_context/BANNER_MANAGEMENT.md) - CRUD + Drag & Drop reordering with CQRS pattern, mobile preview, multi-language support (TH/EN), and segment tier filtering
-- 📄 [Admin Authentication](./project_context/ADMIN_AUTH_README.md) - JWT-based authentication system for Admin panel with `withAuthentication` HOC and `useUnauthorizedHandler` hook
-- 📄 [Digital Business Card](./project_context/business-card.md) - Interactive digital business cards with QR sharing, vCard export, email validation, click-to-call/email, social media integration, and brand-colored UI
-- 📄 [Utils Documentation](./project_context/utils-documentation.md) - Comprehensive guide to all utility functions, custom hooks, error mappers, and helpers with performance optimization patterns
-- 📄 [Home Section Settings](./project_context/home-section-settings.md) - Landing page section visibility management with admin toggle UI and Go backend settings handler
-
----
-
-### Quick Reference Template
-
-For simple features that don't need full documentation:
-
-**Feature Name**: [Name]  
-**Location**: `apps/[app-name]/src/[path]`  
-**Purpose**: [One-line description]  
-**Docs**: [Link to detailed doc if exists]
-
----
-
-## 🔧 Technical Patterns
-
-### API Communication
-
-**Pattern**: RESTful API + gRPC
-**Ports**:
-
-- Next.js (Frontend): 3001 (dev via pnpm)
-- Backend Go (Gin HTTP): **9000** (not 8080 — Docker Desktop occupies 8080)
-- Backend Go (gRPC): 50051
-
-**CORS**: Configured in Gin backend to allow frontend origin
-
-### Database & Migration Strategy
-
-**ORM**: GORM v2 with PostgreSQL  
-**Migration Pattern**: GORM AutoMigrate + Raw SQL Constraints (Hybrid Approach)
-
-**Why Hybrid Approach?**
-- GORM AutoMigrate: Fast development, handles table structure automatically
-- Raw SQL: For constraints GORM cannot handle (CHECK, partial indexes, complex validations)
-
-**Migration File Location**: `/internal/infrastructure/adapter/persistence/gorm/{feature}/migration.go`
-
-**Standard Pattern**:
-```go
-package feature
-
-import (
-	"path/to/model"
-	"gorm.io/gorm"
-)
-
-func AutoMigrate(db *gorm.DB) error {
-	// 1. Create tables with GORM
-	if err := db.AutoMigrate(&model.FeatureModel{}); err != nil {
-		return err
-	}
-
-	// 2. Add business rule constraints (GORM can't handle)
-	db.Exec(`
-		DO $$
-		BEGIN
-			IF NOT EXISTS (
-				SELECT 1 FROM pg_constraint 
-				WHERE conname = 'chk_feature_rule'
-			) THEN
-				ALTER TABLE features 
-				ADD CONSTRAINT chk_feature_rule 
-				CHECK (some_condition);
-			END IF;
-		END $$;
-	`)
-
-	return nil
-}
+```
+core/domain/{feature}/    ← Entity + Repository interface (no framework deps)
+application/{feature}/    ← Command/Query handlers + DTO + Mapper + Validation
+infrastructure/adapter/   ← HTTP handlers, GORM repos, middleware
 ```
 
-**Registration in container.go**:
-```go
-import (
-	gormfeature "monorepo/backend-go/internal/infrastructure/adapter/persistence/gorm/feature"
-)
+**New feature checklist**: Entity → Repo interface → DTO → Command/Query handler → Mapper → GORM repo + migration → HTTP handler → Wire in `container.go` → Register in `routes.go`
 
-// Run migrations
-if err := gormfeature.AutoMigrate(db); err != nil {
-	return nil, fmt.Errorf("failed to run feature migrations: %w", err)
-}
+### Frontend (Next.js) — App Router
+
+```
+app/{route}/page.tsx      ← Page component
+components/{domain}/      ← Domain-specific components
+services/{domain}.ts      ← API call functions (axios)
+types/{domain}.ts         ← TypeScript types
 ```
 
-**Reference Implementations**:
-- ✅ `banner/migration.go` - CHECK constraints, slug validation
-- ✅ `devtoolkit/migration.go` - Basic AutoMigrate pattern
-- ✅ `homesettings/migration.go` - Single-record table, partial unique index
+### Security
 
-**⚠️ Important Notes**:
-- ❌ NO standalone SQL migration files (e.g., `001_create_tables.sql`) - Project has no SQL file runner
-- ✅ ALWAYS use GORM parameterized queries in repositories (never raw SQL with string interpolation)
-- ✅ Use `DO $$ ... END $$` blocks for idempotent constraint addition
-- ✅ Separate domain entity (`/core/domain/`) from persistence model (`/infrastructure/adapter/persistence/gorm/`)
+- **Backend**: ContentValidator per domain (`application/{feature}/validation/`) — XSS, length, format
+- **Frontend**: Client validation = UX only, backend is source of truth
+- **DB**: GORM parameterized queries only. No raw SQL string interpolation.
+- **Auth**: JWT + rate limiting + account locking
 
-### Error Handling
+### Migration
 
-**Strategy**: [Consistent error handling approach]  
-**Format**: [Error response format]
-
-### State Management
-
-**Frontend**: React Client Components (`"use client"`) + Server Components where applicable
-**Why**: Next.js App Router with `useCallback`/`useState` for interactive admin pages; Server Components for static/SSR content
-
-### Security Guidelines
-
-**CRITICAL: Input Validation & Sanitization**
-
-All string fields from users, APIs, or external sources MUST be validated and sanitized to prevent XSS attacks and SQL injection.
-
-**Backend (Go) - ContentValidator Pattern**:
-```go
-// File: internal/application/[domain]/validation/content_validator.go
-
-// ✅ MANDATORY: Always use ContentValidator for string inputs
-type ContentValidator struct{}
-
-// Example validators:
-func (v *ContentValidator) ValidateAndSanitizeTitle(title string) (string, error)
-func (v *ContentValidator) ValidateAndSanitizeDescription(desc string) (string, error)
-func (v *ContentValidator) SanitizeMainContent(content string) (string, error)
-func (v *ContentValidator) ValidateImageURL(url string) (string, error)
-func (v *ContentValidator) ValidateTags(tags []string) ([]string, error)
-```
-
-**Required Security Measures**:
-1. **XSS Protection**: HTML escaping for plain text, dangerous tag removal for markdown
-2. **SQL Injection Prevention**: GORM parameterized queries (never raw SQL)
-3. **Length Validation**: Enforce maximum length limits on all fields
-4. **Format Validation**: Validate URLs, IDs, emails, etc.
-
-**Example Implementation**:
-```go
-// ✅ GOOD: Command handler with validation
-type CreateHandler struct {
-    validator *validation.ContentValidator
-}
-
-func (h *CreateHandler) Handle(ctx context.Context, cmd CreateCommand) error {
-    // Validate and sanitize ALL string inputs
-    sanitizedTitle, err := h.validator.ValidateAndSanitizeTitle(cmd.Title)
-    if err != nil {
-        return err
-    }
-
-    sanitizedContent, err := h.validator.SanitizeMainContent(cmd.Content)
-    if err != nil {
-        return err
-    }
-
-    // Use sanitized data for persistence
-    model := &Model{
-        Title: sanitizedTitle,
-        Content: sanitizedContent,
-    }
-
-    return h.repository.Create(ctx, model)
-}
-```
-
-**Reference Implementation**: See [Product Management](./project_context/product-management.md) for complete security implementation example with ContentValidator.
-
-**Frontend (React/Next.js) - Client-Side Validation**:
-- Client-side validation is for UX only (not security)
-- Backend validation is the primary security defense
-- Always validate on backend even if frontend validates
+GORM AutoMigrate + raw SQL constraints in `persistence/gorm/{feature}/migration.go`.
+- AutoMigrate = additive only (new tables/columns)
+- Renames/drops = explicit SQL migration
+- Register in `container.go` with `gormfeature.AutoMigrate(db)`
 
 ---
 
-## 📦 Dependencies & Libraries
+## API Endpoints Summary
 
-### Key Dependencies
-
-| Package    | Purpose            | Chosen Because                           |
-| ---------- | ------------------ | ---------------------------------------- |
-| Next.js 16 | Frontend Framework | React framework with SSR, App Router     |
-| Gin        | Go Web Framework   | High performance, minimal, easy to use   |
-| gRPC       | Backend Protocol   | High-performance RPC framework           |
-| TypeScript | Type Safety        | Frontend type safety and tooling         |
-| pnpm       | Package Manager    | Fast, efficient, monorepo support        |
-| Turborepo  | Build System       | Fast builds, caching, parallel execution |
-
----
-
-## 🚀 Deployment & Environment
-
-**Development**:
-
-- **Run all services**: `pnpm dev` (uses Turborepo)
-- **Run individually**:
-  - Next.js: `pnpm web`
-  - Gin: `pnpm go`
-- Hot reload enabled for all services
-
-**Ports**:
-- Next.js: http://localhost:3000
-- Gin HTTP: http://localhost:8080
-- Gin gRPC: localhost:50051
-
-**Production**: [To be documented]
+| Method | Route | Auth | Domain |
+|--------|-------|------|--------|
+| POST | `/api/auth/login` | No | Auth |
+| POST | `/api/auth/logout` | Yes | Auth |
+| GET | `/api/auth/me` | Yes | Auth |
+| GET | `/api/home-settings` | No | HomeSettings |
+| PUT | `/api/home-settings` | Yes | HomeSettings |
+| GET | `/api/settings/home-sections` | No | HomeSettings |
+| PUT | `/api/settings/home-sections` | Yes | HomeSettings |
+| GET/POST | `/api/banners` | Mixed | Banner |
+| PUT/DELETE | `/api/banners/:id` | Yes | Banner |
+| PUT | `/api/banners/reorder` | Yes | Banner |
+| GET/POST | `/api/products` | Mixed | Product |
+| GET/PUT/DELETE | `/api/products/:id` | Mixed | Product |
+| GET/POST | `/api/categories` | Mixed | Product |
 
 ---
 
-## 📝 Development Notes
+## DB Tables
 
-### Known Issues
-
-- Template Gallery system is in progress (Phase 1 completed)
-
-### Recent Additions
-
-- ✅ **Digital Business Card** - Interactive business cards with email validation, click-to-call/email, vCard export, social media links with brand colors, LINE official icon, and client-side URL encoding
-- ✅ **Banner Management System** - Complete CRUD with Drag & Drop reordering, mobile preview carousel, CQRS pattern, segment tier filtering, and bulk priority updates
-- ✅ **Product Content Management** - Complete CMS with separate create/edit pages, markdown editor, code examples with copy button, and 4 new content fields (main_content, how_to_use, reference, example)
-- ✅ **Security Implementation** - ContentValidator pattern with XSS protection, SQL injection prevention, input sanitization for all string fields
-- ✅ **Product Management** - Complete CRUD system with Admin Dashboard
-- ✅ **Category Management** - Category CRUD with API integration
-- ✅ **Admin Layout** - Sidebar navigation for admin pages
-- ✅ **PostgreSQL Integration** - Database connected with GORM
-
-### Future Improvements
-
-- Complete Template Gallery (Phases 2-6)
-- Implement authentication system
+| Table | Domain | Notes |
+|-------|--------|-------|
+| `admin_users` | Auth | Login creds, lock state |
+| `home_settings` | HomeSettings | Single row (id='default'), all section content + visibility |
+| `banners` | Banner | With `display_order` for sorting |
+| `products` | Product | Main product info |
+| `product_details` | Product | Extended content (markdown, code examples) |
+| `dev_toolkit_categories` | Product | Category tree |
 - Setup Docker for containerization
 - Add search and pagination to Product list
 - Image upload functionality

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Tag, Wrench, Image, Activity, ToggleLeft, ToggleRight, Save, RefreshCw } from "lucide-react";
+import { Tag, Wrench, Image, Activity, Save, RefreshCw, Settings, Pencil, Eye, EyeOff, ExternalLink, GripVertical } from "lucide-react";
 import {
   getHomeSections,
   updateHomeSections,
@@ -41,6 +41,13 @@ const QUICK_LINKS = [
     label: "Banner",
     color: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
     iconBg: "bg-amber-500",
+  },
+  {
+    href: "/admin/home-settings",
+    icon: Settings,
+    label: "จัดการหน้าแรก",
+    color: "bg-green-500/10 text-green-600 dark:text-green-400",
+    iconBg: "bg-green-500",
   },
   {
     href: "/admin/healthcheck",
@@ -153,12 +160,14 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Section Visibility */}
+      {/* Section Visibility — Card Grid */}
       <div className="glass-panel rounded-2xl p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-foreground">ควบคุมการแสดง Section</h2>
-            <p className="text-xs text-(--muted) mt-0.5">เปิด/ปิดส่วนต่างๆ ที่แสดงในหน้าหลัก</p>
+            <p className="text-xs text-(--muted) mt-0.5">
+              เปิด/ปิดส่วนต่างๆ ที่แสดงในหน้าหลัก ({enabledCount}/{sectionKeys.length} เปิดอยู่)
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -191,27 +200,65 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="divide-y divide-(--border)">
-          {sectionKeys.map((key) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {sectionKeys.map((key, index) => {
             const isEnabled = sections[key];
             return (
-              <div key={key} className="flex items-center justify-between py-3">
-                <span className="text-sm text-foreground">{SECTION_LABELS[key]}</span>
-                <button
-                  onClick={() => handleToggle(key)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isEnabled
-                      ? "bg-(--primary)/10 text-(--primary) hover:bg-(--primary)/20"
-                      : "bg-(--border)/50 text-(--muted) hover:bg-(--border)"
-                  }`}
-                >
-                  {isEnabled ? (
-                    <ToggleRight className="w-5 h-5" />
-                  ) : (
-                    <ToggleLeft className="w-5 h-5" />
-                  )}
-                  {isEnabled ? "เปิด" : "ปิด"}
-                </button>
+              <div
+                key={key}
+                className={`relative group rounded-xl border-2 transition-all duration-200 overflow-hidden ${
+                  isEnabled
+                    ? "border-emerald-500/40 bg-emerald-500/5"
+                    : "border-(--border) bg-(--border)/10 opacity-70"
+                }`}
+              >
+                {/* Order badge */}
+                <div className="absolute top-2 left-2">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 text-(--muted)">
+                    #{index + 1}
+                  </span>
+                </div>
+
+                {/* Status indicator */}
+                <div className="absolute top-2 right-2">
+                  <div className={`w-2.5 h-2.5 rounded-full ${
+                    isEnabled ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" : "bg-gray-400"
+                  }`} />
+                </div>
+
+                <div className="pt-8 pb-3 px-4">
+                  {/* Section name */}
+                  <p className="text-sm font-semibold text-foreground leading-tight mb-1">
+                    {SECTION_LABELS[key]}
+                  </p>
+
+                  {/* Status text */}
+                  <p className={`text-xs mb-3 ${isEnabled ? "text-emerald-600 dark:text-emerald-400" : "text-(--muted)"}`}>
+                    {isEnabled ? "กำลังแสดงในหน้าหลัก" : "ซ่อนอยู่"}
+                  </p>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleToggle(key)}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        isEnabled
+                          ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                          : "bg-(--border) text-(--muted) hover:bg-(--border)/80"
+                      }`}
+                    >
+                      {isEnabled ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                      {isEnabled ? "แสดง" : "ซ่อน"}
+                    </button>
+                    <Link
+                      href={`/admin/home-settings?section=${key}`}
+                      className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-(--primary)/10 text-(--primary) hover:bg-(--primary)/20 transition-all"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                      แก้ไข
+                    </Link>
+                  </div>
+                </div>
               </div>
             );
           })}

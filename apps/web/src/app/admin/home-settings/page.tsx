@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Accordion, AccordionItem } from "@/components/ui/Accordion";
@@ -17,12 +17,20 @@ import { ChevronLeft, Save, Eye } from "lucide-react";
 
 function HomeSettingsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showModal: showUnauthorizedModal, errorMessage: unauthorizedError, handleModalClose } = useUnauthorizedHandler();
   
   const [settings, setSettings] = useState<HomeSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(() => {
+    const sectionParam = searchParams.get("section");
+    if (sectionParam) {
+      const idx = SECTION_METADATA.findIndex((s) => s.key === sectionParam);
+      return idx >= 0 ? idx : 0;
+    }
+    return 0;
+  });
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
@@ -116,11 +124,11 @@ function HomeSettingsPage() {
         {/* Header */}
         <header className="space-y-4">
           <Link
-            href="/admin/category"
+            href="/admin"
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
-            กลับ
+            กลับหน้า Dashboard
           </Link>
           
           <div className="flex items-center justify-between">
@@ -152,89 +160,56 @@ function HomeSettingsPage() {
         <div className="grid grid-cols-12 gap-6">
           {/* Sidebar - Section List */}
           <div className="col-span-3">
-            <div className="sticky top-6">
-              <div className="flex items-center justify-between mb-3 px-1">
-                <h3 className="text-sm font-semibold text-foreground">Sections</h3>
-                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                  {SECTION_METADATA.filter((s) => (settings[s.key] as any)?.enabled).length}/
-                  {SECTION_METADATA.length} แสดง
+            <div className="sticky top-6 space-y-2">
+              <div className="flex items-center justify-between mb-1 px-1">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sections</h3>
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  {SECTION_METADATA.filter((s) => (settings[s.key] as any)?.enabled).length}/{SECTION_METADATA.length}
                 </span>
               </div>
               
-              <div className="border-l-2 border-border">
+              <nav className="space-y-0.5">
                 {SECTION_METADATA.map((section, index) => {
                   const sectionData = settings[section.key] as any;
                   const isActive = activeTab === index;
-                  const isDragging = draggedIndex === index;
                   
                   return (
-                    <div
+                    <button
                       key={section.key}
-                      draggable
-                      onDragStart={() => setDraggedIndex(index)}
-                      onDragEnd={() => setDraggedIndex(null)}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => {
-                        if (draggedIndex !== null && draggedIndex !== index) {
-                          const newSettings = { ...settings };
-                          const draggedSection = SECTION_METADATA[draggedIndex];
-                          const targetSection = SECTION_METADATA[index];
-                          const draggedOrder = (newSettings[draggedSection.key] as any).order;
-                          const targetOrder = (newSettings[targetSection.key] as any).order;
-                          (newSettings[draggedSection.key] as any).order = targetOrder;
-                          (newSettings[targetSection.key] as any).order = draggedOrder;
-                          setSettings(newSettings);
+                      onClick={() => setActiveTab(index)}
+                      className={`
+                        w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all text-sm
+                        ${isActive
+                          ? "bg-primary/10 text-primary font-medium shadow-sm"
+                          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                         }
-                      }}
-                      className={`group relative ${isDragging ? 'opacity-50' : ''}`}
+                      `}
                     >
-                      <button
-                        onClick={() => setActiveTab(index)}
-                        className={`
-                          w-full flex items-center justify-between gap-2 px-4 py-2.5 text-left transition-all
-                          border-l-2 -ml-[2px]
-                          ${isActive
-                            ? "bg-green-600/10 border-green-600 text-green-600 font-medium"
-                            : "border-transparent text-muted-foreground hover:bg-green-600/5"
-                          }
-                          hover:border-green-600 hover:text-green-600
-                        `}
-                      >
-                        <p className="text-sm truncate">
-                          {section.name}
-                        </p>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded shrink-0 ${
-                          sectionData?.enabled 
-                            ? 'bg-green-600 text-white'
-                            : 'bg-red-600 text-white'
-                        }`}>
-                          {sectionData?.enabled ? 'แสดง' : 'ซ่อน'}
-                        </span>
-                      </button>
-                    </div>
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${
+                        sectionData?.enabled 
+                          ? 'bg-emerald-500'
+                          : 'bg-gray-400'
+                      }`} />
+                      <span className="truncate">{section.name}</span>
+                    </button>
                   );
                 })}
-              </div>
+              </nav>
 
               {/* SEO Section */}
-              <div className="border-l-2 border-border mt-4 pt-4">
+              <div className="pt-2 mt-2 border-t border-border">
                 <button
                   onClick={() => setActiveTab(SECTION_METADATA.length)}
                   className={`
-                    w-full flex items-center gap-2 px-4 py-2.5 text-left transition-all
-                    border-l-2 -ml-[2px]
+                    w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all text-sm
                     ${activeTab === SECTION_METADATA.length
-                      ? "bg-green-600/10 border-green-600 text-green-600 font-medium"
-                      : "border-transparent text-muted-foreground hover:bg-green-600/5"
+                      ? "bg-primary/10 text-primary font-medium shadow-sm"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     }
-                    hover:border-green-600 hover:text-green-600
                   `}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate">
-                      SEO & Meta Tags
-                    </p>
-                  </div>
+                  <span className="text-base">🔍</span>
+                  <span className="truncate">SEO & Meta Tags</span>
                 </button>
               </div>
             </div>

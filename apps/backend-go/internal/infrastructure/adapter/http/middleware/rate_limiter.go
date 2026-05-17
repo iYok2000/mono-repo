@@ -135,8 +135,8 @@ func getClientIP(r *http.Request) string {
 
 // LoginRateLimiter is a stricter rate limiter for login endpoints
 func NewLoginRateLimiter() *RateLimiter {
-	// 5 login attempts per 15 minutes
-	return NewRateLimiter(5, 15*time.Minute)
+	// 20 login attempts per 15 minutes
+	return NewRateLimiter(20, 15*time.Minute)
 }
 
 // APIRateLimiter is a general rate limiter for API endpoints

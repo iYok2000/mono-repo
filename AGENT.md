@@ -8,31 +8,28 @@ This file overrides all other instructions.
 
 ## ⛔ Hard Stop — Ask Before
 
-* Delete files
-* Rename domain/table/route/type/path
-* Config changes
-* New libraries
-* Breaking behavior
-* Creating any `.md`
+* Delete files / Rename domain/table/route/type/path
+* Config changes / New libraries
+* Breaking behavior / Creating any `.md`
 
 ---
 
-## 🧭 Mandatory Pre-flight (before any change)
+## 🧭 Pre-flight (before ANY code change)
 
-1. Read `PROJECT_CONTEXT.md`
-2. Check `DOMAIN_MAP.md`
-3. List impacted files
-4. If multi-domain → propose plan first
+1. Read `DEVELOPMENT.md` → ports, commands, file maps
+2. Read `DOMAIN_MAP.md` → find exact files for the target domain
+3. If multi-domain → propose plan first
+4. List impacted files before editing
 
 ---
 
 ## 🔁 Renames / Structural Changes
 
-If renaming anything, update ALL layers:
+Update ALL layers (check `DOMAIN_MAP.md` for full list):
 
-**Go**: container, routes, handlers, DTO/validator, repo/mapper, model (TableName, FK, index)
-**FE**: slugs, links, services, hooks, types, components
-**DB**: ❌ no AutoMigrate → ✅ explicit migration
+**Go**: container → routes → handler → DTO/validator → repo/mapper → model (TableName, FK, index)
+**FE**: slugs → links → services → hooks → types → components
+**DB**: No AutoMigrate for renames → explicit SQL migration
 Run `rg` to confirm zero old references.
 
 ---
@@ -48,7 +45,7 @@ Run `rg` to confirm zero old references.
 
 ## 🔐 Security Rules
 
-* GORM params only (no raw SQL)
+* GORM params only (no raw SQL injection)
 * Sanitize all inputs (ContentValidator)
 * Respect CSRF / rate limit / auth middleware
 * No secrets in code (env only)
@@ -70,10 +67,8 @@ Never create `.md` without approval. Only in `project_context/`.
 
 ## ✅ Before Finish
 
-Ensure:
-
-* Build/type-check would pass
-* No rule above is violated
-* No leftover rename references
-* Indexes/FKs exist
-* Pagination exists
+* `go build ./...` passes (from `apps/backend-go/`)
+* `pnpm typecheck` passes (from `apps/web/`)
+* No leftover rename references (`rg old-name`)
+* Indexes/FKs exist for new tables
+* Routes registered in `routes.go`, handlers wired in `container.go`

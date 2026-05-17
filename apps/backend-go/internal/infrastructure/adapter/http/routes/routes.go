@@ -102,12 +102,20 @@ func RegisterRoutes(router *gin.Engine, cfg *config.Config, cnt *container.Conta
 			banners.POST("/reorder", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), bannerHandler.ReorderBanners)
 		}
 
-		// Settings endpoints
+		// Settings endpoints (visibility only)
 		settingsHandler := handler.NewSettingsHandler(cnt.SqlDB)
 		settings := api.Group("/settings")
 		{
 			settings.GET("/home-sections", settingsHandler.GetHomeSections)
 			settings.PUT("/home-sections", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), settingsHandler.UpdateHomeSections)
 		}
+
+		// Home Settings endpoints (full content editing)
+		homeSettingsHandler := handler.NewHomeSettingsHandler(
+			cnt.GetHomeSettingsHandler,
+			cnt.UpdateHomeSettingsHandler,
+		)
+		api.GET("/home-settings", homeSettingsHandler.GetHomeSettings)
+		api.PUT("/home-settings", authMiddleware.RequireAuth(), apiRateLimiter.LimitGin(), homeSettingsHandler.UpdateHomeSettings)
 	}
 }
