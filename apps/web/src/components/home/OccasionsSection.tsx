@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Accordion, AccordionItem } from "@/components/ui/Accordion";
 import { Cake, Heart, GraduationCap, Gift, Sparkles, Users, Star, Zap, Crown, Trophy, MessageCircle, Award } from "lucide-react";
 
@@ -45,7 +46,7 @@ interface OccasionsSectionProps {
   settings?: OccasionsSettings;
 }
 
-export function OccasionsSection({ settings }: OccasionsSectionProps) {
+export const OccasionsSection = memo(function OccasionsSection({ settings }: OccasionsSectionProps) {
   const title = settings?.title || "เหมาะกับทุกโอกาสพิเศษ";
   const subtitle = settings?.subtitle || "วันเกิด • วันครบรอบ • งานแต่ง • รับปริญญา • เซอร์ไพรส์แฟน • ขอบคุณลูกค้า — แค่แตะก็เปิดใจ";
 
@@ -93,7 +94,7 @@ export function OccasionsSection({ settings }: OccasionsSectionProps) {
             return (
               <div
                 key={index}
-                className="flex flex-col items-center justify-center p-6 bg-[var(--card)] border border-[var(--border)] rounded-2xl hover:border-[var(--primary)] hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                className="flex flex-col items-center justify-center p-6 bg-[var(--card)] border border-[var(--border)] rounded-2xl hover:border-[var(--primary)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
               >
                 <div className="w-16 h-16 mb-4 bg-[var(--primary-soft)] rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <IconComponent className="w-8 h-8 text-[var(--primary)]" />
@@ -109,4 +110,4 @@ export function OccasionsSection({ settings }: OccasionsSectionProps) {
       </div>
     </section>
   );
-}
+});

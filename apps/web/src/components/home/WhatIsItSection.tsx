@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Smartphone, Video, Heart } from "lucide-react";
 
 interface WhatIsItSettings {
@@ -17,7 +18,7 @@ interface WhatIsItSectionProps {
   settings?: WhatIsItSettings;
 }
 
-export function WhatIsItSection({ settings }: WhatIsItSectionProps) {
+export const WhatIsItSection = memo(function WhatIsItSection({ settings }: WhatIsItSectionProps) {
   const title = settings?.title || "การ์ดความทรงจำ NFC คืออะไร?";
   const subtitle = settings?.subtitle || "การ์ดของขวัญที่ซ่อนวิดีโอหรือข้อความพิเศษไว้ภายใน เพียงแตะกับโทรศัพท์ก็เปิดชมได้ทันที เหมาะสำหรับเก็บความทรงจำ ส่งความรู้สึก หรือเซอร์ไพรส์คนสำคัญ";
   const feature1Title = settings?.feature_1_title || "แตะเดียวเปิดได้เลย";
@@ -45,11 +46,11 @@ export function WhatIsItSection({ settings }: WhatIsItSectionProps) {
         <div className="grid md:grid-cols-3 gap-8 mt-16">
           
           {/* Feature 1 */}
-          <div className="text-center group">
-            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--primary-soft)] rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110">
+          <div className="text-center group cursor-default">
+            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--primary-soft)] rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[var(--primary)]/10">
               <Smartphone className="w-10 h-10 text-[var(--primary)]" />
             </div>
-            <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3">
+            <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3 group-hover:text-[var(--primary)] transition-colors duration-200">
               {feature1Title}
             </h3>
             <p className="text-base text-[var(--muted)] leading-relaxed">
@@ -58,11 +59,11 @@ export function WhatIsItSection({ settings }: WhatIsItSectionProps) {
           </div>
 
           {/* Feature 2 */}
-          <div className="text-center group">
-            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--primary-soft)] rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110">
+          <div className="text-center group cursor-default">
+            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--primary-soft)] rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[var(--primary)]/10">
               <Video className="w-10 h-10 text-[var(--primary)]" />
             </div>
-            <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3">
+            <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3 group-hover:text-[var(--primary)] transition-colors duration-200">
               {feature2Title}
             </h3>
             <p className="text-base text-[var(--muted)] leading-relaxed">
@@ -71,11 +72,11 @@ export function WhatIsItSection({ settings }: WhatIsItSectionProps) {
           </div>
 
           {/* Feature 3 */}
-          <div className="text-center group">
-            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--primary-soft)] rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110">
+          <div className="text-center group cursor-default">
+            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--primary-soft)] rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[var(--primary)]/10">
               <Heart className="w-10 h-10 text-[var(--primary)]" />
             </div>
-            <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3">
+            <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3 group-hover:text-[var(--primary)] transition-colors duration-200">
               {feature3Title}
             </h3>
             <p className="text-base text-[var(--muted)] leading-relaxed">
@@ -88,4 +89,4 @@ export function WhatIsItSection({ settings }: WhatIsItSectionProps) {
       </div>
     </section>
   );
-}
+});

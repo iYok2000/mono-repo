@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+
 interface FAQSettings {
   title?: string;
   subtitle?: string;
@@ -17,7 +19,7 @@ interface FAQSectionProps {
   settings?: FAQSettings;
 }
 
-export function FAQSection({ settings }: FAQSectionProps) {
+export const FAQSection = memo(function FAQSection({ settings }: FAQSectionProps) {
   // Build FAQ array from settings
   const faqs = [
     {
@@ -59,7 +61,7 @@ export function FAQSection({ settings }: FAQSectionProps) {
           {faqs.map((faq, index) => (
             <details
               key={index}
-              className="group rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 transition-all hover:border-[var(--primary)]"
+              className="group rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 transition-all duration-300 hover:border-[var(--primary)] hover:shadow-md hover:shadow-[var(--primary)]/5"
             >
               <summary className="flex items-center justify-between cursor-pointer list-none">
                 <h3 className="text-lg font-semibold text-[var(--foreground)] group-open:text-[var(--primary)]">
@@ -88,4 +90,4 @@ export function FAQSection({ settings }: FAQSectionProps) {
       </div>
     </section>
   );
-}
+});

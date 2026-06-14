@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Palette, Link, CheckCircle2, Users, Upload, Film } from "lucide-react";
 import { StepCard } from "@/components/ui/StepCard";
 
@@ -66,7 +67,7 @@ interface HowItWorksSectionProps {
   settings?: HowItWorksSettings;
 }
 
-export function HowItWorksSection({ settings }: HowItWorksSectionProps) {
+export const HowItWorksSection = memo(function HowItWorksSection({ settings }: HowItWorksSectionProps) {
   const title = settings?.title || "ใช้งานยังไง? แค่ 3 ขั้นตอนง่ายๆ";
   const subtitle = settings?.subtitle || "";
 
@@ -132,4 +133,4 @@ export function HowItWorksSection({ settings }: HowItWorksSectionProps) {
       </div>
     </section>
   );
-}
+});

@@ -1,355 +1,53 @@
-# Banner Management System
+# Banner Management
 
-## Overview
+> Last updated: 2026-04-28
 
-ระบบจัดการ Banner สำหรับแสดงโฆษณาและข้อมูลโปรโมชั่นในแอพพลิเคชัน รองรับหลายภาษา (TH/EN), การจัดกลุ่มผู้ใช้ตาม Segment Tier, และการจัดลำดับแบบ Drag & Drop
+## What
+CRUD + drag-and-drop reorder for promotional banners. Multi-language (TH/EN), segment tier targeting, date-range scheduling, mobile preview.
 
-## Why
+## Where
 
-**Business Requirements:**
-- ต้องการแสดง promotional banners ในแอพแบบ dynamic
-- กำหนดกลุ่มเป้าหมาย (Segment Tiers) แยกต้าม user tier
-- สามารถจัดการเนื้อหาแบบ multi-language (TH/EN)
-- กำหนดระยะเวลาแสดงผล (start/end date)
-- จัดลำดับ priority การแสดงผลได้ง่าย
-- Preview ก่อนเผยแพร่
+**Backend** (CQRS):
+- Commands: `internal/application/banner/command/` — create, update, delete, reorder
+- Queries: `internal/application/banner/query/` — list (filtered), get by ID
+- DTOs: `internal/application/banner/dto/`
+- Validation: `internal/application/banner/validation/`
 
-## Architecture
+**Frontend**:
+- Admin: `app/admin/banner/` — page, create, edit/[id]
+- Components: `app/admin/banner/_components/` — BannerList, BannerFilter, BannerCarousel, AppPreviewModal, MobilePreview, SegmentTierSelector
+- Hooks: `app/admin/banner/_hooks/` — useBanner, useBannerFilter, useDragReorder
 
-### Backend (Go - Hexagonal + CQRS)
+## Routes
 
-```
-internal/application/banner/
-├── command/              # Write Operations
-│   ├── create_banner.go      # สร้าง
-│   ├── update_banner.go      # แก้ไข
-│   ├── delete_banner.go      # ลบ
-│   └── reorder_banners.go    # จัดลำดับ (Bulk Update)
-│
-├── query/                # Read Operations
-│   ├── list_banners.go       # ดึงรายการ (with filters)
-│   └── get_banner.go         # ดึง 1 รายการ
-│
-├── dto/                  # Data Transfer Objects
-├── validation/           # Input Validation & Sanitization
-```
+| Method | Route | Purpose |
+|--------|-------|---------|
+| GET | `/api/banners` | List (with filters: search, segment, status) |
+| GET | `/api/banners/:id` | Get by ID |
+| POST | `/api/banners` | Create |
+| PUT | `/api/banners/:id` | Update |
+| DELETE | `/api/banners/:id` | Delete |
+| POST | `/api/banners/reorder` | Bulk priority update |
 
-**Pattern ที่ใช้:**
-- **Hexagonal Architecture** - แยก Domain, Application, Infrastructure
-- **CQRS** - แยก Command (Write) และ Query (Read)
-- **Repository Pattern** - Interface สำหรับ data access
-- **Dependency Injection** - ผ่าน Container
-
-### Frontend (Next.js/React)
-
-```
-app/admin/banner/
-├── page.tsx                    # Main page (list & management)
-├── create/page.tsx             # Create form
-├── edit/[id]/page.tsx          # Edit form
-├── _components/
-│   ├── BannerList.tsx          # Table with drag & drop
-│   ├── BannerFilter.tsx        # Search & filters
-│   ├── BannerCarousel.tsx      # Preview carousel
-│   ├── AppPreviewModal.tsx     # Mobile app preview
-│   ├── MobilePreview.tsx       # Phone mockup
-│   └── SegmentTierSelector.tsx # Multi-select dropdown
-└── _hooks/
-    ├── useBanner.ts            # Data fetching
-    ├── useBannerFilter.ts      # Filter logic
-    └── useDragReorder.ts       # Drag & drop state
-```
-
-## Features
-
-### 1. CRUD Operations
-- **Create** - สร้าง banner ใหม่พร้อม validation
-- **Read** - ดึงรายการแบบ filtered และ sorted
-- **Update** - แก้ไขข้อมูล banner
-- **Delete** - ลบ banner
-- **Toggle Status** - เปิด/ปิดใช้งาน
-
-### 2. Drag & Drop Reordering
-- ลากเลื่อน row ในตารางเพื่อเรียงลำดับ
-- Bulk update priorities แบบ atomic
-- Visual feedback (highlight, opacity)
-- Auto-recalculate priorities
-
-### 3. Advanced Filtering
-- **Search** - ค้นหาจาก ID หรือ URL
-- **Segment Tier** - เลือกหลายกลุ่มพร้อมกัน (checkbox)
-- **Status** - Active/Inactive/All
-- **Clear filters** - ล้างตัวกรองทั้งหมด
-
-### 4. Mobile Preview
-- Preview แบบ phone mockup
-- Auto-play carousel (3 seconds)
-- Language toggle (TH/EN)
-- แสดงเฉพาะ active banners
-- Sorted by priority
-
-### 5. Security (MANDATORY)
-- **Input Validation** - ทุก field ต้องผ่าน validator
-- **Sanitization** - HTML escape, XSS protection
-- **SQL Injection Prevention** - GORM parameterized queries
-- **Length Validation** - Max length checks
-
-## API Endpoints
-
-```
-GET    /api/banners              # List all banners (with filters)
-GET    /api/banners/:id          # Get banner by ID
-POST   /api/banners              # Create new banner
-PUT    /api/banners/:id          # Update banner
-DELETE /api/banners/:id          # Delete banner
-POST   /api/banners/reorder      # Bulk update priorities
-```
-
-### Request/Response Examples
-
-**POST /api/banners**
-```json
-{
-  "image_th": "/images/banner-th.jpg",
-  "image_en": "/images/banner-en.jpg",
-  "url_th": "https://example.com/promo-th",
-  "url_en": "https://example.com/promo-en",
-  "segment_tiers": ["tier1", "tier2"],
-  "start_date": "2025-01-01T00:00:00Z",
-  "end_date": "2025-12-31T23:59:59Z",
-  "is_active": true,
-  "priority": 1
-}
-```
-
-**POST /api/banners/reorder**
-```json
-{
-  "updates": [
-    {"id": "banner-1", "priority": 3},
-    {"id": "banner-2", "priority": 1},
-    {"id": "banner-3", "priority": 2}
-  ]
-}
-```
-
-## Key Implementation Details
-
-### 1. Drag & Drop Logic
-
-**Frontend** (`handleReorder` in page.tsx):
-```typescript
-// Calculate priority updates when dragging
-const updates = filteredBanners.map((banner) => {
-  if (banner.id === bannerId) {
-    return { id: banner.id, priority: newPriority };
-  } else if (oldPriority < newPriority) {
-    // Moving down: shift banners up
-    if (banner.priority > oldPriority && banner.priority <= newPriority) {
-      return { id: banner.id, priority: banner.priority - 1 };
-    }
-  } else if (oldPriority > newPriority) {
-    // Moving up: shift banners down
-    if (banner.priority >= newPriority && banner.priority < oldPriority) {
-      return { id: banner.id, priority: banner.priority + 1 };
-    }
-  }
-  return { id: banner.id, priority: banner.priority };
-});
-```
-
-**Backend** (`reorder_banners.go`):
-```go
-// Batch update using repository method
-func (h *ReorderBannersHandler) Handle(ctx context.Context, cmd ReorderBannersCommand) error {
-    // Validate all banner IDs exist
-    for _, update := range cmd.Updates {
-        banner, err := h.repo.GetByID(ctx, update.ID)
-        if err != nil || banner == nil {
-            return errors
-        }
-    }
-
-    // Batch update in single transaction
-    return h.repo.UpdatePriorities(ctx, repoUpdates)
-}
-```
-
-### 2. Filter State Management
-
-**Custom Hook** (`useBannerFilter.ts`):
-```typescript
-export const useBannerFilter = (banners: Banner[]) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
-  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>("all");
-
-  const filteredBanners = useMemo(() => {
-    return banners
-      .filter((banner) => {
-        const matchesSearch = /* search logic */;
-        const matchesSegment = /* segment logic */;
-        const matchesStatus = /* status logic */;
-        return matchesSearch && matchesSegment && matchesStatus;
-      })
-      .sort((a, b) => a.priority - b.priority); // Lower priority first
-  }, [banners, searchQuery, selectedSegments, selectedStatus]);
-
-  return { /* state and setters */ };
-};
-```
-
-### 3. Component Architecture
-
-**Separation of Concerns:**
-- `BannerFilter` - Pure UI component (receives props)
-- `useBannerFilter` - Business logic (filter algorithm)
-- `page.tsx` - Orchestration (connects data & UI)
-
-**Benefits:**
-- ✅ Reusable components
-- ✅ Testable logic
-- ✅ Clear responsibilities
-- ✅ Easy to maintain
-
-## Database Schema
+## DB Schema
 
 ```sql
-CREATE TABLE banners (
-    id VARCHAR(255) PRIMARY KEY,
-    image_th VARCHAR(500) NOT NULL,
-    image_en VARCHAR(500) NOT NULL,
-    url_th VARCHAR(500) NOT NULL,
-    url_en VARCHAR(500) NOT NULL,
-    segment_tiers JSONB NOT NULL,
-    start_date TIMESTAMP NOT NULL,
-    end_date TIMESTAMP NOT NULL,
-    is_active BOOLEAN DEFAULT true,
-    priority INTEGER NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_banners_is_active ON banners(is_active);
-CREATE INDEX idx_banners_priority ON banners(priority);
-CREATE INDEX idx_banners_dates ON banners(start_date, end_date);
+banners (
+  id VARCHAR(255) PK,
+  image_th, image_en VARCHAR(500) NOT NULL,
+  url_th, url_en VARCHAR(500) NOT NULL,
+  segment_tiers JSONB NOT NULL,
+  start_date, end_date TIMESTAMP NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  priority INTEGER NOT NULL,
+  created_at, updated_at TIMESTAMP
+)
+-- Indexes: is_active, priority, (start_date, end_date)
 ```
 
-## Dependencies
-
-### Backend
-- **Gin** - HTTP framework
-- **GORM** - ORM for database
-- **PostgreSQL** - Database
-- Custom error handling (`pkg/errors`)
-
-### Frontend
-- **Next.js 14** - React framework (App Router)
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Axios** - HTTP client
-- Native HTML5 Drag & Drop API
-
-## Security Considerations
-
-### Input Validation (MANDATORY)
-
-**Backend Validation Chain:**
-1. **HTTP Request Layer** - Gin binding validation
-   ```go
-   type CreateBannerRequest struct {
-       ImageTH      string   `json:"image_th" binding:"required,max=500"`
-       SegmentTiers []string `json:"segment_tiers" binding:"required,min=1"`
-       Priority     int      `json:"priority" binding:"required,min=0"`
-   }
-   ```
-
-2. **Command Handler** - Business validation & sanitization
-   ```go
-   sanitizedImageTH, err := h.validator.ValidateImagePath(cmd.ImageTH)
-   sanitizedURLTH, err := h.validator.ValidateURL(cmd.URLTH)
-   ```
-
-3. **Repository Layer** - GORM parameterized queries (SQL injection prevention)
-
-**Frontend Validation:**
-- Client-side validation for UX only
-- Backend re-validates everything (security layer)
-
-## Performance Optimizations
-
-1. **Bulk Updates** - Reorder API อัพเดทหลาย banners พร้อมกัน
-2. **Indexed Queries** - Index บน is_active, priority, dates
-3. **Memoization** - useMemo สำหรับ filtered data
-4. **Optimistic UI** - Drag & drop แสดง feedback ทันที
-
-## Testing Scenarios
-
-### Manual Testing Checklist
-- [ ] Create banner with valid data
-- [ ] Create banner with invalid data (validation errors)
-- [ ] Update banner information
-- [ ] Delete banner
-- [ ] Toggle banner status
-- [ ] Drag & drop to reorder (priority updates correctly)
-- [ ] Filter by search query
-- [ ] Filter by segment tiers (multiple selection)
-- [ ] Filter by status
-- [ ] Preview in mobile mockup (both languages)
-- [ ] Check banners display in correct priority order
-
-## Notes
-
-### Important Behaviors
-- **Priority Sorting** - Lower number = higher priority (1 shows before 2)
-- **Atomic Reorder** - ทุก priority update สำเร็จพร้อมกันหรือล้มทั้งหมด
-- **Active Banners Only** - Mobile preview แสดงเฉพาะ is_active = true
-- **CQRS Pattern** - Command และ Query แยกไฟล์กัน (เพื่อ scalability)
-
-### Future Enhancements
-- [ ] Image upload (ตอนนี้ใช้ URL)
-- [ ] A/B Testing support
-- [ ] Click tracking & analytics
-- [ ] Schedule publishing (auto activate/deactivate)
-- [ ] Banner templates
-- [ ] Caching layer for high traffic
-
-### Known Limitations
-- Image hosting ต้องจัดการแยก (ไม่มี upload)
-- ไม่มี version history
-- ไม่มี approval workflow
-
-## Testing
-
-**Unit Tests**:
-- Location: `apps/backend-go/internal/application/banner/command/*_test.go`
-- Coverage: Command validation, business logic, priority calculations
-- Run: `go test ./internal/application/banner/...`
-
-**Integration Tests**:
-- Location: `apps/backend-go/internal/infrastructure/adapter/http/handler/banner_test.go`
-- Scenarios: CRUD operations, bulk reorder, filtering, error handling
-- Run: `go test -tags=integration ./internal/infrastructure/...`
-
-**Manual Testing Checklist**:
-1. Navigate to `/admin/banner`
-2. Create new banner with TH/EN images and URLs
-3. Verify banner appears in list
-4. Drag banner to change priority
-5. Confirm priority numbers update correctly
-6. Use filters (search, segment, status)
-7. Open mobile preview, verify active banners show
-8. Toggle language in preview
-9. Edit banner, change segment tiers
-10. Delete banner, confirm removal
-
-## Related Features
-- Segment Tier Management (for filtering)
-- Multi-language support (TH/EN)
-
----
-
-**Created**: 2024-12-15  
-**Last Updated**: 2026-02-03  
-**Author**: Backend Team  
-**Status**: Production-ready
+## Key Behavior
+- Drag & drop recalculates priorities for all affected banners (shift up/down)
+- Reorder uses single transaction (atomic bulk update)
+- Filters: search (ID/URL), segment tier (multi-select checkbox), status (active/inactive/all)
+- Mobile preview: phone mockup, auto-play carousel (3s), language toggle
+- Security: all inputs validated + sanitized, GORM parameterized queries

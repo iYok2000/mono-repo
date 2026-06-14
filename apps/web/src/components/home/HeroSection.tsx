@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Button } from "@/components/ui/Button";
 import { ArrowRight, Check, Play } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +25,7 @@ interface HeroSectionProps {
   settings?: HeroSettings;
 }
 
-export function HeroSection({ settings }: HeroSectionProps) {
+export const HeroSection = memo(function HeroSection({ settings }: HeroSectionProps) {
   // Fallback to default values if settings not provided
   const badgeText = settings?.badge_text || "ของขวัญความทรงจำ • Digital Gift to Thailand";
   const titleHighlight = settings?.title_highlight || "ของขวัญวิดีโอแบบ NFC";
@@ -42,23 +43,23 @@ export function HeroSection({ settings }: HeroSectionProps) {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text Content */}
-          <div className="space-y-8 animate-slide-up">
-            {/* Pre-title Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--primary-soft)] rounded-full">
+          <div className="space-y-8">
+            {/* Pre-title Badge — stagger 0 */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--primary-soft)] rounded-full opacity-0 animate-[slide-up_0.6s_ease-out_0.1s_forwards]">
               <span className="w-2 h-2 bg-[var(--primary)] rounded-full animate-pulse-led"></span>
               <span className="text-[var(--primary)] text-sm font-medium">
                 {badgeText}
               </span>
             </div>
 
-            {/* Main Heading with Green Highlight */}
-            <div className="space-y-3">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
-                <span className="text-[var(--primary)]">
+            {/* Main Heading — stagger 1 */}
+            <div className="space-y-3 opacity-0 animate-[slide-up_0.7s_ease-out_0.25s_forwards]">
+              <h1 className="text-3xl sm:text-4xl lg:text-[3.25rem] xl:text-[3.5rem] font-extrabold leading-[1.1] tracking-tight">
+                <span className="text-[var(--primary)] inline-block">
                   {titleHighlight}
                 </span>
                 <br />
-                <span className="text-[var(--foreground)]">
+                <span className="text-[var(--foreground)] inline-block mt-1">
                   {titleRest}
                 </span>
               </h1>
@@ -68,38 +69,22 @@ export function HeroSection({ settings }: HeroSectionProps) {
               </p>
             </div>
 
-            {/* Micro-proof Badges */}
-            <div className="space-y-2">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--primary-soft)] flex items-center justify-center mt-0.5">
-                  <Check className="w-3 h-3 text-[var(--primary)]" />
+            {/* Micro-proof Badges — stagger 2 */}
+            <div className="space-y-2.5 opacity-0 animate-[slide-up_0.6s_ease-out_0.45s_forwards]">
+              {[feature1, feature2, feature3].map((feature, i) => (
+                <div key={i} className="flex items-start gap-3 group/feature">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--primary-soft)] flex items-center justify-center mt-0.5 transition-transform duration-200 group-hover/feature:scale-110">
+                    <Check className="w-3 h-3 text-[var(--primary)]" />
+                  </div>
+                  <p className="text-base text-[var(--muted)] font-normal leading-relaxed transition-colors duration-200 group-hover/feature:text-[var(--foreground)]">
+                    {feature}
+                  </p>
                 </div>
-                <p className="text-base text-[var(--muted)] font-normal leading-relaxed">
-                  {feature1}
-                </p>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--primary-soft)] flex items-center justify-center mt-0.5">
-                  <Check className="w-3 h-3 text-[var(--primary)]" />
-                </div>
-                <p className="text-base text-[var(--muted)] font-normal leading-relaxed">
-                  {feature2}
-                </p>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--primary-soft)] flex items-center justify-center mt-0.5">
-                  <Check className="w-3 h-3 text-[var(--primary)]" />
-                </div>
-                <p className="text-base text-[var(--muted)] font-normal leading-relaxed">
-                  {feature3}
-                </p>
-              </div>
+              ))}
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 pt-1">
+            {/* CTA Buttons — stagger 3 */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2 opacity-0 animate-[slide-up_0.6s_ease-out_0.6s_forwards]">
               <Button icon={<Play className="w-4 h-4" />} variant="large">
                 {ctaPrimary}
               </Button>
@@ -202,4 +187,4 @@ export function HeroSection({ settings }: HeroSectionProps) {
       <div className="absolute -bottom-16 left-0 right-0 h-32 bg-gradient-to-t from-[var(--card)] to-transparent pointer-events-none"></div>
     </section>
   );
-}
+});

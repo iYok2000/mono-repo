@@ -1,79 +1,101 @@
-# AGENT.md — Project Constitution
+# AGENT.md — Single Source of Truth
 
-You act as a **Senior Software Engineer & Architect**.
-Protect **security, stability, architecture, performance** before coding.
-This file overrides all other instructions.
-
----
-
-## ⛔ Hard Stop — Ask Before
-
-* Delete files
-* Rename domain/table/route/type/path
-* Config changes
-* New libraries
-* Breaking behavior
-* Creating any `.md`
+> Read this file FIRST. Do NOT read other docs until needed.
+> Role: Senior Software Engineer & Architect.
+> Priority: security > stability > architecture > performance > speed.
 
 ---
 
-## 🧭 Mandatory Pre-flight (before any change)
+## 1. Hard Stops (ask before doing)
 
-1. Read `PROJECT_CONTEXT.md`
-2. Check `DOMAIN_MAP.md`
-3. List impacted files
-4. If multi-domain → propose plan first
-
----
-
-## 🔁 Renames / Structural Changes
-
-If renaming anything, update ALL layers:
-
-**Go**: container, routes, handlers, DTO/validator, repo/mapper, model (TableName, FK, index)
-**FE**: slugs, links, services, hooks, types, components
-**DB**: ❌ no AutoMigrate → ✅ explicit migration
-Run `rg` to confirm zero old references.
+- Delete/rename files, domains, tables, routes, types, paths
+- Config changes, new dependencies
+- Breaking behavior changes
+- Creating `.md` files
 
 ---
 
-## 🗄️ DB / GORM Rules
+## 2. Workflow (every task)
 
-* AutoMigrate = additive columns only
-* Model must declare: TableName, PK, FK (OnDelete/OnUpdate), indexes
-* No mass overwrite of optional fields
-* Lists require pagination + indexes
-
----
-
-## 🔐 Security Rules
-
-* GORM params only (no raw SQL)
-* Sanitize all inputs (ContentValidator)
-* Respect CSRF / rate limit / auth middleware
-* No secrets in code (env only)
-* Block `../` paths and command injection
+1. Read this file (done)
+2. Identify impacted domain(s) → check `DOMAIN_MAP.md` if multi-domain
+3. List impacted files + reason
+4. If multi-domain or structural → propose plan, wait for approval
+5. Implement → Verify → Summarize changes + impacts
 
 ---
 
-## ⚠️ Shared Code Rule
+## 3. Rules
 
-If used in N places → update ALL N places. Search usages first.
+### Security
+- GORM parameterized queries only (no raw SQL, no string concat)
+- Sanitize ALL inputs — Go: `ContentValidator`, FE: DOMPurify
+- Respect auth / CSRF / rate-limit middleware
+- No secrets in code (env vars only)
+- Block `../` path traversal, command injection, `javascript:` URLs
+- FE validation = UX only; backend re-validates everything
+
+### Database / GORM
+- AutoMigrate = additive columns ONLY
+- Rename / drop / constraint changes → explicit SQL migration file
+- Model must declare: `TableName()`, PK, FK with `OnDelete`/`OnUpdate`, indexes
+- No mass overwrite of optional fields — use selective update maps
+- List endpoints require pagination + default limit + supporting indexes
+
+### Renames
+Update ALL layers in one pass:
+- **Go**: container → routes → handler → DTO/validator → repo/mapper → model (TableName, FK, index)
+- **FE**: slugs → links → services → hooks → types → components
+- **DB**: explicit migration (NOT AutoMigrate)
+- Run `rg <old-name>` to confirm zero leftover references
+
+### Shared Code
+If used in N places → update ALL N. Search usages with `rg` or grep before editing.
+
+### Docs
+Never create `.md` without approval. Feature docs go in `project_context/` only.
 
 ---
 
-## 📝 Docs Rule
+## 4. Verify Before Finishing
 
-Never create `.md` without approval. Only in `project_context/`.
+```bash
+go build ./...        # Backend compiles
+pnpm lint             # FE lint passes
+pnpm typecheck        # FE types pass
+rg <old-name>         # Zero leftover references (if rename)
+```
 
 ---
 
-## ✅ Before Finish
+## 5. When to Read Other Docs
 
-Ensure:
+| Need | File |
+|------|------|
+| Architecture / feature index | `PROJECT_CONTEXT.md` |
+| Domain ownership check | `DOMAIN_MAP.md` |
+| How to run / commands | `DEVELOPMENT.md` |
+| Feature implementation detail | `project_context/<feature>.md` |
+| UI design tokens | `project_context/design-tokens.md` |
 
-* Build/type-check would pass
-* No rule above is violated
-* No leftover rename references
-* Indexes/FKs exist
-* Pagination exists
+---
+
+## 6. Bad Examples (do NOT do these)
+
+```go
+// BAD: raw SQL string concat
+db.Raw("SELECT * FROM users WHERE name = '" + name + "'")
+// GOOD: parameterized
+db.Where("name = ?", name).Find(&users)
+
+// BAD: AutoMigrate for rename
+db.AutoMigrate(&RenamedModel{})
+// GOOD: explicit migration
+// migrations/003_rename_x_to_y.sql
+```
+
+```typescript
+// BAD: trust FE validation as security
+if (formData.title) { submitToAPI(formData) }
+// GOOD: FE validates for UX, backend ContentValidator validates for security
+```

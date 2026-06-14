@@ -17,22 +17,77 @@ export interface HeroSectionSettings extends SectionSettings {
   feature_1: string;
   feature_2: string;
   feature_3: string;
+  cta_primary: string;
+  cta_secondary: string;
+  cta_tertiary: string;
 }
 
 export interface WhatIsItSectionSettings extends SectionSettings {
   title: string;
   subtitle: string;
-  description: string;
+  feature_1_title: string;
+  feature_1_description: string;
+  feature_2_title: string;
+  feature_2_description: string;
+  feature_3_title: string;
+  feature_3_description: string;
 }
 
 export interface SKUSectionSettings extends SectionSettings {
   title: string;
   subtitle: string;
   card_title: string;
-  nfc_card_name: string;
-  nfc_card_price: string;
-  nfc_sticker_name: string;
-  nfc_sticker_price: string;
+  card_1_label: string;
+  card_2_label: string;
+  card_3_label: string;
+  // Express Card
+  express_enabled: boolean;
+  express_badge_text: string;
+  express_badge_icon: string;
+  express_badge_color: string;
+  express_emoji: string;
+  express_name: string;
+  express_tagline: string;
+  express_description: string;
+  express_feature_1: string;
+  express_feature_2: string;
+  express_feature_3: string;
+  express_feature_4: string;
+  express_button_text: string;
+  express_button_link: string;
+  express_footer_text: string;
+  // Squad Card
+  squad_enabled: boolean;
+  squad_badge_text: string;
+  squad_badge_icon: string;
+  squad_badge_color: string;
+  squad_emoji: string;
+  squad_name: string;
+  squad_tagline: string;
+  squad_description: string;
+  squad_feature_1: string;
+  squad_feature_2: string;
+  squad_feature_3: string;
+  squad_feature_4: string;
+  squad_button_text: string;
+  squad_button_link: string;
+  squad_footer_text: string;
+  // Greeting Card
+  greeting_enabled: boolean;
+  greeting_badge_text: string;
+  greeting_badge_icon: string;
+  greeting_badge_color: string;
+  greeting_emoji: string;
+  greeting_name: string;
+  greeting_tagline: string;
+  greeting_description: string;
+  greeting_feature_1: string;
+  greeting_feature_2: string;
+  greeting_feature_3: string;
+  greeting_feature_4: string;
+  greeting_button_text: string;
+  greeting_button_link: string;
+  greeting_footer_text: string;
 }
 
 export interface HowItWorksSectionSettings extends SectionSettings {
@@ -50,11 +105,23 @@ export interface OccasionsSectionSettings extends SectionSettings {
   title: string;
   subtitle: string;
   occasion_1: string;
+  occasion_1_icon: string;
   occasion_2: string;
+  occasion_2_icon: string;
   occasion_3: string;
+  occasion_3_icon: string;
   occasion_4: string;
+  occasion_4_icon: string;
   occasion_5: string;
+  occasion_5_icon: string;
   occasion_6: string;
+  occasion_6_icon: string;
+  occasion_7: string;
+  occasion_7_icon: string;
+  occasion_8: string;
+  occasion_8_icon: string;
+  occasion_9: string;
+  occasion_9_icon: string;
 }
 
 export interface WhyNFCSectionSettings extends SectionSettings {

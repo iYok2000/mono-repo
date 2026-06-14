@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cx } from "@/lib/cx";
-import { Tag, Wrench, Image, LayoutDashboard, Activity } from "lucide-react";
+import { Tag, Wrench, Image, LayoutDashboard, Activity, Settings } from "lucide-react";
 
 interface MenuItem {
   title: string;
@@ -32,6 +32,11 @@ const MENU_ITEMS: MenuItem[] = [
     title: "จัดการ Banner",
     href: "/admin/banner",
     icon: Image,
+  },
+  {
+    title: "Home Settings",
+    href: "/admin/home-settings",
+    icon: Settings,
   },
   {
     title: "Health Check",
@@ -87,7 +92,7 @@ export const AdminSidebar = () => {
       {/* Sidebar */}
       <aside
         className={cx(
-          "fixed md:sticky top-20 left-4 z-40 w-60 glass-panel rounded-2xl h-[calc(100vh-6rem)] transition-transform duration-300 md:translate-x-0 flex flex-col",
+          "fixed md:sticky top-16 left-0 z-40 w-60 glass-panel md:rounded-r-2xl h-[calc(100vh-4rem)] transition-transform duration-300 md:translate-x-0 flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -96,8 +101,8 @@ export const AdminSidebar = () => {
           <div className="w-12 h-12 bg-(--primary) rounded-xl flex items-center justify-center mb-2 shadow-[0_4px_12px_rgba(16,185,129,0.3)]">
             <span className="text-white font-black text-xl">G</span>
           </div>
-          <h2 className="text-sm font-bold text-foreground">Admin Panel</h2>
-          <p className="text-xs text-(--muted) mt-0.5">GyByte Management</p>
+          <h2 className="text-sm font-bold text-foreground">GyByte Management</h2>
+          <p className="text-xs text-(--muted) mt-0.5">Admin Panel</p>
         </div>
 
         {/* Navigation */}

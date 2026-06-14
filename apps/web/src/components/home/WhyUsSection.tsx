@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+
 interface PreviewSettings {
   title?: string;
   subtitle?: string;
@@ -10,7 +12,7 @@ interface PreviewSectionProps {
   settings?: PreviewSettings;
 }
 
-export function PreviewSection({ settings }: PreviewSectionProps) {
+export const PreviewSection = memo(function PreviewSection({ settings }: PreviewSectionProps) {
   const title = settings?.title || "ตัวอย่างการ์ด";
   const subtitle = settings?.subtitle || "ดูว่าจะออกมาหน้าตาแบบไหน";
   
@@ -92,4 +94,4 @@ export function PreviewSection({ settings }: PreviewSectionProps) {
       </div>
     </section>
   );
-}
+});

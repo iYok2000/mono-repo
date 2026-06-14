@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Smartphone, Zap, Sparkles, Clock } from "lucide-react";
 
 const benefits = [
@@ -42,7 +43,7 @@ interface WhyNFCSectionProps {
   settings?: WhyNFCSettings;
 }
 
-export function WhyNFCSection({ settings }: WhyNFCSectionProps) {
+export const WhyNFCSection = memo(function WhyNFCSection({ settings }: WhyNFCSectionProps) {
   const title = settings?.title || "ทำไมต้องเป็นของขวัญความทรงจำแบบ NFC?";
   const subtitle = settings?.subtitle || "เพราะเป็นมากกว่าการ์ดธรรมดา — เป็นประสบการณ์พิเศษที่ผู้รับจะจดจำได้ตลอดไป";
   
@@ -89,7 +90,7 @@ export function WhyNFCSection({ settings }: WhyNFCSectionProps) {
           {benefitsData.map((benefit, index) => (
             <div
               key={index}
-              className="flex gap-6 p-8 glass-panel rounded-2xl shadow-(--shadow-sm) hover:border-(--primary) hover:shadow-lg transition-all duration-300 group"
+              className="flex gap-6 p-8 glass-panel rounded-2xl shadow-(--shadow-sm) hover:border-(--primary) hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
             >
               {/* Icon */}
               <div className="flex-shrink-0">
@@ -114,4 +115,4 @@ export function WhyNFCSection({ settings }: WhyNFCSectionProps) {
       </div>
     </section>
   );
-}
+});

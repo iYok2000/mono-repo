@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Tag, Wrench, Image, Activity, ToggleLeft, ToggleRight, Save, RefreshCw } from "lucide-react";
+import { Tag, Wrench, Image, Activity, Settings, ToggleLeft, ToggleRight, Save, RefreshCw } from "lucide-react";
 import {
   getHomeSections,
   updateHomeSections,
@@ -17,7 +17,7 @@ import { goApi } from "@/lib/axios";
 interface Stats {
   categories: number;
   banners: number;
-  toolkits: number;
+  products: number;
 }
 
 const QUICK_LINKS = [
@@ -29,9 +29,9 @@ const QUICK_LINKS = [
     iconBg: "bg-blue-500",
   },
   {
-    href: "/admin/devtoolkit",
+    href: "/admin/product",
     icon: Wrench,
-    label: "DevToolkit",
+    label: "Product",
     color: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
     iconBg: "bg-violet-500",
   },
@@ -49,11 +49,18 @@ const QUICK_LINKS = [
     color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     iconBg: "bg-emerald-500",
   },
+  {
+    href: "/admin/home-settings",
+    icon: Settings,
+    label: "Home Settings",
+    color: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+    iconBg: "bg-pink-500",
+  },
 ];
 
 export default function AdminDashboard() {
   const [sections, setSections] = useState<SectionVisibility>(DEFAULT_SECTION_VISIBILITY);
-  const [stats, setStats] = useState<Stats>({ categories: 0, banners: 0, toolkits: 0 });
+  const [stats, setStats] = useState<Stats>({ categories: 0, banners: 0, products: 0 });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
@@ -61,20 +68,20 @@ export default function AdminDashboard() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [sectionData, cats, bans, toolkitsRes] = await Promise.allSettled([
+      const [sectionData, cats, bans, productsRes] = await Promise.allSettled([
         getHomeSections(),
         getCategories(),
         getBanners(),
-        goApi.get("/api/toolkits"),
+        goApi.get("/api/products"),
       ]);
 
       if (sectionData.status === "fulfilled") setSections(sectionData.value);
       if (cats.status === "fulfilled") setStats((s) => ({ ...s, categories: cats.value.length }));
       if (bans.status === "fulfilled") setStats((s) => ({ ...s, banners: bans.value.length }));
-      if (toolkitsRes.status === "fulfilled") {
-        const data = toolkitsRes.value.data;
-        const count = Array.isArray(data) ? data.length : 0;
-        setStats((s) => ({ ...s, toolkits: count }));
+      if (productsRes.status === "fulfilled") {
+        const data = productsRes.value.data;
+        const count = Array.isArray(data?.data) ? data.data.length : Array.isArray(data) ? data.length : 0;
+        setStats((s) => ({ ...s, products: count }));
       }
     } finally {
       setLoading(false);
@@ -120,7 +127,7 @@ export default function AdminDashboard() {
         {[
           { label: "หมวดหมู่", value: stats.categories, color: "text-blue-600 dark:text-blue-400" },
           { label: "Banner", value: stats.banners, color: "text-amber-600 dark:text-amber-400" },
-          { label: "DevToolkit", value: stats.toolkits, color: "text-violet-600 dark:text-violet-400" },
+          { label: "Product", value: stats.products, color: "text-violet-600 dark:text-violet-400" },
           { label: "Sections เปิด", value: enabledCount, color: "text-emerald-600 dark:text-emerald-400" },
         ].map((stat) => (
           <div key={stat.label} className="glass-panel rounded-2xl p-4">

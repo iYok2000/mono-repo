@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+
 interface WhyUsSettings {
   title?: string;
   subtitle?: string;
@@ -15,7 +17,7 @@ interface WhyUsSectionProps {
   settings?: WhyUsSettings;
 }
 
-export function WhyUsSection({ settings }: WhyUsSectionProps) {
+export const WhyUsSection = memo(function WhyUsSection({ settings }: WhyUsSectionProps) {
   const title = settings?.title || "ทำไมต้องเรา?";
   const subtitle = settings?.subtitle || "6 เหตุผลที่คุณควรเลือก GyByte";
 
@@ -70,10 +72,10 @@ export function WhyUsSection({ settings }: WhyUsSectionProps) {
           {reasons.map((reason, index) => (
             <div
               key={index}
-              className="group p-6 lg:p-8 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-[var(--shadow-md)]"
+              className="group p-6 lg:p-8 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-300 hover:shadow-[var(--shadow-md)] hover:-translate-y-1"
             >
-              <div className="text-5xl mb-4">{reason.icon}</div>
-              <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3">
+              <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">{reason.icon}</div>
+              <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3 group-hover:text-[var(--primary)] transition-colors duration-200">
                 {reason.title}
               </h3>
               <p className="text-[var(--muted)] leading-relaxed">
@@ -85,4 +87,4 @@ export function WhyUsSection({ settings }: WhyUsSectionProps) {
       </div>
     </section>
   );
-}
+});

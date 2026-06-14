@@ -1,56 +1,42 @@
-# DEVELOPMENT.md — AI Context
+# DEVELOPMENT.md — How to Run & Verify
 
-This file explains how the project runs so you can reason about changes correctly.
+> Last updated: 2026-04-28
 
----
+## Commands
 
-## 🏃 How the project runs
+| Command | Purpose |
+|---------|---------|
+| `make setup` | First-time setup (deps + DB + migrations) |
+| `make rundev` | Start Postgres (Docker) + FE (3001) + BE (9000) |
+| `make db-migrate` | Run migrations manually |
+| `make db-reset` | Reset DB + re-run migrations |
 
-* `make setup` → install deps + start DB + run migrations
-* `make rundev` → start Postgres in Docker + frontend (3001) + backend (9000) + auto-migrate if needed
-* PostgreSQL runs in Docker (`mono-repo-postgres`)
-* Backend Go binary must be restarted manually after route changes (`pkill -f 'go run cmd/server'`)
+## Ports
 
-You DO NOT manage containers, ports, or credentials.
+| Service | Port |
+|---------|------|
+| Next.js (FE) | 3001 |
+| Go Gin (HTTP) | 9000 (not 8080 — Docker Desktop uses 8080) |
+| Go gRPC | 50051 |
+| PostgreSQL | 5432 (Docker: `mono-repo-postgres`) |
 
----
+## Migration Model
 
-## 🗄️ Migration Model (Important)
+- GORM AutoMigrate = table/column creation ONLY
+- Renames / drops / constraints → explicit SQL migration files
+- Migration code: `internal/infrastructure/adapter/persistence/gorm/{feature}/migration.go`
+- SQL files: `apps/backend-go/migrations/`
 
-* Project uses **GORM AutoMigrate + SQL constraints**
-* AutoMigrate is for table/column creation only
-* Renames / drops / constraints require explicit SQL migration files
-* Migration pattern lives in:
-  `/internal/infrastructure/adapter/persistence/gorm/{feature}/migration.go`
+## Notes
 
----
+- Backend Go must be restarted manually after route changes: `pkill -f 'go run cmd/server'`
+- You do NOT manage containers, ports, or credentials
 
-## 🧪 Verification Commands (use before finishing)
+## Verify (before finishing any task)
 
-If you cannot run them, explain where it may fail.
-
+```bash
+go build ./...     # Backend compiles
+pnpm lint          # FE lint
+pnpm typecheck     # FE types
+rg <old-name>      # Zero leftover refs (if rename)
 ```
-go build ./...
-pnpm lint
-pnpm typecheck
-rg <old-name>
-```
-
----
-
-## 📦 Available Commands
-
-| Command           | Purpose                        |
-| ----------------- | ------------------------------ |
-| `make setup`      | First-time environment setup   |
-| `make rundev`     | Start development (Postgres + pnpm dev) |
-| `make db-migrate` | Run migrations manually        |
-| `make db-reset`   | Reset DB and re-run migrations |
-
----
-
-## 📁 Related Docs
-
-* `PROJECT_CONTEXT.md` — architecture and rules
-* `DOMAIN_MAP.md` — domain ownership
-* `apps/backend-go/migrations/README.md` — migration details

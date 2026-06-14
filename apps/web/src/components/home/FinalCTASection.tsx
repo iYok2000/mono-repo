@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 
 interface FinalCTASettings {
@@ -12,7 +13,7 @@ interface FinalCTASectionProps {
   settings?: FinalCTASettings;
 }
 
-export function FinalCTASection({ settings }: FinalCTASectionProps) {
+export const FinalCTASection = memo(function FinalCTASection({ settings }: FinalCTASectionProps) {
   const title = settings?.title || 'พร้อมทำของขวัญที่\n"แตะแล้วเป็นความทรงจำ"\nไหม?';
   const subtitle = settings?.subtitle || "เริ่มสร้างการ์ดความทรงจำของคุณได้เลย ไม่ว่าจะเป็นของขวัญวันเกิด ครบรอบ หรือโมเมนต์พิเศษ";
   const buttonText = settings?.button_text || "เริ่มทำ Express";
@@ -85,4 +86,4 @@ export function FinalCTASection({ settings }: FinalCTASectionProps) {
       </div>
     </section>
   );
-}
+});

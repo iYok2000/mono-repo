@@ -24,6 +24,9 @@ func ToDTO(e *entity.HomeSettings) *dto.HomeSettingsDTO {
 			Feature1:       e.Hero.Feature1,
 			Feature2:       e.Hero.Feature2,
 			Feature3:       e.Hero.Feature3,
+			CTAPrimary:     e.Hero.CTAPrimary,
+			CTASecondary:   e.Hero.CTASecondary,
+			CTATertiary:    e.Hero.CTATertiary,
 		},
 		WhatIsIt: dto.WhatIsItSectionDTO{
 			Enabled:             e.WhatIsIt.Enabled,
@@ -213,6 +216,9 @@ func ToEntity(d *dto.HomeSettingsDTO) *entity.HomeSettings {
 			Feature1:       d.Hero.Feature1,
 			Feature2:       d.Hero.Feature2,
 			Feature3:       d.Hero.Feature3,
+			CTAPrimary:     d.Hero.CTAPrimary,
+			CTASecondary:   d.Hero.CTASecondary,
+			CTATertiary:    d.Hero.CTATertiary,
 		},
 		WhatIsIt: entity.WhatIsItSection{
 			Section:             entity.Section{Enabled: d.WhatIsIt.Enabled, Order: d.WhatIsIt.Order},

@@ -1,5 +1,5 @@
 import { goApi } from "@/lib/axios";
-import type { HomeSettings } from "./types";
+import type { HomeSettings } from "@/types/homeSettings";
 
 interface ApiResponse<T> {
   success: boolean;
@@ -24,17 +24,4 @@ export const updateHomeSettings = async (
   return response.data.data;
 };
 
-/**
- * Update specific section
- */
-export const updateSection = async <K extends keyof HomeSettings>(
-  sectionKey: K,
-  sectionData: HomeSettings[K]
-): Promise<HomeSettings> => {
-  const response = await goApi.patch<ApiResponse<HomeSettings>>(
-    `/api/home-settings/${sectionKey}`,
-    sectionData
-  );
-  return response.data.data;
-};
 

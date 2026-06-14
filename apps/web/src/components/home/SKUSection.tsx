@@ -1,10 +1,102 @@
 "use client";
 
+import { memo } from "react";
 import { Button } from "@/components/ui/Button";
 import { Check, Zap, Users, Heart, CreditCard, Sparkles } from "lucide-react";
 import Link from "next/link";
 
-export function SKUSection() {
+interface SKUSettings {
+  title?: string;
+  subtitle?: string;
+  card_title?: string;
+  express_enabled?: boolean;
+  express_badge_text?: string;
+  express_emoji?: string;
+  express_name?: string;
+  express_tagline?: string;
+  express_description?: string;
+  express_feature_1?: string;
+  express_feature_2?: string;
+  express_feature_3?: string;
+  express_feature_4?: string;
+  express_button_text?: string;
+  express_button_link?: string;
+  express_footer_text?: string;
+  squad_enabled?: boolean;
+  squad_badge_text?: string;
+  squad_emoji?: string;
+  squad_name?: string;
+  squad_tagline?: string;
+  squad_description?: string;
+  squad_feature_1?: string;
+  squad_feature_2?: string;
+  squad_feature_3?: string;
+  squad_feature_4?: string;
+  squad_button_text?: string;
+  squad_button_link?: string;
+  squad_footer_text?: string;
+  greeting_enabled?: boolean;
+  greeting_badge_text?: string;
+  greeting_emoji?: string;
+  greeting_name?: string;
+  greeting_tagline?: string;
+  greeting_description?: string;
+  greeting_feature_1?: string;
+  greeting_feature_2?: string;
+  greeting_feature_3?: string;
+  greeting_feature_4?: string;
+  greeting_button_text?: string;
+  greeting_button_link?: string;
+  greeting_footer_text?: string;
+}
+
+interface SKUSectionProps {
+  settings?: SKUSettings;
+}
+
+export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps) {
+  const title = settings?.title || "เลือกแพ็กของขวัญที่เหมาะกับคุณ";
+  const subtitle = settings?.subtitle || "คนส่วนใหญ่เลือก <strong>Express</strong> — ของขวัญเร็ว ใช้ได้เลย ทั้ง 3 แบบมี NFC + QR สำรอง";
+
+  const expressEmoji = settings?.express_emoji || "⚡";
+  const expressName = settings?.express_name || "GyByte Express";
+  const expressBadge = settings?.express_badge_text || "เร็วสุด";
+  const expressTagline = settings?.express_tagline || "⭐ ตัวเลือกยอดนิยม — ของขวัญเร็ว ใช้ได้เลย";
+  const expressDesc = settings?.express_description || "สำหรับวันเกิด ครบรอบ เซอร์ไพรส์ — ทำเสร็จไวในวันเดียว เหมาะสำหรับของขวัญแทนใจ 1 คน";
+  const expressF1 = settings?.express_feature_1 || "ตั้งเวลาเปิด + ใส่รหัสผ่านได้";
+  const expressF2 = settings?.express_feature_2 || "ใช้ลิงก์จาก Google Drive ของคุณ";
+  const expressF3 = settings?.express_feature_3 || "ครอบ NFC + QR สำรองทุกชิ้น";
+  const expressF4 = settings?.express_feature_4 || "เหมาะสำหรับเซอร์ไพรส์ 1 คน";
+  const expressBtnText = settings?.express_button_text || "สั่งของขวัญด่วน Express";
+  const expressBtnLink = settings?.express_button_link || "/create/express";
+  const expressFooter = settings?.express_footer_text || "พร้อมใช้ใน 10 นาที • เหมาะสำหรับของขวัญฉุกเฉิน";
+
+  const squadEmoji = settings?.squad_emoji || "👥";
+  const squadName = settings?.squad_name || "GyByte Squad";
+  const squadBadge = settings?.squad_badge_text || "ทำหมู่";
+  const squadTagline = settings?.squad_tagline || "Group Video Gift — อัดคลิปอวยพรจากเพื่อนหลายคน";
+  const squadDesc = settings?.squad_description || "เหมาะสำหรับ <strong>วันอำลาเพื่อน</strong>, <strong>วันแต่งงาน</strong>, หรือ<strong>ครบรอบพิเศษของหมู่คณะ</strong> — เมื่อมีเพื่อน 7–10 คนที่อยากส่งคลิปอวยพรรวมกัน";
+  const squadF1 = settings?.squad_feature_1 || "มีหน้าสถานะติดตามว่าใครส่งคลิปแล้ว";
+  const squadF2 = settings?.squad_feature_2 || "เราตัดต่อให้ + เพิ่มเพลงประกอบ + ส่ง Final";
+  const squadF3 = settings?.squad_feature_3 || "Use-case: อำลา / แต่งงาน / ครบรอบหมู่คณะ";
+  const squadF4 = settings?.squad_feature_4 || "รองรับ 7–10 คน (ขยายได้ตามจำนวนเพื่อน)";
+  const squadBtnText = settings?.squad_button_text || "เริ่มสร้าง Squad Pack";
+  const squadBtnLink = settings?.squad_button_link || "/create/squad";
+  const squadFooter = settings?.squad_footer_text || "ใช้เวลา 3–5 วัน • เหมาะสำหรับของขวัญแบบมีส่วนร่วม";
+
+  const greetingEmoji = settings?.greeting_emoji || "💌";
+  const greetingName = settings?.greeting_name || "Greeting Card";
+  const greetingBadge = settings?.greeting_badge_text || "เริ่มต้นเบาๆ";
+  const greetingTagline = settings?.greeting_tagline || "ใช้แทนการ์ดกระดาษ — ราคาประหยัด ทำง่าย";
+  const greetingDesc = settings?.greeting_description || "เหมาะสำหรับ<strong>ของขวัญทั่วไป</strong> เช่น วันเกิดเพื่อนร่วมงาน ส่งกำลังใจ หรือใช้เป็น<strong>นามบัตรส่วนตัว</strong>ที่มีข้อความอวยพร";
+  const greetingF1 = settings?.greeting_feature_1 || "เทมเพลตนามบัตรให้เลือก (ทำเสร็จไว)";
+  const greetingF2 = settings?.greeting_feature_2 || "ใส่ชื่อ IG Line@ เบอร์ รูปภาพ";
+  const greetingF3 = settings?.greeting_feature_3 || "เพิ่มวิดีโออวยพรสั้นๆ หรือข้อความ";
+  const greetingF4 = settings?.greeting_feature_4 || "ใช้แทนการ์ดกระดาษ — ราคาถูกสุด";
+  const greetingBtnText = settings?.greeting_button_text || "เลือกเทมเพลต Greeting";
+  const greetingBtnLink = settings?.greeting_button_link || "/create/greeting";
+  const greetingFooter = settings?.greeting_footer_text || "เริ่มต้นง่าย • เหมาะสำหรับของขวัญทั่วไป";
+
   return (
     <section className="relative py-16 lg:py-24 bg-[var(--card)]" id="pricing">
       <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
@@ -14,11 +106,9 @@ export function SKUSection() {
             <span className="text-[var(--primary)] text-sm font-medium">ของขวัญวันเกิด • ครบรอบ • อำลา • นามบัตร</span>
           </div>
           <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--foreground)] mb-4">
-            เลือกแพ็กของขวัญที่เหมาะกับคุณ
+            {title}
           </h2>
-          <p className="text-lg text-[var(--muted)] max-w-2xl mx-auto">
-            คนส่วนใหญ่เลือก <strong className="text-[var(--primary)] font-semibold">Express</strong> — ของขวัญเร็ว ใช้ได้เลย ทั้ง 3 แบบมี NFC + QR สำรอง
-          </p>
+          <p className="text-lg text-[var(--muted)] max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: subtitle }} />
         </div>
 
         {/* Product Cards */}
@@ -32,22 +122,22 @@ export function SKUSection() {
             <div className="absolute -top-3 left-8">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--primary)] text-white text-xs font-semibold rounded-full shadow-md">
                 <Zap className="w-3 h-3" />
-                เร็วสุด
+                {expressBadge}
               </span>
             </div>
 
             <div className="space-y-6">
               {/* Header */}
               <div>
-                <div className="text-5xl mb-4">⚡</div>
+                <div className="text-5xl mb-4">{expressEmoji}</div>
                 <h3 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-2">
-                  GyByte Express
+                  {expressName}
                 </h3>
                 <p className="text-lg text-[var(--primary)] font-medium mb-3">
-                  ⭐ ตัวเลือกยอดนิยม — ของขวัญเร็ว ใช้ได้เลย
+                  {expressTagline}
                 </p>
                 <p className="text-base text-[var(--muted)] leading-relaxed">
-                  สำหรับวันเกิด ครบรอบ เซอร์ไพรส์ — ทำเสร็จไวในวันเดียว เหมาะสำหรับของขวัญแทนใจ 1 คน
+                  {expressDesc}
                 </p>
               </div>
 
@@ -55,31 +145,31 @@ export function SKUSection() {
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">ตั้งเวลาเปิด + ใส่รหัสผ่านได้</span>
+                  <span className="text-[var(--muted)] text-base">{expressF1}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">ใช้ลิงก์จาก Google Drive ของคุณ</span>
+                  <span className="text-[var(--muted)] text-base">{expressF2}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">ครอบ NFC + QR สำรองทุกชิ้น</span>
+                  <span className="text-[var(--muted)] text-base">{expressF3}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5 fill-[var(--primary)]" />
-                  <span className="text-[var(--muted)] text-base">เหมาะสำหรับเซอร์ไพรส์ 1 คน</span>
+                  <span className="text-[var(--muted)] text-base">{expressF4}</span>
                 </li>
               </ul>
 
               {/* CTA */}
               <div className="pt-4">
-                <Link href="/create/express">
+                <Link href={expressBtnLink}>
                   <Button variant="primary" fullWidth>
-                    สั่งของขวัญด่วน Express
+                    {expressBtnText}
                   </Button>
                 </Link>
                 <p className="text-center text-sm text-[var(--subtle)] mt-3">
-                  พร้อมใช้ใน 10 นาที • เหมาะสำหรับของขวัญฉุกเฉิน
+                  {expressFooter}
                 </p>
               </div>
             </div>
@@ -111,16 +201,16 @@ export function SKUSection() {
                 background: 'var(--squad-gradient)'
               }}>
                 <Users className="w-3 h-3" />
-                ทำหมู่
+                {squadBadge}
               </span>
             </div>
 
             <div className="space-y-6 relative z-10">
               {/* Header */}
               <div>
-                <div className="text-5xl mb-4">👥</div>
+                <div className="text-5xl mb-4">{squadEmoji}</div>
                 <h3 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-2">
-                  GyByte Squad
+                  {squadName}
                 </h3>
                 <p className="text-lg font-medium mb-3" style={{
                   background: 'var(--squad-gradient)',
@@ -128,47 +218,42 @@ export function SKUSection() {
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
                 }}>
-                  Group Video Gift — อัดคลิปอวยพรจากเพื่อนหลายคน
+                  {squadTagline}
                 </p>
-                <p className="text-base text-[var(--muted)] leading-relaxed mb-3">
-                  เหมาะสำหรับ <strong>วันอำลาเพื่อน</strong>, <strong>วันแต่งงาน</strong>, หรือ<strong>ครบรอบพิเศษของหมู่คณะ</strong> — เมื่อมีเพื่อน 7–10 คนที่อยากส่งคลิปอวยพรรวมกัน
-                </p>
-                <p className="text-base text-[var(--muted)] leading-relaxed">
-                  เราจะรวบรวมคลิปจากทุกคน แล้ว<strong>ตัดต่อให้เป็นวิดีโอเดียว</strong>ที่ดูแล้วประทับใจ พร้อมส่งมอบในรูปแบบ NFC card ที่พร้อมเปิดดู
-                </p>
+                <p className="text-base text-[var(--muted)] leading-relaxed mb-3" dangerouslySetInnerHTML={{ __html: squadDesc }} />
               </div>
 
               {/* Features */}
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">มีหน้าสถานะติดตามว่าใครส่งคลิปแล้ว</span>
+                  <span className="text-[var(--muted)] text-base">{squadF1}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">เราตัดต่อให้ + เพิ่มเพลงประกอบ + ส่ง Final</span>
+                  <span className="text-[var(--muted)] text-base">{squadF2}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">Use-case: อำลา / แต่งงาน / ครบรอบหมู่คณะ</span>
+                  <span className="text-[var(--muted)] text-base">{squadF3}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Users className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5 fill-[var(--violet)]" />
-                  <span className="text-[var(--muted)] text-base">รองรับ 7–10 คน (ขยายได้ตามจำนวนเพื่อน)</span>
+                  <span className="text-[var(--muted)] text-base">{squadF4}</span>
                 </li>
               </ul>
 
               {/* CTA */}
               <div className="pt-4">
-                <Link href="/create/squad">
+                <Link href={squadBtnLink}>
                   <button className="w-full py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium text-white transition-all duration-150 shadow-lg hover:shadow-xl hover:scale-[1.02]" style={{
                     background: 'var(--squad-gradient)'
                   }}>
-                    เริ่มสร้าง Squad Pack
+                    {squadBtnText}
                   </button>
                 </Link>
                 <p className="text-center text-sm text-[var(--subtle)] mt-3">
-                  ใช้เวลา 3–5 วัน • เหมาะสำหรับของขวัญแบบมีส่วนร่วม
+                  {squadFooter}
                 </p>
               </div>
             </div>
@@ -183,54 +268,52 @@ export function SKUSection() {
             <div className="absolute -top-3 left-8">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--amber)] text-white text-xs font-semibold rounded-full shadow-md">
                 <Sparkles className="w-3 h-3" />
-                เริ่มต้นเบาๆ
+                {greetingBadge}
               </span>
             </div>
 
             <div className="space-y-6">
               {/* Header */}
               <div>
-                <div className="text-5xl mb-4">💌</div>
+                <div className="text-5xl mb-4">{greetingEmoji}</div>
                 <h3 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-2">
-                  Greeting Card
+                  {greetingName}
                 </h3>
                 <p className="text-lg text-[var(--amber)] font-medium mb-3">
-                  ใช้แทนการ์ดกระดาษ — ราคาประหยัด ทำง่าย
+                  {greetingTagline}
                 </p>
-                <p className="text-base text-[var(--muted)] leading-relaxed">
-                  เหมาะสำหรับ<strong>ของขวัญทั่วไป</strong> เช่น วันเกิดเพื่อนร่วมงาน ส่งกำลังใจ หรือใช้เป็น<strong>นามบัตรส่วนตัว</strong>ที่มีข้อความอวยพร
-                </p>
+                <p className="text-base text-[var(--muted)] leading-relaxed" dangerouslySetInnerHTML={{ __html: greetingDesc }} />
               </div>
 
               {/* Features */}
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <CreditCard className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">เทมเพลตนามบัตรให้เลือก (ทำเสร็จไว)</span>
+                  <span className="text-[var(--muted)] text-base">{greetingF1}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">ใส่ชื่อ IG Line@ เบอร์ รูปภาพ</span>
+                  <span className="text-[var(--muted)] text-base">{greetingF2}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">เพิ่มวิดีโออวยพรสั้นๆ หรือข้อความ</span>
+                  <span className="text-[var(--muted)] text-base">{greetingF3}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Sparkles className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5 fill-[var(--amber)]" />
-                  <span className="text-[var(--muted)] text-base">ใช้แทนการ์ดกระดาษ — ราคาถูกสุด</span>
+                  <span className="text-[var(--muted)] text-base">{greetingF4}</span>
                 </li>
               </ul>
 
               {/* CTA */}
               <div className="pt-4">
-                <Link href="/create/greeting">
+                <Link href={greetingBtnLink}>
                   <Button variant="primary" fullWidth className="!bg-[var(--amber)] hover:!bg-[#D97706] active:!bg-[#B45309]">
-                    เลือกเทมเพลต Greeting
+                    {greetingBtnText}
                   </Button>
                 </Link>
                 <p className="text-center text-sm text-[var(--subtle)] mt-3">
-                  เริ่มต้นง่าย • เหมาะสำหรับของขวัญทั่วไป
+                  {greetingFooter}
                 </p>
               </div>
             </div>
@@ -292,4 +375,4 @@ export function SKUSection() {
       </div>
     </section>
   );
-}
+});
