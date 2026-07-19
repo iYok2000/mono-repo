@@ -167,6 +167,7 @@ func ToDTO(e *entity.HomeSettings) *dto.HomeSettingsDTO {
 			Title:       e.Preview.Title,
 			Subtitle:    e.Preview.Subtitle,
 			Description: e.Preview.Description,
+			Image:       e.Preview.Image,
 		},
 		FAQ: dto.FAQSectionDTO{
 			Enabled:      e.FAQ.Enabled,
@@ -352,6 +353,7 @@ func ToEntity(d *dto.HomeSettingsDTO) *entity.HomeSettings {
 			Title:       d.Preview.Title,
 			Subtitle:    d.Preview.Subtitle,
 			Description: d.Preview.Description,
+			Image:       d.Preview.Image,
 		},
 		FAQ: entity.FAQSection{
 			Section:      entity.Section{Enabled: d.FAQ.Enabled, Order: d.FAQ.Order},

@@ -319,59 +319,6 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
             </div>
           </div>
         </div>
-
-        {/* Comparison Table */}
-        <div className="max-w-5xl mx-auto animate-fade-in delay-400">
-          <h3 className="text-2xl font-bold text-[var(--foreground)] text-center mb-8">
-            เลือกอันไหนให้เหมาะกับตัวเอง?
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Express Quick Guide - Position 1 */}
-            <div className="bg-[var(--primary-soft)] rounded-xl p-6 border border-[var(--primary)]/20 transition-all duration-300 hover:border-[var(--primary)]/40 hover:shadow-lg hover:-translate-y-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center shadow-md">
-                  <span className="text-xl">⚡</span>
-                </div>
-                <h4 className="text-xl font-bold text-[var(--foreground)]">Express</h4>
-              </div>
-              <p className="text-base text-[var(--muted)] leading-relaxed">
-                <strong>คนส่วนใหญ่เลือกตัวนี้</strong> — ของขวัญเร็ว ใช้ได้เลย ไม่มีเวลาทำคนเดียวได้
-              </p>
-            </div>
-
-            {/* Squad Quick Guide - Position 2 */}
-            <div className="rounded-xl p-6 border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative overflow-hidden" style={{
-              background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.05), rgba(139, 92, 246, 0.05), rgba(59, 130, 246, 0.05))',
-              borderColor: 'rgba(139, 92, 246, 0.2)'
-            }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-md" style={{
-                  background: 'var(--squad-gradient)'
-                }}>
-                  <span className="text-xl">👥</span>
-                </div>
-                <h4 className="text-xl font-bold text-[var(--foreground)]">Squad</h4>
-              </div>
-              <p className="text-base text-[var(--muted)] leading-relaxed">
-                เพื่อนหลายคนส่งคลิปรวมกัน — เราตัดต่อให้ เหมาะกับอำลา/แต่งงาน
-              </p>
-            </div>
-
-            {/* Greeting Quick Guide - Position 3 */}
-            <div className="bg-[var(--amber)]/10 rounded-xl p-6 border border-[var(--amber)]/20 transition-all duration-300 hover:border-[var(--amber)]/40 hover:shadow-lg hover:-translate-y-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[var(--amber)] flex items-center justify-center shadow-md">
-                  <span className="text-xl">💌</span>
-                </div>
-                <h4 className="text-xl font-bold text-[var(--foreground)]">Greeting</h4>
-              </div>
-              <p className="text-base text-[var(--muted)] leading-relaxed">
-                เริ่มต้นเบาๆ ของขวัญทั่วไป ใช้แทนการ์ดกระดาษ ราคาถูก
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

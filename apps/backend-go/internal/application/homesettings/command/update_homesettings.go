@@ -188,6 +188,7 @@ func (h *UpdateHomeSettingsHandler) Handle(ctx context.Context, updateDTO *dto.U
 		existing.Preview.Title = updateDTO.Preview.Title
 		existing.Preview.Subtitle = updateDTO.Preview.Subtitle
 		existing.Preview.Description = updateDTO.Preview.Description
+		existing.Preview.Image = updateDTO.Preview.Image
 	}
 
 	if updateDTO.FAQ != nil {

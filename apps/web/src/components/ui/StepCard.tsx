@@ -7,8 +7,8 @@ export interface StepCardProps {
   title: string;
   /** Card description */
   description: string;
-  /** Lucide icon component */
-  icon: LucideIcon;
+  /** Optional Lucide icon component. Omit to render the card without an icon. */
+  icon?: LucideIcon;
   /** Optional delay for staggered animation (in ms) */
   delay?: number;
 }
@@ -46,10 +46,12 @@ export function StepCard({ number, title, description, icon: Icon, delay = 0 }: 
           {description}
         </p>
 
-        {/* Icon */}
-        <div className="w-12 h-12 flex items-center justify-center bg-[var(--primary-soft)] rounded-xl mt-6">
-          <Icon className="w-6 h-6 text-[var(--primary)]" />
-        </div>
+        {/* Icon (only when provided) */}
+        {Icon && (
+          <div className="w-12 h-12 flex items-center justify-center bg-[var(--primary-soft)] rounded-xl mt-6">
+            <Icon className="w-6 h-6 text-[var(--primary)]" />
+          </div>
+        )}
       </div>
     </div>
   );

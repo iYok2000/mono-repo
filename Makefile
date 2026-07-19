@@ -30,7 +30,7 @@ setup: install
 	@docker compose up postgres -d --remove-orphans
 	@echo "⏳ Waiting for PostgreSQL to be ready..."
 	@sleep 5
-	@docker compose exec postgres pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /dev/null 2>&1 || sleep 3
+	@docker compose exec postgres sh -c 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"' > /dev/null 2>&1 || sleep 3
 	@echo "✅ PostgreSQL is ready!"
 	@echo ""
 	@$(MAKE) db-migrate
@@ -47,20 +47,22 @@ db-migrate:
 	@docker compose up postgres -d --remove-orphans > /dev/null 2>&1 || true
 	@sleep 2
 	@echo "   ↳ Creating admin authentication tables..."
-	@docker exec -i mono-repo-postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < apps/backend-go/internal/infrastructure/adapter/persistence/migrations/001_create_admin_users.sql 2>&1 | grep -v "already exists" || true
+	@docker exec -i mono-repo-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"' < apps/backend-go/internal/infrastructure/adapter/persistence/migrations/001_create_admin_users.sql
 	@echo "   ↳ Creating home settings table..."
-	@docker exec -i mono-repo-postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < apps/backend-go/internal/infrastructure/adapter/persistence/migrations/002_create_home_settings.sql 2>&1 | grep -v "already exists" || true
+	@docker exec -i mono-repo-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"' < apps/backend-go/internal/infrastructure/adapter/persistence/migrations/002_create_home_settings.sql
 	@echo "✅ Migrations completed!"
 	@echo ""
 	@echo "🔑 Default admin account:"
 	@echo "   Username: superadmin"
 	@echo "   Password: Admin123!@#"
-	@echo "   (You'll be required to change password on first login)"
+	@echo "   (Change it after first login via /admin/auth/change-password)"
 
 # Reset database and re-run migrations
 db-reset:
 	@echo "🔄 Resetting database..."
-	@docker exec -i mono-repo-postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;" 2>&1 || true
+	@docker compose up postgres -d --remove-orphans > /dev/null 2>&1 || true
+	@sleep 2
+	@docker exec -i mono-repo-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"'
 	@echo "✅ Database reset!"
 	@$(MAKE) db-migrate
 
@@ -70,14 +72,14 @@ rundev:
 	@docker compose up postgres -d --remove-orphans
 	@echo "⏳ Waiting for PostgreSQL to be ready..."
 	@sleep 3
-	@docker compose exec postgres pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} > /dev/null 2>&1 || sleep 2
+	@docker compose exec postgres sh -c 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"' > /dev/null 2>&1 || sleep 2
 	@echo "✅ PostgreSQL is ready!"
 	@echo ""
 	@echo "🔍 Checking if migrations are needed..."
-	@docker exec -i mono-repo-postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "\dt admin_users" > /dev/null 2>&1 || $(MAKE) db-migrate
+	@docker exec -i mono-repo-postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "\dt admin_users"' > /dev/null 2>&1 || $(MAKE) db-migrate
 	@echo ""
 	@echo "🚀 Starting applications with pnpm..."
 	@echo "   - Next.js will be at http://localhost:3000"
-	@echo "   - Go Backend will be at http://localhost:9000"
+	@echo "   - Go Backend will be at http://localhost:8080"
 	@echo ""
 	@pnpm dev

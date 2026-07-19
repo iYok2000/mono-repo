@@ -92,7 +92,7 @@ VALUES (
     '$2a$12$i5jgAVGdlj3V.3evreIRJuuFklVYJ5w0JFpc6F67eEPXNG2v0TK5u', -- Admin123!@#
     'Super Administrator',
     'super_admin',
-    true -- Force password change on first login
+    false -- prod-style flow: no forced change on first login
 ) ON CONFLICT (username) DO NOTHING;
 
 -- Comments for documentation

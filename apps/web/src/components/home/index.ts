@@ -8,5 +8,3 @@ export { PreviewSection } from "./WhyUsSection";
 export { WhyUsSection } from "./WhyUsNewSection";
 export { FAQSection } from "./FAQSection";
 export { FinalCTASection } from "./FinalCTASection";
-export { ScrollytellingDemo } from "./ScrollytellingDemo";
-export { FirstSightHero, CategorySelectionSection } from "./FirstSightHero";

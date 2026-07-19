@@ -22,8 +22,11 @@ const (
 	LockoutDuration   = 15 * time.Minute
 
 	// JWT expiration
-	AccessTokenDuration  = 15 * time.Minute
-	RefreshTokenDuration = 7 * 24 * time.Hour
+	// Session is capped at 10 minutes: both access and refresh tokens expire
+	// 10 minutes after login. The refresh handler reuses the same refresh token,
+	// so a session can never extend past its original 10-minute window.
+	AccessTokenDuration  = 10 * time.Minute
+	RefreshTokenDuration = 10 * time.Minute
 
 	// Session
 	MaxActiveSessions = 5

@@ -478,7 +478,7 @@ echo "- Status: Success" >> deployments/deploy_$(date +%Y%m%d).md
 
 - [Development Guide](DEVELOPMENT.md) - Local development setup
 - [Migration Guide](apps/backend-go/migrations/README.md) - Detailed migration documentation
-- [Admin Auth](project_context/ADMIN_AUTH_README.md) - Authentication system
+- [Admin Auth](project_context/admin-auth.md) - Authentication system
 - [Product Management](project_context/product-management.md) - Product features
 
 ---

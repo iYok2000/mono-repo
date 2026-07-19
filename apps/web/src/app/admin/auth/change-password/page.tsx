@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { withAuthentication } from "@/hoc";
 import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
+import { Modal } from "@/components/ui/Modal";
 
 function ChangePasswordPage() {
   const { showModal, errorMessage, handleModalClose } = useUnauthorizedHandler();
@@ -56,7 +57,8 @@ function ChangePasswordPage() {
 
     try {
       await changePassword(currentPassword, newPassword);
-      // Will be redirected to login page after successful change
+      // Password changed and auth refreshed — go straight to the dashboard
+      router.push("/admin");
     } catch (err: unknown) {
       const error = err as { message?: string };
       setError(error.message || "เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
@@ -219,7 +221,14 @@ function ChangePasswordPage() {
         </div>
         
         {/* Unauthorized Modal */}
-        <UnauthorizedModal />
+        <Modal
+          isOpen={showModal}
+          onClose={handleModalClose}
+          type="warning"
+          title="⚠️ Session หมดอายุ"
+          message={errorMessage}
+          confirmText="เข้าสู่ระบบใหม่"
+        />
       </div>
     </div>
   );

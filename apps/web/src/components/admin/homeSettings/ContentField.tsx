@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 interface ContentFieldProps {
   label: string;
   value: string | boolean;
@@ -23,69 +21,65 @@ export function ContentField({
   helperText,
   type = "text",
 }: ContentFieldProps) {
-  const [isFocused, setIsFocused] = useState(false);
-
-  const inputClasses = `
-    w-full px-4 py-2.5 rounded-lg
-    border border-border bg-card text-foreground
-    focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
-    transition-all duration-200
-    ${isFocused ? "ring-2 ring-primary" : ""}
-  `;
+  const inputClasses =
+    "w-full px-4 py-2.5 rounded-xl border border-border bg-card text-foreground text-sm " +
+    "placeholder:text-muted-foreground/60 shadow-sm " +
+    "focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary " +
+    "hover:border-primary/40 transition-all duration-200";
 
   if (type === "checkbox") {
+    const checked = typeof value === "boolean" ? value : false;
     return (
-      <div className="flex items-center space-x-3 py-2">
+      <label
+        className={
+          "flex items-center gap-3 py-3 px-4 rounded-xl border cursor-pointer transition-all duration-200 " +
+          (checked
+            ? "border-primary/40 bg-primary/5"
+            : "border-border bg-card hover:border-primary/30")
+        }
+      >
         <input
           type="checkbox"
-          checked={typeof value === "boolean" ? value : false}
+          checked={checked}
           onChange={(e) => onChange(e.target.checked)}
-          className="w-5 h-5 rounded border-border text-primary focus:ring-2 focus:ring-primary"
+          className="w-5 h-5 rounded-md border-border text-primary focus:ring-2 focus:ring-primary/40 accent-(--color-primary)"
         />
-        <label className="text-sm font-medium text-foreground cursor-pointer">
-          {label}
-        </label>
+        <span className="text-sm font-medium text-foreground select-none">{label}</span>
         {helperText && (
-          <span className="text-xs text-muted-foreground ml-2">({helperText})</span>
+          <span className="text-xs text-muted-foreground ml-auto">{helperText}</span>
         )}
-      </div>
+      </label>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <label className="block text-sm font-medium text-foreground">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
-      
+
       {multiline ? (
         <textarea
-          value={value}
+          value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={rows}
-          className={inputClasses}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          className={inputClasses + " resize-y leading-relaxed"}
           required={required}
         />
       ) : (
         <input
           type="text"
-          value={value}
+          value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className={inputClasses}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           required={required}
         />
       )}
-      
-      {helperText && (
-        <p className="text-xs text-muted-foreground">{helperText}</p>
-      )}
+
+      {helperText && <p className="text-xs text-muted-foreground">{helperText}</p>}
     </div>
   );
 }

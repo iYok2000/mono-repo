@@ -13,7 +13,37 @@ import { useUnauthorizedHandler } from "@/hooks/useUnauthorizedHandler";
 import * as homeSettingsService from "@/services/homeSettings";
 import type { HomeSettings } from "@/services/homeSettings";
 import { SECTION_METADATA } from "@/services/homeSettings";
-import { ChevronLeft, Save, Eye } from "lucide-react";
+import {
+  ChevronLeft,
+  Save,
+  Eye,
+  Home,
+  Info,
+  Package,
+  ListOrdered,
+  Calendar,
+  Zap,
+  Star,
+  Sparkles,
+  HelpCircle,
+  Rocket,
+  Search,
+  type LucideIcon,
+} from "lucide-react";
+
+// Icon per section key — shown in the sidebar for quick visual scanning
+const SECTION_ICONS: Record<string, LucideIcon> = {
+  hero: Home,
+  what_is_it: Info,
+  sku: Package,
+  how_it_works: ListOrdered,
+  occasions: Calendar,
+  why_nfc: Zap,
+  why_us: Star,
+  preview: Sparkles,
+  faq: HelpCircle,
+  final_cta: Rocket,
+};
 
 function HomeSettingsPage() {
   const router = useRouter();
@@ -200,13 +230,17 @@ function HomeSettingsPage() {
                           hover:border-green-600 hover:text-green-600
                         `}
                       >
-                        <p className="text-sm truncate">
-                          {section.name}
-                        </p>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded shrink-0 ${
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          {(() => {
+                            const SectionIcon = SECTION_ICONS[section.key] ?? Info;
+                            return <SectionIcon className="w-4 h-4 shrink-0" />;
+                          })()}
+                          <span className="text-sm truncate">{section.name}</span>
+                        </span>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
                           sectionData?.enabled 
                             ? 'bg-green-600 text-white'
-                            : 'bg-red-600 text-white'
+                            : 'bg-red-500/80 text-white'
                         }`}>
                           {sectionData?.enabled ? 'แสดง' : 'ซ่อน'}
                         </span>
@@ -230,6 +264,7 @@ function HomeSettingsPage() {
                     hover:border-green-600 hover:text-green-600
                   `}
                 >
+                  <Search className="w-4 h-4 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm truncate">
                       SEO & Meta Tags
@@ -534,6 +569,7 @@ function SectionEditorContent({ section, settings, onUpdate }: SectionEditorCont
           { key: "title", label: "หัวข้อ", placeholder: "ตัวอย่างการใช้งาน", required: true },
           { key: "subtitle", label: "หัวข้อย่อย", placeholder: "ดูว่าจะเป็นอย่างไร" },
           { key: "description", label: "คำอธิบาย", placeholder: "ลองดูตัวอย่างการใช้งานจริง", multiline: true, helperText: "อธิบายส่วน Preview" },
+          { key: "image", label: "รูปตัวอย่าง (URL/พาธ)", placeholder: "/mock/preview-card.svg", helperText: "พาธรูปใน public หรือ URL เต็ม เช่น /mock/preview-card.svg หรือ https://..." },
         ];
       
       case "faq":

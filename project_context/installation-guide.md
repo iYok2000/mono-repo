@@ -2,16 +2,13 @@
 
 > Last updated: 2026-04-28
 
+> First-time / manual setup only. For day-to-day commands, ports, and verify steps → see `DEVELOPMENT.md`.
+
 ## Prerequisites
 - Node.js 18+, Go 1.23+, pnpm 8+, Docker
 
-## Quick Start
-```bash
-make setup    # Install deps + start DB + run migrations
-make rundev   # Start Postgres (Docker) + FE (3001) + BE (9000)
-```
-
 ## Manual Setup
+> Prefer `make setup` (see `DEVELOPMENT.md`). Use the steps below only when doing setup by hand.
 ```bash
 # 1. Install pnpm
 npm install -g pnpm

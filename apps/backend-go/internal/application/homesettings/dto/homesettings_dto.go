@@ -209,6 +209,7 @@ type PreviewSectionDTO struct {
 	Title       string `json:"title"`
 	Subtitle    string `json:"subtitle"`
 	Description string `json:"description"`
+	Image       string `json:"image"`
 }
 
 type FAQSectionDTO struct {

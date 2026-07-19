@@ -152,6 +152,7 @@ export interface PreviewSectionSettings extends SectionSettings {
   title: string;
   subtitle: string;
   description: string;
+  image: string;
 }
 
 export interface FAQSectionSettings extends SectionSettings {

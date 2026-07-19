@@ -216,6 +216,7 @@ type PreviewSection struct {
 	Title       string
 	Subtitle    string
 	Description string
+	Image       string
 }
 
 // FAQSection represents FAQ section settings

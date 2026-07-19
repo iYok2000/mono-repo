@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cx } from "@/lib/cx";
-import { Tag, Wrench, Image, LayoutDashboard, Activity, Settings } from "lucide-react";
+import { Tag, Wrench, Image, LayoutDashboard, Activity, Settings, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MenuItem {
   title: string;
@@ -48,6 +49,7 @@ const MENU_ITEMS: MenuItem[] = [
 export const AdminSidebar = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { logout } = useAuth();
 
   return (
     <>
@@ -129,14 +131,25 @@ export const AdminSidebar = () => {
           })}
         </nav>
 
-        {/* Back to Site */}
-        <div className="p-3 border-t border-(--border)">
+        {/* Back to Site + Logout */}
+        <div className="p-3 border-t border-(--border) space-y-2">
           <Link
             href="/"
             className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-(--primary-soft) text-(--primary) font-semibold text-sm hover:bg-(--primary) hover:text-white transition-all duration-200"
           >
             กลับหน้าหลัก
           </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setIsOpen(false);
+              logout();
+            }}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 font-semibold text-sm hover:bg-red-600 hover:text-white transition-all duration-200"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            ออกจากระบบ
+          </button>
         </div>
       </aside>
     </>

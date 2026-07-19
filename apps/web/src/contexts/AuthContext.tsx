@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 interface User {
@@ -27,6 +27,32 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const API_URL = process.env.NEXT_PUBLIC_GO_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000";
+
+// Absolute session lifetime. MUST NOT exceed the backend token lifetime
+// (AccessTokenDuration / RefreshTokenDuration in security.go = 10 minutes).
+const SESSION_MAX_MS = 10 * 60 * 1000;
+const SESSION_EXPIRES_KEY = "session_expires_at";
+
+// Records the absolute time (ms since epoch) at which the current session must end.
+function setSessionExpiry() {
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(SESSION_EXPIRES_KEY, String(Date.now() + SESSION_MAX_MS));
+  }
+}
+
+function getSessionExpiry(): number | null {
+  if (typeof window !== "undefined") {
+    const value = sessionStorage.getItem(SESSION_EXPIRES_KEY);
+    return value ? parseInt(value, 10) : null;
+  }
+  return null;
+}
+
+function clearSessionExpiry() {
+  if (typeof window !== "undefined") {
+    sessionStorage.removeItem(SESSION_EXPIRES_KEY);
+  }
+}
 
 // In-memory token storage (more secure than localStorage)
 let accessToken: string | null = null;
@@ -56,12 +82,14 @@ function clearAccessToken() {
     // Also clear old localStorage tokens
     localStorage.removeItem("access_token");
   }
+  clearSessionExpiry();
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isAuthenticated = !!user;
 
@@ -144,6 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (data.success && data.data.access_token) {
         setAccessToken(data.data.access_token);
+        setSessionExpiry(); // start the 10-minute absolute session clock
         setUser(data.data.user);
 
         // Return redirect path instead of navigating here
@@ -175,7 +204,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Logout function
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       const token = getAccessToken();
       
@@ -195,7 +224,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       router.push("/admin/auth/login");
     }
-  };
+  }, [router]);
+
+  // Enforce absolute 10-minute session: auto-logout when the session clock runs out,
+  // even if the user is idle. Survives page reloads via sessionStorage.
+  useEffect(() => {
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+
+    if (!user) return;
+
+    const expiry = getSessionExpiry();
+    if (!expiry) return;
+
+    const remaining = expiry - Date.now();
+    if (remaining <= 0) {
+      logout();
+      return;
+    }
+
+    logoutTimerRef.current = setTimeout(() => {
+      logout();
+    }, remaining);
+
+    return () => {
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+        logoutTimerRef.current = null;
+      }
+    };
+  }, [user, logout]);
 
   // Change password function
   const changePassword = async (currentPassword: string, newPassword: string) => {
@@ -223,8 +283,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.error?.message || "Password change failed");
       }
 
-      // Password changed successfully, logout and redirect to login
-      await logout();
+      // Password changed successfully. Refresh the auth state so the
+      // must_change_password flag clears immediately — this avoids the
+      // change → login → "must change again" loop caused by forcing a re-login.
+      await refreshAuth();
     } catch (error) {
       console.error("Password change error:", error);
       throw error;

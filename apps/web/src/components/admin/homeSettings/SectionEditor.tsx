@@ -26,8 +26,8 @@ export function SectionEditor<T extends SectionSettings>({
     <div className="space-y-6">
       {/* Section Header with Toggle */}
       <div className="space-y-4">
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-foreground">{sectionName}</h2>
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold text-foreground">{sectionName}</h2>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
         <SectionToggle
@@ -38,9 +38,13 @@ export function SectionEditor<T extends SectionSettings>({
       </div>
 
       {/* Section Content - Only show when enabled */}
-      {sectionData.enabled && (
-        <div className="space-y-4 p-4 bg-background/50 rounded-lg border border-border">
+      {sectionData.enabled ? (
+        <div className="space-y-4 p-5 bg-background/50 rounded-2xl border border-border">
           {children}
+        </div>
+      ) : (
+        <div className="p-6 rounded-2xl border border-dashed border-border text-center text-sm text-muted-foreground">
+          Section นี้ถูกซ่อนอยู่ — เปิดสวิตช์ด้านบนเพื่อแก้ไขเนื้อหาและแสดงบนหน้าเว็บ
         </div>
       )}
     </div>

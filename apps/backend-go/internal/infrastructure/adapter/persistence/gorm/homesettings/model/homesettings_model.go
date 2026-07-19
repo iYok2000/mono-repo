@@ -168,6 +168,7 @@ type HomeSettingsModel struct {
 	PreviewTitle       string `gorm:"column:preview_title;size:200" json:"preview_title"`
 	PreviewSubtitle    string `gorm:"column:preview_subtitle;size:300" json:"preview_subtitle"`
 	PreviewDescription string `gorm:"column:preview_description;type:text" json:"preview_description"`
+	PreviewImage       string `gorm:"column:preview_image;size:500" json:"preview_image"`
 
 	// FAQ Section
 	FAQEnabled      bool   `gorm:"column:faq_enabled;not null;default:true" json:"faq_enabled"`
@@ -358,6 +359,7 @@ func ToEntity(m *HomeSettingsModel) *entity.HomeSettings {
 			Title:       m.PreviewTitle,
 			Subtitle:    m.PreviewSubtitle,
 			Description: m.PreviewDescription,
+			Image:       m.PreviewImage,
 		},
 		FAQ: entity.FAQSection{
 			Section:      entity.Section{Enabled: m.FAQEnabled, Order: m.FAQOrder},
@@ -538,6 +540,7 @@ func FromEntity(e *entity.HomeSettings) *HomeSettingsModel {
 		PreviewTitle:       e.Preview.Title,
 		PreviewSubtitle:    e.Preview.Subtitle,
 		PreviewDescription: e.Preview.Description,
+		PreviewImage:       e.Preview.Image,
 		// FAQ
 		FAQEnabled:      e.FAQ.Enabled,
 		FAQOrder:        e.FAQ.Order,

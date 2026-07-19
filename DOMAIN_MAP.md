@@ -8,8 +8,7 @@
 | **Auth** | `admin_users`, `admin_sessions`, `admin_login_history` | `/api/auth/*` | `authService`, `tokenService` | `UserDTO` |
 | **Product** | `products`, `product_details` (legacy: `dev_toolkits`, `dev_toolkit_*`) | `/api/products/*`, `/api/categories/*` | `productService`, `categoryService` | `ProductDTO`, `CategoryDTO` |
 | **Banner** | `banners` | `/api/banners/*` | `bannerService` | `BannerDTO` |
-| **HomeSettings** | `home_settings` | `/api/settings/home-sections` | `homeSettingsService` | — |
-| **Coupon** | `coupons`, `redemptions` | `/api/coupons/*` | `couponService` | — |
+| **HomeSettings** | `home_settings` | `/api/settings/home-sections` (raw SQL), `/api/home-settings` (CQRS) | `settingsService`, `homeSettingsService` | — |
 
 **Rules**:
 - Do NOT modify another domain's tables/services from outside that domain
