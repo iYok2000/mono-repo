@@ -44,11 +44,11 @@ export const WhyUsSection = memo(function WhyUsSection({ settings }: WhyUsSectio
   ];
 
   return (
-    <section className="relative py-16 lg:py-24" id="why-us">
+    <section className="relative py-16 sm:py-20 lg:py-24" id="why-us">
       <div className="mx-auto w-full max-w-7xl px-6">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground mb-3">
+          <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-bold tracking-tight text-foreground mb-3">
             {title}
           </h2>
           <p className="text-lg text-(--muted)">

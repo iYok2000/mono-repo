@@ -45,11 +45,11 @@ export const WhatIsItSection = memo(function WhatIsItSection({ settings }: WhatI
   ];
 
   return (
-    <section className="py-24 px-6 bg-(--card)">
+    <section className="py-16 sm:py-20 lg:py-24 px-6 bg-(--card)">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-bold text-foreground mb-6">
             {title}
           </h2>
           <p className="text-lg lg:text-xl text-(--muted) leading-relaxed max-w-3xl mx-auto">

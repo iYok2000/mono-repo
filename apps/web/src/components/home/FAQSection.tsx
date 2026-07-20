@@ -44,11 +44,11 @@ export const FAQSection = memo(function FAQSection({ settings }: FAQSectionProps
   const subtitle = settings?.subtitle || "ทุกอย่างที่คุณอยากรู้";
 
   return (
-    <section className="relative py-16 lg:py-24" id="faq">
+    <section className="relative py-16 sm:py-20 lg:py-24" id="faq">
       <div className="mx-auto w-full max-w-4xl">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[var(--foreground)] mb-3">
+          <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-bold tracking-tight text-[var(--foreground)] mb-3">
             {title}
           </h2>
           <p className="text-lg text-[var(--muted)]">

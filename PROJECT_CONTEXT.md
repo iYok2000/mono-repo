@@ -1,6 +1,6 @@
 # PROJECT_CONTEXT.md — Architecture & Feature Index
 
-> Last updated: 2026-07-19
+> Last updated: 2026-07-20
 > For rules and workflow → see `AGENT.md`
 
 ---
@@ -50,6 +50,7 @@ packages/
 | Banner Management | [banner-management](./project_context/banner-management.md) | `internal/application/banner/`, `app/admin/banner/` |
 | Home Section Settings | [home-section-settings](./project_context/home-section-settings.md) | `settings_handler.go` + `internal/application/homesettings/`, `app/admin/page.tsx`, `app/admin/home-settings/` |
 | Digital Business Card | [business-card](./project_context/business-card.md) | `app/create/greeting/`, `app/card/[data]/` |
+| AdReady (AdSense Auditor) | [adready-checker](./project_context/adready-checker.md) | `internal/core/domain/audit/`, `internal/application/audit/`, `app/(audit)/audit/`, `app/services/fix-adsense/`, `app/api/audit/` |
 | Utilities | [utils-documentation](./project_context/utils-documentation.md) | `utils/`, `hooks/`, `services/export/` |
 | Design Tokens | [design-tokens](./project_context/design-tokens.md) | Tailwind config, `globals.css` |
 | UI Components | [components](./project_context/components.md) | `components/ui/`, `components/home/`, `components/admin/` |

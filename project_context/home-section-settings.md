@@ -12,6 +12,7 @@ hero, what_is_it, sku, how_it_works, occasions, why_nfc, why_us, preview, faq, f
 
 Notable content fields:
 - `hero`: `badge_text`, `badge_icon`, `title_highlight`, `title_rest`, `subtitle`, `feature_1..3`, `cta_primary/secondary/tertiary` (rendered by `HeroSection`)
+  - Layout is 2-column (text + "Byte" mascot). Exception to the "no decorative icons" rule above: `HeroSection` has a **fixed, non-admin-editable** leading `Sparkles` icon on the heading and an `ArrowRightCircle` icon on the primary CTA (styling only — not backed by any `home_settings` field).
 - `how_it_works`: 3 steps (`step_1..3_title/description`) — landing renders exactly these
 - `preview`: `title`, `subtitle`, `description`, **`image`** (product-style card; falls back to `/mock/preview-card.svg`)
 - `sku`: Express/Squad/Greeting card content; `why_us`/`why_nfc`/`what_is_it`: 3–4 feature/benefit title+desc

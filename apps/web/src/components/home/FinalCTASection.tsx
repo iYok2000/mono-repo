@@ -19,7 +19,7 @@ export const FinalCTASection = memo(function FinalCTASection({ settings }: Final
   const buttonText = settings?.button_text || "เริ่มทำ Express";
 
   return (
-    <section className="relative py-20 lg:py-28">
+    <section className="relative py-16 sm:py-20 lg:py-28">
       <div className="mx-auto w-full max-w-5xl">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] p-12 lg:p-16 text-center">
           {/* Background Pattern */}
@@ -34,7 +34,7 @@ export const FinalCTASection = memo(function FinalCTASection({ settings }: Final
           <div className="relative z-10 space-y-8">
             {/* Headline */}
             <div className="space-y-4">
-              <h2 className="text-3xl lg:text-5xl font-bold text-white leading-tight" style={{ whiteSpace: 'pre-line' }}>
+              <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-bold text-white leading-tight" style={{ whiteSpace: 'pre-line' }}>
                 {title}
               </h2>
               <p className="text-lg lg:text-xl text-white/80 max-w-2xl mx-auto">

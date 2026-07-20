@@ -28,7 +28,7 @@ export const PreviewSection = memo(function PreviewSection({ settings }: Preview
   const image = settings?.image || MOCK_PREVIEW_IMAGE;
 
   return (
-    <section className="relative py-16 lg:py-24" id="preview">
+    <section className="relative py-16 sm:py-20 lg:py-24" id="preview">
       <div className="mx-auto w-full max-w-4xl px-6">
         <article className="group grid overflow-hidden rounded-3xl border border-(--border) bg-(--card) shadow-(--shadow-md) transition-all duration-300 hover:-translate-y-1 hover:shadow-(--shadow-lg) hover:border-(--primary)/40 md:grid-cols-2">
           {/* Product image */}

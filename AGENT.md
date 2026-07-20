@@ -1,6 +1,6 @@
 # AGENT.md — Single Source of Truth
 
-> Read this file FIRST. Do NOT read other docs until needed.
+> Read this file FIRST. It maps out every other doc to read — see §5 Onboarding.
 > Role: Senior Software Engineer & Architect.
 > Priority: security > stability > architecture > performance > speed.
 
@@ -68,15 +68,28 @@ rg <old-name>         # Zero leftover references (if rename)
 
 ---
 
-## 5. When to Read Other Docs
+## 5. Onboarding — What to Read Next
+
+Reading this file is enough to START. To understand the project, read in this order:
+
+**Step 1 — always read next (project overview):**
+1. `PROJECT_CONTEXT.md` — stack, architecture, ports, **Feature Index** (list of all feature docs), and **Known Gaps** (what is NOT built yet — e.g. dead `/create/express|squad` links, no recipient viewer). Read this to avoid assuming unbuilt features exist.
+2. `DOMAIN_MAP.md` — domains → tables / routes / services. Check BEFORE any cross-domain or DB work.
+
+**Step 2 — read on demand for the task:**
 
 | Need | File |
 |------|------|
-| Architecture / feature index | `PROJECT_CONTEXT.md` |
-| Domain ownership check | `DOMAIN_MAP.md` |
-| How to run / commands | `DEVELOPMENT.md` |
-| Feature implementation detail | `project_context/<feature>.md` |
-| UI design tokens | `project_context/design-tokens.md` |
+| How to run / migrate / verify | `DEVELOPMENT.md` |
+| A specific feature's detail | `project_context/<feature>.md` — pick from PROJECT_CONTEXT → Feature Index |
+| UI components (paths, props, variants) | `project_context/components.md` |
+| Design tokens (colors, type, spacing) | `project_context/design-tokens.md` |
+| First-time setup | `project_context/installation-guide.md` |
+| Frontend (Next.js) config | `project_context/nextjs-setup.md` |
+
+**Current feature docs** (under `project_context/`): `admin-auth`, `product-management`, `banner-management`, `home-section-settings`, `business-card`, `components`, `design-tokens`, `installation-guide`, `nextjs-setup`.
+
+**Rule:** docs describe the built system + Known Gaps. If a doc conflicts with the code, trust the code and tell the user. Docs last synced: 2026-07-19.
 
 ---
 

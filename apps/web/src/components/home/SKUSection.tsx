@@ -98,23 +98,20 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
   const greetingFooter = settings?.greeting_footer_text || "เริ่มต้นง่าย • เหมาะสำหรับของขวัญทั่วไป";
 
   return (
-    <section className="relative py-16 lg:py-24 bg-[var(--card)]" id="pricing">
+    <section className="relative py-16 sm:py-20 lg:py-24 bg-[var(--card)]" id="pricing">
       <div className="mx-auto w-full max-w-7xl px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-slide-up">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--primary-soft)] rounded-full mb-4">
-            <span className="text-[var(--primary)] text-sm font-medium">ของขวัญวันเกิด • ครบรอบ • อำลา • นามบัตร</span>
-          </div>
-          <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--foreground)] mb-4">
+        <div className="text-center mb-12 sm:mb-16 animate-slide-up">
+          <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-bold text-[var(--foreground)] mb-4">
             {title}
           </h2>
           <p className="text-lg text-[var(--muted)] max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: subtitle }} />
         </div>
 
         {/* Product Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 mb-16">
           {/* Express Card */}
-          <div className="relative group bg-[var(--card)] rounded-2xl border-2 border-[var(--border)] p-8 transition-all duration-300 hover:border-[var(--primary)] hover:shadow-2xl hover:-translate-y-2 animate-slide-in">
+          <div className="relative group bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 transition-all duration-300 hover:border-[var(--primary)] hover:shadow-xl hover:-translate-y-1 animate-slide-in">
             {/* Glow Effect on Hover */}
             <div className="absolute inset-0 rounded-2xl bg-[var(--primary)]/0 group-hover:bg-[var(--primary)]/5 transition-all duration-300 -z-10 blur-xl"></div>
             
@@ -129,46 +126,46 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
             <div className="space-y-6">
               {/* Header */}
               <div>
-                <div className="text-5xl mb-4">{expressEmoji}</div>
-                <h3 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-2">
+                <div className="w-11 h-11 mb-3 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center text-2xl">{expressEmoji}</div>
+                <h3 className="text-lg lg:text-xl font-bold text-[var(--foreground)] mb-1">
                   {expressName}
                 </h3>
-                <p className="text-lg text-[var(--primary)] font-medium mb-3">
+                <p className="text-sm text-[var(--primary)] font-medium mb-2">
                   {expressTagline}
                 </p>
-                <p className="text-base text-[var(--muted)] leading-relaxed">
+                <p className="text-sm text-[var(--muted)] leading-relaxed">
                   {expressDesc}
                 </p>
               </div>
 
               {/* Features */}
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{expressF1}</span>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--primary)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{expressF1}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{expressF2}</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--primary)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{expressF2}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{expressF3}</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--primary)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{expressF3}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Heart className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5 fill-[var(--primary)]" />
-                  <span className="text-[var(--muted)] text-base">{expressF4}</span>
+                <li className="flex items-start gap-2.5">
+                  <Heart className="w-4 h-4 text-[var(--primary)] flex-shrink-0 mt-0.5 fill-[var(--primary)]" />
+                  <span className="text-[var(--muted)] text-sm">{expressF4}</span>
                 </li>
               </ul>
 
               {/* CTA */}
-              <div className="pt-4">
+              <div className="pt-1">
                 <Link href={expressBtnLink}>
                   <Button variant="primary" fullWidth>
                     {expressBtnText}
                   </Button>
                 </Link>
-                <p className="text-center text-sm text-[var(--subtle)] mt-3">
+                <p className="text-center text-xs text-[var(--subtle)] mt-2.5">
                   {expressFooter}
                 </p>
               </div>
@@ -176,7 +173,7 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
           </div>
 
           {/* Squad Card - Position 2 */}
-          <div className="relative group bg-[var(--card)] rounded-2xl border-2 border-transparent p-8 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-slide-in delay-200" style={{ 
+          <div className="relative group bg-[var(--card)] rounded-2xl border-2 border-transparent p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-slide-in delay-200" style={{ 
             background: 'var(--squad-gradient)',
             backgroundClip: 'padding-box',
             // borderImage: 'var(--squad-gradient) 1'
@@ -208,11 +205,11 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
             <div className="space-y-6 relative z-10">
               {/* Header */}
               <div>
-                <div className="text-5xl mb-4">{squadEmoji}</div>
-                <h3 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-2">
+                <div className="w-11 h-11 mb-3 rounded-xl bg-[var(--violet)]/10 flex items-center justify-center text-2xl">{squadEmoji}</div>
+                <h3 className="text-lg lg:text-xl font-bold text-[var(--foreground)] mb-1">
                   {squadName}
                 </h3>
-                <p className="text-lg font-medium mb-3" style={{
+                <p className="text-sm font-medium mb-2" style={{
                   background: 'var(--squad-gradient)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -220,39 +217,39 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
                 }}>
                   {squadTagline}
                 </p>
-                <p className="text-base text-[var(--muted)] leading-relaxed mb-3" dangerouslySetInnerHTML={{ __html: squadDesc }} />
+                <p className="text-sm text-[var(--muted)] leading-relaxed mb-3" dangerouslySetInnerHTML={{ __html: squadDesc }} />
               </div>
 
               {/* Features */}
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{squadF1}</span>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--violet)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{squadF1}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{squadF2}</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--violet)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{squadF2}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{squadF3}</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--violet)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{squadF3}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-[var(--violet)] flex-shrink-0 mt-0.5 fill-[var(--violet)]" />
-                  <span className="text-[var(--muted)] text-base">{squadF4}</span>
+                <li className="flex items-start gap-2.5">
+                  <Users className="w-4 h-4 text-[var(--violet)] flex-shrink-0 mt-0.5 fill-[var(--violet)]" />
+                  <span className="text-[var(--muted)] text-sm">{squadF4}</span>
                 </li>
               </ul>
 
               {/* CTA */}
-              <div className="pt-4">
+              <div className="pt-1">
                 <Link href={squadBtnLink}>
-                  <button className="w-full py-3.5 px-6 rounded-xl text-[0.9375rem] font-medium text-white transition-all duration-150 shadow-lg hover:shadow-xl hover:scale-[1.02]" style={{
+                  <button className="w-full py-3 px-6 rounded-xl text-sm font-medium text-white transition-all duration-150 shadow-lg hover:shadow-xl hover:scale-[1.02]" style={{
                     background: 'var(--squad-gradient)'
                   }}>
                     {squadBtnText}
                   </button>
                 </Link>
-                <p className="text-center text-sm text-[var(--subtle)] mt-3">
+                <p className="text-center text-xs text-[var(--subtle)] mt-2.5">
                   {squadFooter}
                 </p>
               </div>
@@ -260,7 +257,7 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
           </div>
 
           {/* Greeting Card - Position 3 (Beginner-Friendly) */}
-          <div className="relative group bg-[var(--card)] rounded-2xl border-2 border-[var(--border)] p-8 transition-all duration-300 hover:border-[var(--amber)] hover:shadow-2xl hover:-translate-y-2 animate-slide-in delay-300">
+          <div className="relative group bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 transition-all duration-300 hover:border-[var(--amber)] hover:shadow-xl hover:-translate-y-1 animate-slide-in delay-300">
             {/* Glow Effect on Hover */}
             <div className="absolute inset-0 rounded-2xl bg-[var(--amber)]/0 group-hover:bg-[var(--amber)]/5 transition-all duration-300 -z-10 blur-xl"></div>
             
@@ -275,44 +272,44 @@ export const SKUSection = memo(function SKUSection({ settings }: SKUSectionProps
             <div className="space-y-6">
               {/* Header */}
               <div>
-                <div className="text-5xl mb-4">{greetingEmoji}</div>
-                <h3 className="text-2xl lg:text-3xl font-bold text-[var(--foreground)] mb-2">
+                <div className="w-11 h-11 mb-3 rounded-xl bg-[var(--amber)]/10 flex items-center justify-center text-2xl">{greetingEmoji}</div>
+                <h3 className="text-lg lg:text-xl font-bold text-[var(--foreground)] mb-1">
                   {greetingName}
                 </h3>
-                <p className="text-lg text-[var(--amber)] font-medium mb-3">
+                <p className="text-sm text-[var(--amber)] font-medium mb-2">
                   {greetingTagline}
                 </p>
-                <p className="text-base text-[var(--muted)] leading-relaxed" dangerouslySetInnerHTML={{ __html: greetingDesc }} />
+                <p className="text-sm text-[var(--muted)] leading-relaxed" dangerouslySetInnerHTML={{ __html: greetingDesc }} />
               </div>
 
               {/* Features */}
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <CreditCard className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{greetingF1}</span>
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2.5">
+                  <CreditCard className="w-4 h-4 text-[var(--amber)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{greetingF1}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{greetingF2}</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--amber)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{greetingF2}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[var(--muted)] text-base">{greetingF3}</span>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-[var(--amber)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[var(--muted)] text-sm">{greetingF3}</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <Sparkles className="w-5 h-5 text-[var(--amber)] flex-shrink-0 mt-0.5 fill-[var(--amber)]" />
-                  <span className="text-[var(--muted)] text-base">{greetingF4}</span>
+                <li className="flex items-start gap-2.5">
+                  <Sparkles className="w-4 h-4 text-[var(--amber)] flex-shrink-0 mt-0.5 fill-[var(--amber)]" />
+                  <span className="text-[var(--muted)] text-sm">{greetingF4}</span>
                 </li>
               </ul>
 
               {/* CTA */}
-              <div className="pt-4">
+              <div className="pt-1">
                 <Link href={greetingBtnLink}>
                   <Button variant="primary" fullWidth className="!bg-[var(--amber)] hover:!bg-[#D97706] active:!bg-[#B45309]">
                     {greetingBtnText}
                   </Button>
                 </Link>
-                <p className="text-center text-sm text-[var(--subtle)] mt-3">
+                <p className="text-center text-xs text-[var(--subtle)] mt-2.5">
                   {greetingFooter}
                 </p>
               </div>

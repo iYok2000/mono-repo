@@ -49,11 +49,11 @@ export const HowItWorksSection = memo(function HowItWorksSection({ settings }: H
   ];
 
   return (
-    <section className="py-24 lg:py-32 px-6 bg-background" id="how-it-works">
+    <section className="py-16 sm:py-20 lg:py-24 px-6 bg-background" id="how-it-works">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16 lg:mb-20">
-          <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground">
+        <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+          <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-bold text-foreground">
             {title}
           </h2>
           {subtitle && (

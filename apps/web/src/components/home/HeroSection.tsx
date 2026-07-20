@@ -2,10 +2,7 @@
 
 import { memo } from "react";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Check, Play } from "lucide-react";
-import Link from "next/link";
-import { BsPeople } from "react-icons/bs";
-import { FaPeopleArrows } from "react-icons/fa";
+import { ArrowRightCircle, Check, Play, Sparkles } from "lucide-react";
 
 interface HeroSettings {
   badge_text?: string;
@@ -40,7 +37,7 @@ export const HeroSection = memo(function HeroSection({ settings }: HeroSectionPr
 
   return (
     <section className="relative overflow-hidden bg-[var(--background)]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-12">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left: Text Content */}
           <div className="space-y-8">
@@ -54,8 +51,12 @@ export const HeroSection = memo(function HeroSection({ settings }: HeroSectionPr
 
             {/* Main Heading — stagger 1 */}
             <div className="space-y-3 opacity-0 animate-[slide-up_0.7s_ease-out_0.25s_forwards]">
-              <h1 className="text-3xl sm:text-4xl lg:text-[3.25rem] xl:text-[3.5rem] font-extrabold leading-[1.1] tracking-tight">
+              <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-extrabold leading-[1.05] tracking-[-0.01em]">
                 <span className="text-[var(--primary)] inline-block">
+                  <Sparkles
+                    className="inline-block w-[0.85em] h-[0.85em] mr-2 -mt-1 align-middle"
+                    aria-hidden="true"
+                  />
                   {titleHighlight}
                 </span>
                 <br />
@@ -64,7 +65,7 @@ export const HeroSection = memo(function HeroSection({ settings }: HeroSectionPr
                 </span>
               </h1>
 
-              <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] leading-relaxed max-w-xl font-normal">
+              <p className="text-base sm:text-lg text-[var(--muted)] leading-[1.65] max-w-xl font-normal">
                 {subtitle}
               </p>
             </div>
@@ -85,11 +86,15 @@ export const HeroSection = memo(function HeroSection({ settings }: HeroSectionPr
 
             {/* CTA Buttons — stagger 3 */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2 opacity-0 animate-[slide-up_0.6s_ease-out_0.6s_forwards]">
-              <Button icon={<Play className="w-4 h-4" />} variant="large">
+              <Button
+                variant="large"
+                iconAfter={<ArrowRightCircle className="w-5 h-5" />}
+                className="rounded-full hover:scale-[1.04] hover:brightness-110"
+              >
                 {ctaPrimary}
               </Button>
 
-              <Button variant="secondary">{ctaSecondary}</Button>
+              <Button variant="secondary" className="rounded-full">{ctaSecondary}</Button>
 
               <Button icon={<Play className="w-4 h-4" />} variant="link">
                 {ctaTertiary}
